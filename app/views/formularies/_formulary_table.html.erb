@@ -1,0 +1,27 @@
+<table class="table table-dark">
+	<tr>
+		<th scope="col">Brand</th>
+		<th scope="col">Drug</th>
+		<th scope="col">Type</th>
+		<th scope="col">Class</th>
+		<th scope="col">Prior Auth?</th>
+		<th scope="col">Step Therapy</th>
+		<th scope="col">Quantity Limit</th>
+	</tr>
+	<% @formulary_drug_bundle.each do |formulary_drug| %>
+		<tr>
+			<td><%= display_list(formulary_drug.extension.first.valueCodeableConcept.coding) %></td>
+			<td><%= display_list(formulary_drug.code.coding) %></td>
+			<% if formulary_drug.medicineClassification.present? %>
+				<td><%= display_list(formulary_drug.medicineClassification.first.type.coding) %></td>
+				<td><%= display_list(formulary_drug.medicineClassification.first.classification.first.coding) %></td>
+			<% else %>
+				<td></td>
+				<td></td>
+			<% end %>
+			<td><%= yes_no(formulary_drug.extension[PRIOR_AUTH].valueBoolean) %></td>
+			<td><%= yes_no(formulary_drug.extension[STEP_THERAPY].valueBoolean) %></td>
+			<td><%= yes_no(formulary_drug.extension[QUANTITY_LIMIT].valueBoolean) %></td>
+		</tr>
+	<% end %>
+</table>

@@ -1,0 +1,43 @@
+<section class='container'>
+	<section class='row col-12'>
+		<div class='col-12'>
+			<h3 class='float-left text-white'>Covered Drugs</h3>
+			<div class='btn-group float-right mt-2' role='group'>
+				<%= link_to 'Previous', formularies_path(page: 'previous'), class: 'btn btn-outline-primary' %>
+				<%= link_to 'Next', 		formularies_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
+			</div>
+		</div>
+		<table class='table table-dark'>
+			<tr>
+				<th scope='col'>Tier</th>
+				<th scope='col'>Drug</th>
+				<% if false %>
+					<th scope='col'>Type</th>
+					<th scope='col'>Class</th>
+				<% end %>
+				<th scope='col'>Prior Auth</th>
+				<th scope='col'>Step Therapy</th>
+				<th scope='col'>Quantity Limit</th>
+			</tr>
+			<% @formulary_drugs.each do |formulary_drug| %>
+				<tr>
+					<td><%= display_list(formulary_drug.extension.first.valueCodeableConcept.coding) %></td>
+					<td><%= display_list(formulary_drug.code.coding) %></td>
+					<% if false %><%#if formulary_drug.medicineClassification.present? %>
+						<td><%= display_list(formulary_drug.medicineClassification.first.type.coding) %></td>
+						<td><%= display_list(formulary_drug.medicineClassification.first.classification.first.coding) %></td>
+					<% end %>
+					<td><%= yes_no(formulary_drug.extension[PRIOR_AUTH].valueBoolean) %></td>
+					<td><%= yes_no(formulary_drug.extension[STEP_THERAPY].valueBoolean) %></td>
+					<td><%= yes_no(formulary_drug.extension[QUANTITY_LIMIT].valueBoolean) %></td>
+				</tr>
+			<% end %>
+		</table>
+		<div class='col-12'>
+			<div class='btn-group float-right mt-2' role='group'>
+				<%= link_to 'Previous', formularies_path(page: 'previous'), class: 'btn btn-outline-primary' %>
+				<%= link_to 'Next', 		formularies_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
+			</div>
+		</div>
+	</section>
+</section>
