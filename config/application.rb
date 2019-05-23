@@ -18,5 +18,3 @@ module FormularyClient
     # the framework and any gems in your application.
   end
 end
-
-#FHIR.logger.level = Logger::ERROR
