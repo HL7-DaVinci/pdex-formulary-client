@@ -66,6 +66,30 @@ table {
 	float: right;
 }
 
+.drug {
+	margin-bottom: 10px;
+}
+
+.prior-auth, .step-therapy, .quantity-limit {
+	display: inline block;
+	padding: 7px 15px;
+	margin-right: 10px;
+	margin-bottom: 30px;
+	border-radius: 20px;
+}
+
+.prior-auth {
+	background-color: #c44;
+}
+
+.step-therapy {
+	background-color: #494;
+}
+
+.quantity-limit {
+	background-color: #39b;
+}
+
 @media (min-width: 200px) and (max-width: 767px) {
 	#server-form {
 		display: block;

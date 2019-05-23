@@ -15,21 +15,28 @@
 					<th scope='col'>Type</th>
 					<th scope='col'>Class</th>
 				<% end %>
-				<th scope='col'>Prior Auth</th>
-				<th scope='col'>Step Therapy</th>
-				<th scope='col'>Quantity Limit</th>
 			</tr>
 			<% @formulary_drugs.each do |formulary_drug| %>
 				<tr>
 					<td><%= display_list(formulary_drug.extension.first.valueCodeableConcept.coding) %></td>
-					<td><%= display_list(formulary_drug.code.coding) %></td>
+					<td>
+						<div class='drug'>
+							<%= display_list(formulary_drug.code.coding) %>
+						</div>
+						<% if formulary_drug.extension[PRIOR_AUTH].valueBoolean %>
+							<span class='prior-auth'>Prior Authorization</span>
+						<% end %>
+						<% if formulary_drug.extension[STEP_THERAPY].valueBoolean %>
+							<span class='step-therapy'>Step Therapy</span>
+						<% end %>
+						<% if formulary_drug.extension[QUANTITY_LIMIT].valueBoolean %>
+							<span class='quantity-limit'>Quantity Limit</span>
+						<% end %>
+					</td>
 					<% if false %><%#if formulary_drug.medicineClassification.present? %>
 						<td><%= display_list(formulary_drug.medicineClassification.first.type.coding) %></td>
 						<td><%= display_list(formulary_drug.medicineClassification.first.classification.first.coding) %></td>
 					<% end %>
-					<td><%= yes_no(formulary_drug.extension[PRIOR_AUTH].valueBoolean) %></td>
-					<td><%= yes_no(formulary_drug.extension[STEP_THERAPY].valueBoolean) %></td>
-					<td><%= yes_no(formulary_drug.extension[QUANTITY_LIMIT].valueBoolean) %></td>
 				</tr>
 			<% end %>
 		</table>
