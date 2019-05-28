@@ -10,7 +10,7 @@ require 'json'
 	
 class FormulariesController < ApplicationController
 
-	before_action :setup_fhir_client, only: [ :index, :show ]
+	before_action :connect_to_server, only: [ :index, :show ]
 
 	#-----------------------------------------------------------------------------
 
@@ -42,24 +42,44 @@ class FormulariesController < ApplicationController
 	private
 	#-----------------------------------------------------------------------------
 
-	def setup_fhir_client
+	# Connect the FHIR client with the specified server and save the connection
+	# for future requests.
+
+	def connect_to_server
 		if params[:server_url].present?
 			@@client = FHIR::Client.new(params[:server_url])
 			@@client.use_r4
+		elsif !defined?(@@client)
+			redirect_to root_path, flash: { error: "Please specify a server" }
 		end
 	end
 
 	#-----------------------------------------------------------------------------
 
+	# Performs pagination on the drug formulary list, reading 10 formularies from
+	# the server at a time.
+
 	def update_page(page, bundle)
 		link = nil
 
 		case page
-			when 'previous'
-				link = bundle.previous_link
-			when 'next'
-				link = bundle.next_link
+		when 'previous'
+			bundle = previous_bundle(bundle)
+		when 'next'
+			bundle = bundle.next_bundle
 		end
+
+		return bundle
+	end
+
+	#-----------------------------------------------------------------------------
+
+	# Retrieves the previous 10 formularies from the current position in the 
+	# bundle.  FHIR::Bundle in the fhir-client gem only provides direct support 
+	# for the next bundle, not the previous bundle.
+
+	def previous_bundle(bundle)
+		link = bundle.previous_link
 
 		if link.present?
 			new_bundle = @@client.parse_reply(bundle.class, @@client.default_format, 

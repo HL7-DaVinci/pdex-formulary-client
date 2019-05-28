@@ -14,8 +14,8 @@ module FormularyHelper
 
 	#-----------------------------------------------------------------------------
 
-	def yes_no(boolean)
-		boolean ? "Yes" : "No"
+	def code_list(list)
+		list.map{ |element| element.code }.join(', ')
 	end
 
 end

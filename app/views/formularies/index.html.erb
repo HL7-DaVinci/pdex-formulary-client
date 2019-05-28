@@ -9,16 +9,13 @@
 		</div>
 		<table class='table table-dark'>
 			<tr>
-				<th scope='col'>Tier</th>
 				<th scope='col'>Drug</th>
-				<% if false %>
-					<th scope='col'>Type</th>
-					<th scope='col'>Class</th>
-				<% end %>
+				<th scope='col'>Tier</th>
+				<th scope='col'>RxNorm</th>
+				<th scope='col'>ID</th>
 			</tr>
 			<% @formulary_drugs.each do |formulary_drug| %>
 				<tr>
-					<td><%= display_list(formulary_drug.extension.first.valueCodeableConcept.coding) %></td>
 					<td>
 						<div class='drug'>
 							<%= display_list(formulary_drug.code.coding) %>
@@ -33,10 +30,9 @@
 							<span class='quantity-limit'>Quantity Limit</span>
 						<% end %>
 					</td>
-					<% if false %><%#if formulary_drug.medicineClassification.present? %>
-						<td><%= display_list(formulary_drug.medicineClassification.first.type.coding) %></td>
-						<td><%= display_list(formulary_drug.medicineClassification.first.classification.first.coding) %></td>
-					<% end %>
+					<td><%= display_list(formulary_drug.extension.first.valueCodeableConcept.coding) %></td>
+					<td><%= code_list(formulary_drug.code.coding) %></td>
+					<td><%= formulary_drug.id %></td>
 				</tr>
 			<% end %>
 		</table>
