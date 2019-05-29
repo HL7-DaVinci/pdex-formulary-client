@@ -8,11 +8,15 @@
 
 module FormularyHelper
 
+	# Concatenates a list of display elements.
+
 	def display_list(list)
 		list.map{ |element| element.display }.join(', ')
 	end
 
 	#-----------------------------------------------------------------------------
+
+	# Concatenates a list of code elements.
 
 	def code_list(list)
 		list.map{ |element| element.code }.join(', ')

@@ -92,6 +92,10 @@ table {
 	background-color: #39b;
 }
 
+.messages {
+	margin-bottom: -100px;
+}
+
 @media (min-width: 200px) and (max-width: 767px) {
 	#server-form {
 		display: block;

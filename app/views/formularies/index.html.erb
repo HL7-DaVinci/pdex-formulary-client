@@ -14,24 +14,25 @@
 				<th scope='col'>RxNorm</th>
 				<th scope='col'>ID</th>
 			</tr>
-			<% @formulary_drugs.each do |formulary_drug| %>
+			<% @formulary_drugs.each do |formulary_drug_resource| %>
+				<% formulary_drug = FormularyDrug.new(formulary_drug_resource) %>
 				<tr>
 					<td>
 						<div class='drug'>
-							<%= display_list(formulary_drug.code.coding) %>
+							<%= formulary_drug.drug_name %>
 						</div>
-						<% if formulary_drug.extension[PRIOR_AUTH].valueBoolean %>
+						<% if formulary_drug.prior_auth %>
 							<span class='prior-auth'>Prior Authorization</span>
 						<% end %>
-						<% if formulary_drug.extension[STEP_THERAPY].valueBoolean %>
+						<% if formulary_drug.step_therapy %>
 							<span class='step-therapy'>Step Therapy</span>
 						<% end %>
-						<% if formulary_drug.extension[QUANTITY_LIMIT].valueBoolean %>
+						<% if formulary_drug.quantity_limit %>
 							<span class='quantity-limit'>Quantity Limit</span>
 						<% end %>
 					</td>
-					<td><%= display_list(formulary_drug.extension.first.valueCodeableConcept.coding) %></td>
-					<td><%= code_list(formulary_drug.code.coding) %></td>
+					<td><%= formulary_drug.drug_tier %></td>
+					<td><%= formulary_drug.rxnorm_code %></td>
 					<td><%= formulary_drug.id %></td>
 				</tr>
 			<% end %>
