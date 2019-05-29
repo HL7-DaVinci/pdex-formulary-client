@@ -14,8 +14,8 @@
 				<th scope='col'>RxNorm</th>
 				<th scope='col'>ID</th>
 			</tr>
-			<% @formulary_drugs.each do |formulary_drug_resource| %>
-				<% formulary_drug = FormularyDrug.new(formulary_drug_resource) %>
+			<% @fhir_formularies.each do |fhir_formulary| %>
+				<% formulary_drug = FormularyDrug.new(fhir_formulary) %>
 				<tr>
 					<td>
 						<div class='drug'>

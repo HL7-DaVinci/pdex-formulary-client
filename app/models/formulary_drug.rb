@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-class FormularyDrug
+class FormularyDrug < Resource
 
   include ActiveModel::Model
 
@@ -16,21 +16,23 @@ class FormularyDrug
 
 	#-----------------------------------------------------------------------------
 
-	def initialize(formulary_drug)
-		@id  							= parse_id(formulary_drug)
-		@drug_name				= parse_drug_name(formulary_drug)
-		@drug_tier				= parse_drug_tier(formulary_drug)
-		@rxnorm_code 			= parse_rxnorm_code(formulary_drug)
-		#@drug_class				= parse_drug_class(formulary_drug)
-		@prior_auth 			= parse_prior_auth(formulary_drug)
-		@step_therapy 		= parse_step_therapy(formulary_drug)
-		@quantity_limit		= parse_quantity_limit(formulary_drug)
+	def initialize(fhir_formulary)
+		@id  							= parse_id(fhir_formulary)
+		@drug_name				= parse_drug_name(fhir_formulary)
+		@rxnorm_code 			= parse_rxnorm_code(fhir_formulary)
+		#@drug_class				= parse_drug_class(fhir_formulary)
+
+		parse_extensions(fhir_formulary)
 	end
 	
 	#-----------------------------------------------------------------------------
+	private
+	#-----------------------------------------------------------------------------
 
-	def parse_id(formulary_drug)
-		return formulary_drug.id
+	# Isolates the ID from the formulary drug resource.
+
+	def parse_id(fhir_formulary)
+		return fhir_formulary.id
 	end
 
 	#-----------------------------------------------------------------------------
@@ -38,35 +40,15 @@ class FormularyDrug
 	# Isolates the drug name from the formulary drug resource.  If the drug name
 	# is missing, it posts an error message since it is a required element.
 
-	def parse_drug_name(formulary_drug)
-		if (code = formulary_drug.code).present?
+	def parse_drug_name(fhir_formulary)
+		if (code = fhir_formulary.code).present?
 			if (coding = code.coding).present?
 				value = display_list(coding)
 			else
-				error(formulary_drug, "Formulary drug.code.coding is not specified")
+				value = "code.coding not specified"
 			end
 		else
-			error(formulary_drug, "Formulary drug code is not specified")
-		end
-
-		return value
-	end
-
-	#-----------------------------------------------------------------------------
-
-	def parse_drug_tier(formulary_drug)
-		if formulary_drug.extension.present? && (extension = formulary_drug.extension.first)
-			if (concept = extension.valueCodeableConcept).present?
-				if (coding = concept.coding).present?
-					value = display_list(coding)
-				else
-					error(formulary_drug, "Formulary drug tier value is not specified")
-				end
-			else
-				error(formulary_drug, "Codeable concept for formulary drug tier extension is not present")
-			end
-		else
-			error(formulary_drug, "Formulary drug extension for drug tier is not present")
+			value = "Drug name not specified"
 		end
 
 		return value
@@ -77,61 +59,55 @@ class FormularyDrug
 	# Isolates the RxNorm code from the formulary drug resource.  If the RxNorm
 	# code is missing, it posts an error message since it is a required element.
 
-	def parse_rxnorm_code(formulary_drug)
-		if (code = formulary_drug.code).present?
+	def parse_rxnorm_code(fhir_formulary)
+		if (code = fhir_formulary.code).present?
 			if (coding = code.coding).present?
 				value = code_list(coding)
 			else
-				error(formulary_drug, "Formulary drug.code.coding is not specified") 
+				value = "code.coding not specified" 
 			end
 		else
-			error(formulary_drug, "Formulary drug code is not specified")
+			value = "RxNorm code not specified"
 		end
 
 		return value
 	end
 
-	#-----------------------------------------------------------------------------
+ 	#-----------------------------------------------------------------------------
 
-	# Isolates the prior authorization flag from the formulary drug resource.
+ 	# Parses the values within the extensions defined by the formulary drug 
+ 	# resource.
 
-	def parse_prior_auth(formulary_drug)
-		if (prior_auth_element = formulary_drug.extension[PRIOR_AUTH]).present?
-			value = prior_auth_element.valueBoolean
+	def parse_extensions(fhir_formulary)
+		extensions = fhir_formulary.extension
+		if extensions.present?
+			extensions.each do |extension|
+				if extension.url.include?("DrugTierID")
+					@drug_tier = parse_drug_tier(extension)
+				elsif extension.url.include?("PriorAuthorization")
+					@prior_auth = extension.valueBoolean
+				elsif extension.url.include?("StepTherapyLimit")
+					@step_therapy = extension.valueBoolean
+				elsif extension.url.include?("QuantityLimit")
+					@quantity_limit = extension.valueBoolean
+				end
+			end
 		else
-			warning(formulary_drug, "Prior authorization element not specified")
+			@drug_tier = "Required extensions not specified"
 		end
-
-		return value
 	end
 
 	#-----------------------------------------------------------------------------
 
-	# Isolates the step therapy flag from the formulary drug resource
-
-	def parse_step_therapy(formulary_drug)
-		if (step_therapy_element = formulary_drug.extension[STEP_THERAPY]).present?
-			value = step_therapy_element.valueBoolean
-		else
-			warning(formulary_drug, "Step therapy element not specified")
-		end
-
-		return value
-	end
-
-	#-----------------------------------------------------------------------------
-
-	# Isolates the quantity limit flag from the formulary drug resource
-
-	def parse_quantity_limit(formulary_drug)
-		if formulary_drug.present?
-			if (quantity_limit_element = formulary_drug.extension[QUANTITY_LIMIT]).present?
-				value = quantity_limit_element.valueBoolean
+	def parse_drug_tier(extension)
+		if (concept = extension.valueCodeableConcept).present?
+			if (coding = concept.coding).present?
+				value = display_list(coding)
 			else
-				warning(formulary_drug, "Quantity limit element not specified")
+				value = "Drug tier not specified"
 			end
 		else
-			warning(formulary_drug, "Formulary drug is not present")
+			value = "Codeable concept not present"
 		end
 
 		return value

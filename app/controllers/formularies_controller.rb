@@ -24,7 +24,7 @@ class FormulariesController < ApplicationController
 			@@bundle = reply.resource
 		end
 
-		@formulary_drugs = @@bundle.entry.map(&:resource)
+		@fhir_formularies = @@bundle.entry.map(&:resource)
 	end
 
 	#-----------------------------------------------------------------------------
