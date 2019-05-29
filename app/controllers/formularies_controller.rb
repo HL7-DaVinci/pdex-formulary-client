@@ -20,7 +20,12 @@ class FormulariesController < ApplicationController
 		if params[:page].present?
 			@@bundle = update_page(params[:page], @@bundle)
 		else
-			reply = @@client.search(FHIR::MedicationKnowledge)
+			if params[:drug_tier].present? && params[:drug_tier] != 'All'
+				reply = @@client.search(FHIR::MedicationKnowledge, 
+											search: { parameters: { classification: params[:drug_tier] } })
+			else
+				reply = @@client.search(FHIR::MedicationKnowledge)
+			end
 			@@bundle = reply.resource
 		end
 
