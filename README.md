@@ -36,6 +36,14 @@ Users that would like to try out the client before installing locally can use th
 
 The client has been tested on the latest versions of Chrome and Safari.  
 
+
+## Building Releases
+
+Official releases are built automatically, but you may test the process or roll your own similar to the following:
+
+    docker build -t hspc/davinci-pdex-formulary-client:latest .
+    docker run -it --name davinci-pdex-formulary-client -p 3000:3000 --rm hspc/davinci-pdex-formulary-client:latest
+
 ## License
 
 Copyright 2019 The MITRE Corporation
