@@ -33,9 +33,11 @@ RUN gem install -N bundler && bundle install --jobs 8
 COPY . .
 
 # We'll run in production mode by default.
-ENV RAILS_ENV=production
+# FIXME: https://github.com/HL7-DaVinci/pdex-formulary-client/issues/1
+# ENV RAILS_ENV=production
 
 # Showtime!
 EXPOSE 3000
-CMD bundle exec rails s
+CMD puma
+# CMD bundle exec rails s
 #puma -C puma.rb
