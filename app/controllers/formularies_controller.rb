@@ -54,6 +54,7 @@ class FormulariesController < ApplicationController
 		if params[:server_url].present?
 			@@client = FHIR::Client.new(params[:server_url])
 			@@client.use_r4
+			cookies[:server_url] = params[:server_url]
 		elsif !defined?(@@client)
 			redirect_to root_path, flash: { error: "Please specify a formulary server" }
 		end
