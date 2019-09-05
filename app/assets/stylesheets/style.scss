@@ -46,12 +46,17 @@ footer {
 	}
 }
 
-#server-form {
+.welcome-form {
 	margin: 0 auto;
 
-	.form-control {
+	.form-control,
+	.drug-tier-select {
 		width: 600px;
 	}
+}
+
+.welcome-text {
+	text-align: center;
 }
 
 .container {
@@ -72,8 +77,8 @@ table {
 }
 
 .drug-tier-select {
-	width: 100% !important;
-	margin-right: 15px !important;
+// 	width: 100% !important;
+	// margin-right: 15px !important;
 }
 
 .prior-auth, .step-therapy, .quantity-limit {
@@ -102,11 +107,11 @@ table {
 }
 
 @media (min-width: 200px) and (max-width: 767px) {
-	#server-form {
+	.welcome-form {
 		display: block;
 		margin: 0 auto;
 
-		.form-control, .btn {
+		.form-control, .drug-tier-select, .btn {
 			width: 300px;
 			margin-bottom: 10px;
 		}

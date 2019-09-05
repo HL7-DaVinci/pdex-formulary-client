@@ -1,28 +1,28 @@
 <section class='container'>
-	<section class='row col-12'>
-		<% if @client %>
-			<p class="text-success m-auto">Connected to <%= cookies[:server_url] -%><p>
-		<%else%>
-			<p class="text-danger m-auto">No Connection Established</p>
-		<% end %>
-	</section>
-	<section class='row col-12 mt-2 mb-5'>
-		<%= form_tag root_path, method: 'get', class: 'form-inline', id: 'server-form' do %>
+	<% if @client %>
+		<p class="text-success m-auto" style='text-align: center'>Connected to <%= cookies[:server_url] -%></p>
+	<%else%>
+		<p class="text-danger m-auto" style='text-align: center'>No Connection Established</p>
+	<% end %>
+	<h2 class="text-light welcome-text">Connect to a Formulary server</h2>
+	<section class='row col-12 mb-5'>
+		<%= form_tag root_path, method: 'get', class: 'form-inline welcome-form', id: 'server-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-7'>
 				<%= text_field_tag :server_url, nil, class: 'form-control',
 							placeholder: 'http://your-formulary-server.org' %>
 			</div>
-			<%= button_tag class: 'btn btn-primary col-md-2', id: 'formulary-url' do %>
+			<%= button_tag class: 'btn btn-primary col-md-2', id: 'server-url' do %>
 				Connect
 			<% end %>
 			<div class='col'></div>
 		<% end %>
 	</section>
-	<section class="row col-12">
-		<div class='col'></div>
-		<%= form_tag formularies_path, method: 'get', class: 'form-inline col-md-8', id: 'formulary-form' do %>
-			<div class='form-group col-md-9'>
+	<h2 class="text-light welcome-text">Look up Formularies by Drug Tier</h2>
+	<section class='row col-12 mb-5'>
+		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
+			<div class='col'></div>
+			<div class='form-group col-md-7'>
 				<%= select_tag(:drug_tier, options_for_select([['All', 'All'], 
 												['Generic', 'GENERIC'],
 												['Preferred Brand', 'PREFERRED-BRAND'], 
@@ -34,11 +34,23 @@
 												class: 'custom-select drug-tier-select',
 												id: 'inlineFormCustomSelect') %>
 			</div>
-
-			<%= button_tag class: 'btn btn-primary col-md-3', id: 'formulary-url', disabled: @client.nil? do %>
+			<%= button_tag class: 'btn btn-primary col-md-2', id: 'formulary-url', disabled: @client.nil? do %>
 				Lookup
 			<% end %>
+			<div class='col'></div>
 		<% end %>
-		<div class='col'></div>
+	</section>
+	<h2 class="text-light welcome-text">Search Coverage Plans</h2>
+	<section class='row col-12 mt-2 mb-2'>
+		<%= form_tag root_path, method: 'get', class: 'form-inline welcome-form', id: 'server-form' do %>
+			<div class='col'></div>
+			<div class='form-group col-md-7'>
+				<%= text_field_tag :server_url, nil, class: 'form-control' %>
+			</div>
+			<%= button_tag class: 'btn btn-primary col-md-2', id: 'server-url', disabled: @client.nil? do %>
+				Search
+			<% end %>
+			<div class='col'></div>
+		<% end %>
 	</section>
 </section>
