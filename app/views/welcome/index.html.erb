@@ -1,18 +1,28 @@
 <section class='container'>
 	<section class='row col-12'>
+		<% if @client %>
+			<p class="text-success m-auto">Connected to <%= cookies[:server_url] -%><p>
+		<%else%>
+			<p class="text-danger m-auto">No Connection Established</p>
+		<% end %>
+	</section>
+	<section class='row col-12 mt-2 mb-5'>
 		<%= form_tag root_path, method: 'get', class: 'form-inline', id: 'server-form' do %>
+			<div class='col'></div>
 			<div class='form-group col-md-7'>
-				<%= text_field_tag :server_url, cookies[:server_url], class: 'form-control',
+				<%= text_field_tag :server_url, nil, class: 'form-control',
 							placeholder: 'http://your-formulary-server.org' %>
 			</div>
 			<%= button_tag class: 'btn btn-primary col-md-2', id: 'formulary-url' do %>
 				Connect
 			<% end %>
+			<div class='col'></div>
 		<% end %>
 	</section>
 	<section class="row col-12">
-		<%= form_tag formularies_path, method: 'get', class: 'form-inline', id: 'formulary-form' do %>
-			<div class='form-group col-md-3'>
+		<div class='col'></div>
+		<%= form_tag formularies_path, method: 'get', class: 'form-inline col-md-8', id: 'formulary-form' do %>
+			<div class='form-group col-md-9'>
 				<%= select_tag(:drug_tier, options_for_select([['All', 'All'], 
 												['Generic', 'GENERIC'],
 												['Preferred Brand', 'PREFERRED-BRAND'], 
@@ -25,9 +35,10 @@
 												id: 'inlineFormCustomSelect') %>
 			</div>
 
-			<%= button_tag class: 'btn btn-primary col-md-2', id: 'formulary-url' do %>
+			<%= button_tag class: 'btn btn-primary col-md-3', id: 'formulary-url', disabled: @client.nil? do %>
 				Lookup
 			<% end %>
 		<% end %>
+		<div class='col'></div>
 	</section>
 </section>
