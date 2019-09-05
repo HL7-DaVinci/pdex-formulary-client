@@ -23,7 +23,8 @@ class WelcomeController < ApplicationController
 
 	def connect_to_server
 		if params[:server_url].present? && !ClientConnections.set(session.id, params[:server_url])
-			redirect_to root_path, flash: { error: "Please specify an accurate url to a formulary server" }
+			err = "Connection failed: Ensure provided url points to a valid FHIR server"
+			redirect_to root_path, flash: { error: err }
 			return nil
 		end
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?
