@@ -10,7 +10,7 @@ require 'json'
 	
 class FormulariesController < ApplicationController
 
-	before_action :connect_to_server, only: [ :index, :show ]
+	before_action :check_server_connection, only: [ :index, :show ]
 
 	#-----------------------------------------------------------------------------
 
@@ -21,10 +21,10 @@ class FormulariesController < ApplicationController
 			@@bundle = update_page(params[:page], @@bundle)
 		else
 			if params[:drug_tier].present? && params[:drug_tier] != 'All'
-				reply = @@client.search(FHIR::MedicationKnowledge, 
+				reply = @client.search(FHIR::MedicationKnowledge, 
 											search: { parameters: { classification: params[:drug_tier] } })
 			else
-				reply = @@client.search(FHIR::MedicationKnowledge)
+				reply = @client.search(FHIR::MedicationKnowledge)
 			end
 			@@bundle = reply.resource
 		end
@@ -37,7 +37,7 @@ class FormulariesController < ApplicationController
 	# GET /formularies/[id]
 
 	def show
-		reply = @@client.search(FHIR::MedicationKnowledge, 
+		reply = @client.search(FHIR::MedicationKnowledge, 
 											search: { parameters: { id: params[:id] } })
 		byebug
 		byebug
@@ -47,16 +47,12 @@ class FormulariesController < ApplicationController
 	private
 	#-----------------------------------------------------------------------------
 
-	# Connect the FHIR client with the specified server and save the connection
-	# for future requests.
+	# Check that this session has an established FHIR client connection.
+	# Specifically, sets @client and redirects home if nil.
 
-	def connect_to_server
-		if params[:server_url].present?
-			@@client = FHIR::Client.new(params[:server_url])
-			@@client.use_r4
-			cookies[:server_url] = params[:server_url]
-		elsif !defined?(@@client)
-			redirect_to root_path, flash: { error: "Please specify a formulary server" }
+	def check_server_connection
+		unless @client = ClientConnections.get(session.id)
+			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
 		end
 	end
 
@@ -88,8 +84,8 @@ class FormulariesController < ApplicationController
 		link = bundle.previous_link
 
 		if link.present?
-			new_bundle = @@client.parse_reply(bundle.class, @@client.default_format, 
-									@@client.raw_read_url(link.url))
+			new_bundle = @client.parse_reply(bundle.class, @client.default_format, 
+									@client.raw_read_url(link.url))
 			bundle = new_bundle unless new_bundle.nil?
 		end
 
