@@ -41,13 +41,15 @@
 		<% end %>
 	</section>
 	<h2 class="text-light welcome-text">Search Coverage Plans</h2>
-	<section class='row col-12 mt-2 mb-2'>
-		<%= form_tag root_path, method: 'get', class: 'form-inline welcome-form', id: 'server-form' do %>
+	<section class='row col-12 mb-5'>
+		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'coverage-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-7'>
-				<%= text_field_tag :server_url, nil, class: 'form-control' %>
+				<%= select_tag(:coverage, options_for_select(@cp_options),
+												class: 'custom-select coverage-select',
+												id: 'inlineFormCustomSelect') %>
 			</div>
-			<%= button_tag class: 'btn btn-primary col-md-2', id: 'server-url', disabled: @client.nil? do %>
+			<%= button_tag class: 'btn btn-primary col-md-2', id: 'coverage-url', disabled: @client.nil? do %>
 				Search
 			<% end %>
 			<div class='col'></div>

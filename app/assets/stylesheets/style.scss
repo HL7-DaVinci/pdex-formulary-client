@@ -49,8 +49,7 @@ footer {
 .welcome-form {
 	margin: 0 auto;
 
-	.form-control,
-	.drug-tier-select {
+	.form-control, .drug-tier-select, .coverage-select {
 		width: 600px;
 	}
 }
