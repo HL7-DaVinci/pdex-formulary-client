@@ -6,6 +6,7 @@ class ClientConnections
         begin
             client = FHIR::Client.new(url)
             client.use_r4
+            raise 'Not a valid FHIR server' unless client.capability_statement
         rescue
             return nil
         end
