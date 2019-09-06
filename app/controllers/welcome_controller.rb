@@ -38,8 +38,10 @@ class WelcomeController < ApplicationController
 	def coverage_plans
 		begin
 			profile_url = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-			reply = @client.read(FHIR::List, nil, "true", profile_url).resource
-			options = reply.entry.collect{|entry| [entry.resource.title, entry.resource.id]}.unshift(["All", "All"])
+			# reply = @client.read(FHIR::List, nil, "true", profile_url).resource # Summary does not include identifier
+			reply = @client.read(FHIR::List, nil, nil, profile_url).resource
+			options = reply.entry.collect{|entry| [entry.resource.title, entry.resource.identifier.first.value]}
+			options.unshift(["All", ""])
 		rescue => exception
 			options = [["N/A (Must connect first)", "-"]]
 		end
