@@ -39,7 +39,7 @@ class WelcomeController < ApplicationController
 		begin
 			profile_url = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
 			reply = @client.read(FHIR::List, nil, "true", profile_url).resource
-			options = reply.entry.collect{ |entry| [entry.resource.title, entry.resource.id]}
+			options = reply.entry.collect{|entry| [entry.resource.title, entry.resource.id]}.unshift(["All", "All"])
 		rescue => exception
 			options = [["N/A (Must connect first)", "-"]]
 		end

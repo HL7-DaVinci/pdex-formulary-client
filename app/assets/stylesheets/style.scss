@@ -49,9 +49,10 @@ footer {
 .welcome-form {
 	margin: 0 auto;
 
-	.form-control, .drug-tier-select, .coverage-select {
+	.form-control {
 		width: 600px;
 	}
+
 }
 
 .welcome-text {
@@ -75,8 +76,9 @@ table {
 	margin-bottom: 10px;
 }
 
-.drug-tier-select {
-// 	width: 100% !important;
+.drug-tier-select, .coverage-select {
+	width: inherit !important;
+	// width: 100% !important;
 	// margin-right: 15px !important;
 }
 
@@ -110,13 +112,14 @@ table {
 		display: block;
 		margin: 0 auto;
 
-		.form-control, .drug-tier-select, .btn {
-			width: 300px;
+		.form-control, .drug-tier-select, .coverage-select, .btn {
+			width: 300px !important;
 			margin-bottom: 10px;
 		}
 
 		.btn {
 			margin-left: 15px;
 		}
+ 
 	}
 }

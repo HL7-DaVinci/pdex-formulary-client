@@ -18,12 +18,17 @@
 			<div class='col'></div>
 		<% end %>
 	</section>
-	<h2 class="text-light welcome-text">Look up Formularies by Drug Tier</h2>
+	<h2 class="text-light welcome-text">Look up Formularies</h2>
 	<section class='row col-12 mb-5'>
 		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
-			<div class='col'></div>
-			<div class='form-group col-md-7'>
-				<%= select_tag(:drug_tier, options_for_select([['All', 'All'], 
+			<div class='form-group col-md-5'>
+				<%= select_tag(:coverage, options_for_select(@cp_options),
+												prompt: 'Coverage Plan',
+												class: 'custom-select coverage-select',
+												id: 'inlineFormCustomSelect') %>
+			</div>
+			<div class='form-group col-md-5'>
+				<%= select_tag(:drug_tier, options_for_select([['All', ''], 
 												['Generic', 'GENERIC'],
 												['Preferred Brand', 'PREFERRED-BRAND'], 
 												['Non-preferred Brand', 'NON-PREFERRED-BRAND'],
@@ -37,22 +42,6 @@
 			<%= button_tag class: 'btn btn-primary col-md-2', id: 'formulary-url', disabled: @client.nil? do %>
 				Lookup
 			<% end %>
-			<div class='col'></div>
-		<% end %>
-	</section>
-	<h2 class="text-light welcome-text">Search Coverage Plans</h2>
-	<section class='row col-12 mb-5'>
-		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'coverage-form' do %>
-			<div class='col'></div>
-			<div class='form-group col-md-7'>
-				<%= select_tag(:coverage, options_for_select(@cp_options),
-												class: 'custom-select coverage-select',
-												id: 'inlineFormCustomSelect') %>
-			</div>
-			<%= button_tag class: 'btn btn-primary col-md-2', id: 'coverage-url', disabled: @client.nil? do %>
-				Search
-			<% end %>
-			<div class='col'></div>
 		<% end %>
 	</section>
 </section>
