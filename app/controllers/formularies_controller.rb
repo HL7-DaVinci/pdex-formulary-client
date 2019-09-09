@@ -23,8 +23,14 @@ class FormulariesController < ApplicationController
 			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
 			dt = params[:drug_tier].present? ? params[:drug_tier] : ""
 			cp = params[:coverage].present? ? params[:coverage] : ""
-			reply = @client.search(FHIR::MedicationKnowledge, 
-											search: { parameters: { _profile: profile, DrugTier: dt, DrugPlan: cp } })
+			code = params[:code].present? ? params[:code] : ""
+			parameters = {_profile: profile, DrugTier: dt, DrugPlan: cp}
+			parameters[:code] = code unless code.empty?
+			reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { 
+																					_profile: profile,
+																					DrugTier: dt,
+																					DrugPlan: cp,
+																					code: code } })
 			@@bundle = reply.resource
 		end
 
@@ -36,8 +42,7 @@ class FormulariesController < ApplicationController
 	# GET /formularies/[id]
 
 	def show
-		reply = @client.search(FHIR::MedicationKnowledge, 
-											search: { parameters: { id: params[:id] } })
+		reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { id: params[:id] } })
 		byebug
 		byebug
 	end
