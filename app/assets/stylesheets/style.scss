@@ -82,7 +82,7 @@ table {
 	// margin-right: 15px !important;
 }
 
-.col-md-5 { // partially overrides a bootstrap definition, not ideal but works
+.col-md-5 { // partially overrides a bootstrap class, not ideal but works
 	padding-left: 0;
 }
 
@@ -119,6 +119,10 @@ table {
 		.form-control, .drug-tier-select, .coverage-select, .code-input, .btn {
 			width: 300px !important;
 			margin-bottom: 10px;
+		}
+
+		.col-md-5 { // restores bootstrap class to original state
+			padding-left: 15px;
 		}
 
 		.btn {
