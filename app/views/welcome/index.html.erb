@@ -5,7 +5,7 @@
 		<p class="text-danger m-auto" style='text-align: center'>No Connection Established</p>
 	<% end %>
 	<h2 class="text-light welcome-text">Connect to a Formulary server</h2>
-	<section class='row col-12 mb-5'>
+	<section class='row mb-5'>
 		<%= form_tag root_path, method: 'get', class: 'form-inline welcome-form', id: 'server-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-7'>
@@ -18,15 +18,16 @@
 			<div class='col'></div>
 		<% end %>
 	</section>
-	<h2 class="text-light welcome-text">Look up Formularies by Plan and Tier</h2>
-	<section class='row col-12 mb-5'>
+	<h2 class="text-light welcome-text">Lookup Formularies by Plan, Tier and/or RxNorm</h2>
+	<section class='row mb-1'>
 		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
-			<div class='form-group col-md-5'>
+			<div class='col'></div>
+			<div class='form-group col-md-3'>
 				<%= select_tag(:coverage, options_for_select(@cp_options),
 												prompt: 'Coverage Plan',
 												class: 'custom-select coverage-select') %>
 			</div>
-			<div class='form-group col-md-5'>
+			<div class='form-group col-md-3'>
 				<%= select_tag(:drug_tier, options_for_select([['All', ''], 
 												['Generic', 'GENERIC'],
 												['Preferred Brand', 'PREFERRED-BRAND'], 
@@ -37,25 +38,34 @@
 												prompt: 'Drug Tier',
 												class: 'custom-select drug-tier-select') %>
 			</div>
+			<div class='form-group col-md-3'>
+				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
+			</div>
 			<%= button_tag class: 'btn btn-primary col-md-2', id: 'formulary-url', disabled: @client.nil? do %>
 				Lookup
 			<% end %>
+			<div class='col'></div>
 		<% end %>
 	</section>
+	<p class='text-light welcome-text m-auto'>
+		All of the above are optional, "Lookup" will display the intersection of defined terms
+	</p>
+	<!--
 	<h2 class="text-light welcome-text">Look up a Formulary by Plan and RxNorm Code</h2>
 	<section class='row col-12 mb-5'>
-		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'code-form' do %>
+		<%#= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'code-form' do %>
 			<div class='form-group col-md-5'>
-				<%= select_tag(:coverage, options_for_select(@cp_options),
+				<%#= select_tag(:coverage, options_for_select(@cp_options),
 												prompt: 'Coverage Plan',
 												class: 'custom-select coverage-select') %>
 			</div>
 			<div class='form-group col-md-5'>
-				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
+				<%#= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
 			</div>
-			<%= button_tag class: 'btn btn-primary col-md-2', id: 'code-url', disabled: @client.nil? do %>
+			<%#= button_tag class: 'btn btn-primary col-md-2', id: 'code-url', disabled: @client.nil? do %>
 				Lookup
-			<% end %>
-		<% end %>
+			<%# end %>
+		<%# end %>
 	</section>
+	-->
 </section>

@@ -21,16 +21,11 @@ class FormulariesController < ApplicationController
 			@@bundle = update_page(params[:page], @@bundle)
 		else
 			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			dt = params[:drug_tier].present? ? params[:drug_tier] : ""
-			cp = params[:coverage].present? ? params[:coverage] : ""
-			code = params[:code].present? ? params[:code] : ""
-			parameters = {_profile: profile, DrugTier: dt, DrugPlan: cp}
-			parameters[:code] = code unless code.empty?
-			reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { 
-																					_profile: profile,
-																					DrugTier: dt,
-																					DrugPlan: cp,
-																					code: code } })
+			parameters = {_profile: profile}
+			parameters[:DrugTier] = params[:drug_tier] if params[:drug_tier].present?
+			parameters[:DrugPlan] = params[:coverage] if params[:coverage].present?
+			parameters[:code] = params[:code] if params[:code].present?
+			reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: parameters } )
 			@@bundle = reply.resource
 		end
 

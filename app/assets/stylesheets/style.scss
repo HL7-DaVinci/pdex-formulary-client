@@ -82,7 +82,7 @@ table {
 	// margin-right: 15px !important;
 }
 
-.col-md-5 { // partially overrides a bootstrap class, not ideal but works
+.col-md-3 { // partially overrides a bootstrap class, not ideal but works
 	padding-left: 0;
 }
 
@@ -121,7 +121,7 @@ table {
 			margin-bottom: 10px;
 		}
 
-		.col-md-5 { // restores bootstrap class to original state
+		.col-md-3 { // restores bootstrap class to original state
 			padding-left: 15px;
 		}
 
