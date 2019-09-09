@@ -30,9 +30,9 @@ main > .container {
 footer {
 	background-color: #222;
 	height: 80px;
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
 
 	.copyright {
 		color: #eee;
@@ -76,10 +76,14 @@ table {
 	margin-bottom: 10px;
 }
 
-.drug-tier-select, .coverage-select {
+.drug-tier-select, .coverage-select, .code-input {
 	width: inherit !important;
 	// width: 100% !important;
 	// margin-right: 15px !important;
+}
+
+.col-md-5 { // partially overrides a bootstrap definition, not ideal but works
+	padding-left: 0;
 }
 
 .prior-auth, .step-therapy, .quantity-limit {
@@ -112,7 +116,7 @@ table {
 		display: block;
 		margin: 0 auto;
 
-		.form-control, .drug-tier-select, .coverage-select, .btn {
+		.form-control, .drug-tier-select, .coverage-select, .code-input, .btn {
 			width: 300px !important;
 			margin-bottom: 10px;
 		}
