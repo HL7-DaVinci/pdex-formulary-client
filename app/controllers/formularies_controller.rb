@@ -61,16 +61,8 @@ class FormulariesController < ApplicationController
 	# the server at a time.
 
 	def update_page(page, bundle)
-		link = nil
-
-		case page
-		when 'previous'
-			bundle = previous_bundle(bundle)
-		when 'next'
-			bundle = bundle.next_bundle
-		end
-
-		return bundle
+		new_bundle = page.eql?('previous') ? previous_bundle(bundle) : bundle.next_bundle
+		return (new_bundle.nil? ? bundle : new_bundle)
 	end
 
 	#-----------------------------------------------------------------------------
