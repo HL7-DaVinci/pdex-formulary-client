@@ -23,9 +23,8 @@
 		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-3'>
-				<%= select_tag(:coverage, options_for_select(@cp_options),
-												prompt: 'Coverage Plan',
-												class: 'custom-select coverage-select') %>
+				<%= select_tag(:coverage, options_for_select(@cp_options), 
+								prompt: 'Coverage Plan', class: 'custom-select coverage-select') %>
 			</div>
 			<div class='form-group col-md-3'>
 				<%= select_tag(:drug_tier, options_for_select([['All', ''], 
@@ -48,6 +47,7 @@
 		<% end %>
 	</section>
 	<p class='text-light welcome-text m-auto'>
-		All of the above are optional, "Lookup" will display the intersection of defined terms
+		Each of the above options can be left unspecified. 
+		Pressing "Lookup" will display the intersection of defined options.
 	</p>
 </section>
