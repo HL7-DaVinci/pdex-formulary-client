@@ -12,6 +12,7 @@ class WelcomeController < ApplicationController
 
 	def index
 		@client = ClientConnections.get(session.id)
+		@count = formulary_count
 		@cp_options = coverage_plans
 	end
 
@@ -24,7 +25,8 @@ class WelcomeController < ApplicationController
 
 	def connect_to_server
 		if params[:server_url].present? && !ClientConnections.set(session.id, params[:server_url])
-			err = "Connection failed: Ensure provided url points to a valid FHIR server"
+			err = "Connection failed: Ensure provided url points to a valid FHIR server "
+			err += "that holds at least one Formulary"
 			redirect_to root_path, flash: { error: err }
 			return nil
 		end
@@ -37,14 +39,29 @@ class WelcomeController < ApplicationController
 
 	def coverage_plans
 		begin
-			profile_url = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-			reply = @client.read(FHIR::List, nil, nil, profile_url).resource
+			cp_profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
+			reply = @client.read(FHIR::List, nil, nil, cp_profile).resource
 			options = reply.entry.collect{|entry| [entry.resource.title, entry.resource.identifier.first.value]}
 			options.unshift(["All", ""])
 		rescue => exception
 			options = [["N/A (Must connect first)", "-"]]
 		end
 		options
+	end
+
+	#-----------------------------------------------------------------------------
+
+	# Gets count of formularies in server
+
+	def formulary_count
+		begin
+			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			parameters = { parameters: { _profile: profile, _summary: "count" } }
+			count = @client.search(FHIR::MedicationKnowledge, search: parameters ).resource.total
+		rescue => exception
+			count = 0
+		end
+		count
 	end
 
 end

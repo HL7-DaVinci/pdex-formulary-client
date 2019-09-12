@@ -1,6 +1,8 @@
 <section class='container'>
 	<% if @client %>
-		<p class="text-success m-auto" style='text-align: center'>Connected to <%= cookies[:server_url] -%></p>
+		<p class="text-success m-auto" style='text-align: center'>
+			Connected to <%= cookies[:server_url] -%>, which houses <%= @count %> Formularies
+		</p>
 	<%else%>
 		<p class="text-danger m-auto" style='text-align: center'>No Connection Established</p>
 	<% end %>
