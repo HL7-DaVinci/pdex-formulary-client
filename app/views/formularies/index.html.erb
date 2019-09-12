@@ -1,1 +1,5 @@
-<%= render "untiered" %>
+<% if @fhir_formularies.empty? %>  
+    <%= render "no_formularies" %>
+<% else %>
+    <%= render "untiered" %>
+<% end %>

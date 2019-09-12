@@ -55,7 +55,7 @@ footer {
 
 }
 
-.welcome-text {
+.welcome-text, .no-formularies {
 	text-align: center;
 }
 
@@ -109,6 +109,10 @@ table {
 
 .messages {
 	margin-bottom: -100px;
+}
+
+.no-formularies {
+	margin-top: 100pt;
 }
 
 @media (min-width: 200px) and (max-width: 767px) {
