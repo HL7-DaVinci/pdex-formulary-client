@@ -56,8 +56,8 @@ class WelcomeController < ApplicationController
 	def formulary_count
 		begin
 			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			parameters = { parameters: { _profile: profile, _summary: "count" } }
-			count = @client.search(FHIR::MedicationKnowledge, search: parameters ).resource.total
+			search = { parameters: { _profile: profile, _summary: "count" } }
+			count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
 		rescue => exception
 			count = 0
 		end
