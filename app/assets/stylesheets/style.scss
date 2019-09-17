@@ -59,6 +59,10 @@ footer {
 	text-align: center;
 }
 
+#compare-url {
+	width: 100%;
+}
+
 .container {
 	margin-bottom: 70px;
 	margin-top: 70px;
@@ -78,8 +82,6 @@ table {
 
 .drug-tier-select, .coverage-select, .code-input {
 	width: inherit !important;
-	// width: 100% !important;
-	// margin-right: 15px !important;
 }
 
 .col-md-3 { // partially overrides a bootstrap class, not ideal but works
@@ -125,12 +127,12 @@ table {
 			margin-bottom: 10px;
 		}
 
-		.col-md-3 { // restores bootstrap class to original state
-			padding-left: 15px;
-		}
-
 		.btn {
 			margin-left: 15px;
+		}
+
+		.col-md-3 { // restores bootstrap class to original state
+			padding-left: 15px;
 		}
  
 	}
