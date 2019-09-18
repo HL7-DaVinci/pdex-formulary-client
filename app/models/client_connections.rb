@@ -14,11 +14,17 @@ class ClientConnections
         rescue
             return nil
         end
-        @@clients[id] = client
+        @@clients[id] = Hash.new
+        @@clients[id][:client] = client
     end
 
     def self.get(id)
-        @@clients[id]
+        @@clients[id][:client] if @@clients[id]
+    end
+
+    # sets cache if input is provided, then returns current cache value
+    def self.cache(id, input = nil)
+        input ? @@clients[id][:cache] = input : @@clients[id][:cache]
     end
 
 end
