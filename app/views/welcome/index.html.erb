@@ -30,12 +30,12 @@
 			</div>
 			<div class='form-group col-md-3'>
 				<%= select_tag(:drug_tier, options_for_select([['All', ''], 
-												['Generic', 'GENERIC'],
-												['Preferred Brand', 'PREFERRED-BRAND'], 
-												['Non-preferred Brand', 'NON-PREFERRED-BRAND'],
-												['Specialty', 'SPECIALTY'], 
-												['Non-preferred Brand Specialty', 'NON-PREFERRED-BRAND-SPECIALTY'],
-												['Zero-cost Share Preventive', 'ZERO-COST-SHARE-PREVENTIVE']]),
+												['Generic', 'generic'],
+												['Preferred Brand', 'preferred-brand'], 
+												['Non-preferred Brand', 'non-preferred-brand'],
+												['Specialty', 'specialty'], 
+												['Non-preferred Brand Specialty', 'non-preferred-brand-specialty'],
+												['Zero-cost Share Preventive', 'zero-cost-share-preventative']]),
 												prompt: 'Drug Tier',
 												class: 'custom-select drug-tier-select') %>
 			</div>
