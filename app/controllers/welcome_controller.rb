@@ -25,8 +25,8 @@ class WelcomeController < ApplicationController
 
 	def connect_to_server
 		if params[:server_url].present? && !ClientConnections.set(session.id, params[:server_url])
-			err = "Connection failed: Ensure provided url points to a valid FHIR server "
-			err += "that holds at least one Formulary"
+			err = "Connection failed: Ensure provided url points to a valid FHIR server"
+			err += " that holds at least one Formulary"
 			redirect_to root_path, flash: { error: err }
 			return nil
 		end

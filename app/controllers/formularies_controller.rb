@@ -28,7 +28,6 @@ class FormulariesController < ApplicationController
 			reply = @client.search(FHIR::MedicationKnowledge, search: search )
 			@@bundle = reply.resource
 		end
-
 		@fhir_formularies = @@bundle.entry.map(&:resource)
 	end
 

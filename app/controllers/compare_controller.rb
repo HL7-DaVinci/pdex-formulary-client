@@ -8,7 +8,7 @@ class CompareController < ApplicationController
 
 	def index
 		set_cache
-		sift_fds
+		set_table
 	end
 
 	#-----------------------------------------------------------------------------
@@ -69,11 +69,27 @@ class CompareController < ApplicationController
 	
 	#-----------------------------------------------------------------------------
 
-	# Sifts through formulary drugs based on search term, sets @chosen_fds
+	# Sets @table_headers and @table_rows
+
+	def set_table
+		@table_header = @cache[:cps].collect{ |cp| CoveragePlan.new(cp.title , cp.identifier.first.value) }
+		chosen = sift_fds
+		@table_rows = Hash.new
+		chosen.collect!{ |fd| FormularyDrug.new(fd) }
+		chosen.each do |fd|
+			code = fd.rxnorm_code
+			plan = fd.plan_id
+			@table_rows.has_key?(code) ? @table_rows[code][plan] = fd : @table_rows[code] = {plan => fd}
+		end
+	end
+	
+	#-----------------------------------------------------------------------------
+
+	# Sifts through formulary drugs based on search term, returns chosen fds
 
 	def sift_fds
-		return @chosen_fds = @cache[:fds].clone if params[:search].blank?
-		@chosen_fds = @cache[:fds].select{ |fd| fd.code.coding.display.include?(params[:search]) }
+		return @cache[:fds].clone if params[:search].blank?
+		@cache[:fds].select{ |fd| fd.code.coding.display.include?(params[:search]) }
 	end
 
 end
