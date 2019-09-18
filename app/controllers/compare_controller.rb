@@ -7,12 +7,8 @@ class CompareController < ApplicationController
 	# GET /compare
 
 	def index
-		unless @cache = ClientConnections.cache(session.id)
-			@cache = Hash.new
-			@cache[:cps] = get_all(FHIR::List)
-			@cache[:fds] = get_all(FHIR::MedicationKnowledge)
-			ClientConnections.cache(session.id, @cache)
-		end
+		set_cache
+		sift_fds
 	end
 
 	#-----------------------------------------------------------------------------
@@ -25,6 +21,19 @@ class CompareController < ApplicationController
 	def check_server_connection
 		unless @client = ClientConnections.get(session.id)
 			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
+		end
+	end
+
+	#-----------------------------------------------------------------------------
+
+	# Sets @cache, either with already cached info or by retrieving info and caching it
+
+	def set_cache
+		unless @cache = ClientConnections.cache(session.id)
+			@cache = Hash.new
+			@cache[:cps] = get_all(FHIR::List)
+			@cache[:fds] = get_all(FHIR::MedicationKnowledge)
+			ClientConnections.cache(session.id, @cache)
 		end
 	end
 
@@ -52,14 +61,19 @@ class CompareController < ApplicationController
 		search = { search: { parameters: { _count: count } } }
         replies = [].push(@client.search(klass, search).resource)
 		while replies.last
-			begin
-				replies.push(replies.last.next_bundle)
-			rescue
-				replies.push(nil)
-			end
+			replies.push(replies.last.next_bundle)
         end
         replies.compact!
         replies.present? ? replies : nil
-    end
+	end
+	
+	#-----------------------------------------------------------------------------
+
+	# Sifts through formulary drugs based on search term, sets @chosen_fds
+
+	def sift_fds
+		return @chosen_fds = @cache[:fds].clone if params[:search].blank?
+		@chosen_fds = @cache[:fds].select{ |fd| fd.code.coding.display.include?(params[:search]) }
+	end
 
 end
