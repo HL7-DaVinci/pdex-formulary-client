@@ -17,3 +17,39 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require_tree .
+
+(function($) {
+
+    window.progress = {
+
+        compareLoading: function() {
+            $('#compare-url').click(function() {
+                if (!$('#compare-progress-bar-container').hasClass('show')) {
+                    $('#compare-progress-bar-container').addClass('show');
+                    var fds = parseFloat($('.client-connected').text().match(/(\d+)(?!.*\d)/)[0]);
+                    var percent = 0.0;
+                    var update = setInterval(function() {
+                        if (percent > 99.5) {
+                            clearInterval(update);
+                        } else {
+                            try {
+                                percent += (400.0 / fds);
+                                $('.compare-progress-bar')
+                                        .attr('aria-valuenow', percent.toFixed(2))
+                                        .css('width', percent.toFixed(2) + '%')
+                                        .text(percent.toFixed(2) + '%');
+                            } catch {
+                                clearInterval(update);
+                            }
+                        }
+                    }, 25);
+                    
+                }
+            })
+        },
+
+    }
+
+    $(document).on('turbolinks:load', window.progress.compareLoading);
+
+})(jQuery)

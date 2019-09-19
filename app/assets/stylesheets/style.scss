@@ -56,6 +56,10 @@ footer {
 
 }
 
+.client-connected {
+	text-align: center;
+}
+
 .welcome-text, .no-formularies {
 	text-align: center;
 }
@@ -116,6 +120,11 @@ table {
 
 .no-formularies {
 	margin-top: 100pt;
+}
+
+#compare-progress-bar-container {
+	width: 90%;
+	margin: 8pt auto 3pt;
 }
 
 .compare-table-container {
