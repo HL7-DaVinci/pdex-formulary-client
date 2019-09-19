@@ -52,7 +52,10 @@
 	<section class='row mb-1'>
 		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-form' do %>
 			<div class='col'></div>
-			<%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-12', id: 'compare-url', disabled: @client.nil? %>
+			<div class='form-group col-md-7'>
+				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Search by drug name' %>
+			</div>
+			<%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', id: 'compare-url', disabled: @client.nil? %>
 			<div class='col'></div>
 		<% end %>
 	</section>

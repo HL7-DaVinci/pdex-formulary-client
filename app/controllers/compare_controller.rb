@@ -89,7 +89,7 @@ class CompareController < ApplicationController
 
 	def sift_fds
 		return @cache[:fds].clone if params[:search].blank?
-		@cache[:fds].select{ |fd| fd.code.coding.display.include?(params[:search]) }
+		@cache[:fds].select{ |fd| fd.code.coding.first.display.include?(params[:search]) }
 	end
 
 end
