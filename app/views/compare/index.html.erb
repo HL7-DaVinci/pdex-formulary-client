@@ -1,20 +1,24 @@
 <section>
-    <table class='table table-dark'>
-		<tr>
-			<th scope='col'>Drug</th>
-            <% @table_header.each do |cp| %>
-			    <th scope='col'><%= cp.name -%></th>
+    <div class='compare-table-container'>
+        <table class='table table-dark compare-table'>
+            <thead>
+    	        <tr>
+		            <th scope='col' class='compare-drug-col compare-table-header' id="compare-drug-header">Drug</th>
+                    <% @table_header.each do |cp| %>
+			            <th scope='col' class='compare-table-header compare-col'><%= cp.name -%></th>
+                    <% end %>
+    	    	</tr>
+            </thead>
+    		<% @table_rows.each do |code, plan_hash| %>
+	    	    <tr>
+	        	    <td class='compare-drug-col'>
+                        <%= plan_hash.values.first.drug_name -%>
+        		    </td>
+                    <% @table_header.each do |cp| %>
+		                <td class="compare-col drug<%= "-not" unless plan_hash.has_key?(cp.id) -%>-in-plan"></td>
+                    <% end %>
+	        	</tr>
             <% end %>
-		</tr>
-		<% @table_rows.each do |code, plan_hash| %>
-			<tr>
-				<td>
-                    <%= plan_hash.values.first.drug_name -%>
-				</td>
-                <% @table_header.each do |cp| %>
-			        <td style="background-color: <%= plan_hash.has_key?(cp.id) ? "#00ff00" : "#ff0000" -%>"></td>
-                <% end %>
-			</tr>
-		<% end %>
-	</table>
+        </table>
+    </div>
 </section>

@@ -33,6 +33,7 @@ footer {
 	position: fixed;
 	bottom: 0px;
 	width: 100%;
+	z-index: 2;
 
 	.copyright {
 		color: #eee;
@@ -115,6 +116,59 @@ table {
 
 .no-formularies {
 	margin-top: 100pt;
+}
+
+.compare-table-container {
+	width: 90%;
+	height: calc(100% - 150pt);
+	height: -webkit-calc(100% - 150pt);
+	height: -moz-calc(100% - 150pt);
+	height: -o-calc(100% - 150pt);
+	position: fixed;
+	overflow: auto;
+	margin: 75pt 5%;
+}
+
+.compare-table {
+	width: inherit;
+	table-layout: fixed;
+	margin: 0 auto;
+	th {
+		background-color: #343A40
+	}
+}
+
+.compare-drug-col{
+	width: 275pt;
+	position: sticky;
+	left: 0;
+	z-index: 1;
+	background-color: #343A40;
+}
+
+thead tr th.compare-table-header {
+	position: sticky;
+	top: 0;
+	border-width: 1px;
+	border-color: #454D55;
+	border-top: 0;
+}
+
+.compare-col {
+	width: 140pt;
+}
+
+#compare-drug-header {
+	z-index: 2;
+	background: #242A30
+}
+
+.drug-in-plan {
+	background-color: #06e080
+}
+
+.drug-not-in-plan {
+	background-color: #c45b67
 }
 
 @media (min-width: 200px) and (max-width: 767px) {
