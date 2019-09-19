@@ -27,4 +27,8 @@ class ClientConnections
         input ? @@clients[id][:cache] = input : @@clients[id][:cache]
     end
 
+    def self.cache_nil?(id)
+        @@clients[id].nil? || @@clients[id][:cache].nil?
+    end
+
 end

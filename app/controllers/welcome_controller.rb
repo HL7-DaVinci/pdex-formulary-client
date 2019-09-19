@@ -14,6 +14,7 @@ class WelcomeController < ApplicationController
 		@client = ClientConnections.get(session.id)
 		@count = formulary_count
 		@cp_options = coverage_plans
+		@cache_nil = ClientConnections.cache_nil?(session.id)
 	end
 
 	#-----------------------------------------------------------------------------
