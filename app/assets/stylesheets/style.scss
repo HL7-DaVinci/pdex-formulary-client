@@ -122,6 +122,10 @@ table {
 	margin-top: 100pt;
 }
 
+.compare-page-search {
+	margin: 75pt auto 5pt;
+}
+
 #compare-progress-bar-container {
 	width: 90%;
 	margin: 8pt auto 3pt;
@@ -129,13 +133,13 @@ table {
 
 .compare-table-container {
 	width: 90%;
-	height: calc(100% - 150pt);
-	height: -webkit-calc(100% - 150pt);
-	height: -moz-calc(100% - 150pt);
-	height: -o-calc(100% - 150pt);
+	height: calc(100% - 185pt);
+	height: -webkit-calc(100% - 185pt);
+	height: -moz-calc(100% - 185pt);
+	height: -o-calc(100% - 185pt);
 	position: fixed;
 	overflow: auto;
-	margin: 75pt 5%;
+	margin: 0 5% 75pt;
 }
 
 .compare-table {
