@@ -204,4 +204,15 @@ thead tr th.compare-table-header {
 		}
  
 	}
+
+	.compare-table-container {
+		height: calc(100% - 235pt);
+		height: -webkit-calc(100% - 235pt);
+		height: -moz-calc(100% - 235pt);
+		height: -o-calc(100% - 235pt);
+	}
+
+	.compare-drug-col {
+		width: 200pt;
+	}
 }
