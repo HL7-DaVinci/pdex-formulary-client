@@ -118,7 +118,7 @@ class FormularyDrug < Resource
 	#-----------------------------------------------------------------------------
 
 	def display_list(list)
-		list.map{ |element| element.display ? element.display : "Non-preferred Brand Specialty" }.join(', ')
+		list.map{ |element| element.display }.join(', ')
 	end
 
 	#-----------------------------------------------------------------------------
