@@ -79,7 +79,7 @@ class CompareController < ApplicationController
 		chosen.each do |fd|
 			code = fd.rxnorm_code
 			plan = fd.plan_id
-			@table_rows.has_key?(code) ? @table_rows[code][plan] = fd : @table_rows[code] = {plan => fd}
+			@table_rows.has_key?(code) ? @table_rows[code][plan] = fd : @table_rows[code] = { plan => fd }
 		end
 	end
 	
@@ -89,7 +89,7 @@ class CompareController < ApplicationController
 
 	def sift_fds
 		return @cache[:fds].clone if params[:search].blank?
-		@cache[:fds].select{ |fd| fd.code.coding.first.display.include?(params[:search]) }
+		@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
 	end
 
 end
