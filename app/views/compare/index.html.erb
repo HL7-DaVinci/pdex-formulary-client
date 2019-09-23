@@ -26,7 +26,32 @@
                         <%= plan_hash.values.first.drug_name -%>
         		    </td>
                     <% @table_header.each do |cp| %>
-		                <td class="compare-col drug<%= "-not" unless plan_hash.has_key?(cp.id) -%>-in-plan"></td>
+						<% fd = plan_hash[cp.id] %>
+		                <td class="compare-col drug<%= "-not" unless fd -%>-in-plan">
+							<% if fd %>
+								<% if fd.prior_auth %>
+									<div style="display: flex;">
+										<span class='prior-auth-compare'>Prior Authorization</span>
+									</div>
+								<% end %>
+								<% if fd.step_therapy %>
+									<% mtop = fd.prior_auth ? 'compare-buffer' : '' %>
+									<div style="display: flex;">
+										<span class='step-therapy-compare <%= mtop %>'>
+											Step Therapy
+										</span>
+									</div>
+								<% end %>
+								<% if fd && fd.quantity_limit %>
+									<% mtop = fd.prior_auth || fd.step_therapy ? 'compare-buffer' : '' %>
+									<div style="display: flex;">
+										<span class='quantity-limit-compare <%= mtop %>'>
+											Quantity Limit
+										</span>
+									</div>
+								<% end %>
+							<% end %>
+						</td>
                     <% end %>
 	        	</tr>
             <% end %>

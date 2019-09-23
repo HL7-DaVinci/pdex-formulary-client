@@ -93,25 +93,37 @@ table {
 	padding-left: 0;
 }
 
-.prior-auth, .step-therapy, .quantity-limit {
+.prior-auth, .step-therapy, .quantity-limit, 
+.prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
 	float: left;
 	display: inline block;
 	padding: 7px 15px;
-	margin-right: 10px;
-	margin-bottom: 10px;
 	border-radius: 20px;
 }
 
-.prior-auth {
+.prior-auth, .step-therapy, .quantity-limit {
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
+	margin: 0pt auto;
+}
+
+.prior-auth, .prior-auth-compare {
 	background-color: #c44;
 }
 
-.step-therapy {
+.step-therapy, .step-therapy-compare {
 	background-color: #494;
 }
 
-.quantity-limit {
+.quantity-limit, .quantity-limit-compare {
 	background-color: #39b;
+}
+
+.compare-buffer {
+	margin-top: 3pt;
 }
 
 .messages {
@@ -169,7 +181,7 @@ thead tr th.compare-table-header {
 }
 
 .compare-col {
-	width: 140pt;
+	width: 150pt;
 }
 
 #compare-drug-header {
@@ -213,6 +225,6 @@ thead tr th.compare-table-header {
 	}
 
 	.compare-drug-col {
-		width: 200pt;
+		width: 190pt;
 	}
 }
