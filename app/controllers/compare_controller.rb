@@ -9,6 +9,7 @@ class CompareController < ApplicationController
 	def index
 		set_cache
 		set_table
+		@cache_nil = ClientConnections.cache_nil?(session.id)
 	end
 
 	#-----------------------------------------------------------------------------
@@ -31,9 +32,9 @@ class CompareController < ApplicationController
 	def set_cache
 		unless @cache = ClientConnections.cache(session.id)
 			@cache = Hash.new
-			@cache[:cps] = get_all(FHIR::List)
-			@cache[:fds] = get_all(FHIR::MedicationKnowledge)
-			ClientConnections.cache(session.id, @cache)
+			@cache[:cps] = get_all(FHIR::List, { _count: 200 })
+			@cache[:fds] = get_all(FHIR::MedicationKnowledge, { _count: 200, "DrugName:contains" => params[:search] })
+			ClientConnections.cache(session.id, @cache) unless params[:search].present?
 		end
 	end
 
@@ -41,8 +42,8 @@ class CompareController < ApplicationController
 
 	# Gets all instances of klass from server
 
-    def get_all(klass = nil, count = 200)
-        replies = get_all_bundles(klass, count)
+    def get_all(klass = nil, search_params = {})
+        replies = get_all_bundles(klass, search_params)
         return nil unless replies
         resources = []
 		replies.each do |reply|
@@ -56,9 +57,9 @@ class CompareController < ApplicationController
 
 	# Gets all bundles from server when querying for klass
 
-    def get_all_bundles(klass = nil, count = 200)
+    def get_all_bundles(klass = nil, search_params = {})
 		return nil unless klass
-		search = { search: { parameters: { _count: count } } }
+		search = { search: { parameters: search_params } }
         replies = [].push(@client.search(klass, search).resource)
 		while replies.last
 			replies.push(replies.last.next_bundle)
@@ -88,7 +89,7 @@ class CompareController < ApplicationController
 	# Sifts through formulary drugs based on search term, returns chosen fds
 
 	def sift_fds
-		return @cache[:fds].clone if params[:search].blank?
+		return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id)
 		@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
 	end
 

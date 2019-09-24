@@ -70,8 +70,8 @@
 	<p class='text-light welcome-text ml-auto mr-auto mb-5'>
 		<% if @client %>
 			<% if @cache_nil %>
-				Loads in all <%= @count %> Formularies en masse, 
-				will take an estimated <%= (@count * 0.0002 + 1).round / 2.0 %> minutes to build comparison table.
+				May load up to <%= @count %> Formularies from the server. Depending on the query, this could
+				take an estimated <%= (@count * 0.0002 + 1).round / 2.0 %> minutes to build the comparison table.
 			<% else %>
 				All <%= @count %> Formularies are cached, should load quickly.
 			<% end %>
