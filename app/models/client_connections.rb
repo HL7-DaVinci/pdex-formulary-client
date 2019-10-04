@@ -1,6 +1,6 @@
 class ClientConnections
 
-    @@clients = Hash.new
+    @clients = Hash.new
 
     def self.set(id, url)
         begin
@@ -14,21 +14,32 @@ class ClientConnections
         rescue
             return nil
         end
-        @@clients[id] = Hash.new
-        @@clients[id][:client] = client
+        @clients[id] = Hash.new
+        prune
+        @clients[id][:client] = client
     end
 
     def self.get(id)
-        @@clients[id][:client] if @@clients[id]
+        return nil unless @clients[id]
+        prune(id)
+        @clients[id][:client]
     end
 
     # sets cache if input is provided, then returns current cache value
     def self.cache(id, input = nil)
-        input ? @@clients[id][:cache] = input : @@clients[id][:cache]
+        prune(id)
+        input ? @clients[id][:cache] = input : @clients[id][:cache]
     end
 
     def self.cache_nil?(id)
-        @@clients[id].nil? || @@clients[id][:cache].nil?
+        prune(id)
+        @clients[id].nil? || @clients[id][:cache].nil?
+    end
+
+    def self.prune(protectID = nil)
+        @clients[protectID][:lastUsed] = Time.now if @clients[protectID]
+        safeHours = 5
+        @clients.delete_if { |id, connection| (Time.now - connection[:lastUsed]) > (safeHours * 60 * 60) }
     end
 
 end
