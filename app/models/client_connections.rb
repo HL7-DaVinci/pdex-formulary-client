@@ -15,7 +15,7 @@ class ClientConnections
             return nil
         end
         @clients[id] = Hash.new
-        prune
+        prune(id)
         @clients[id][:client] = client
     end
 
@@ -37,7 +37,7 @@ class ClientConnections
     end
 
     def self.prune(protectID = nil)
-        @clients[protectID][:lastUsed] = Time.now if @clients[protectID]
+        @clients[protectID][:lastUsed] = Time.now if protectID && @clients[protectID]
         safeHours = 5
         @clients.delete_if { |id, connection| (Time.now - connection[:lastUsed]) > (safeHours * 60 * 60) }
     end
