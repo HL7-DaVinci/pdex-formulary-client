@@ -33,6 +33,7 @@ footer {
 	position: fixed;
 	bottom: 0px;
 	width: 100%;
+	z-index: 2;
 
 	.copyright {
 		color: #eee;
@@ -55,8 +56,16 @@ footer {
 
 }
 
+.client-connected {
+	text-align: center;
+}
+
 .welcome-text, .no-formularies {
 	text-align: center;
+}
+
+#compare-url {
+	width: 100%;
 }
 
 .container {
@@ -78,33 +87,43 @@ table {
 
 .drug-tier-select, .coverage-select, .code-input {
 	width: inherit !important;
-	// width: 100% !important;
-	// margin-right: 15px !important;
 }
 
 .col-md-3 { // partially overrides a bootstrap class, not ideal but works
 	padding-left: 0;
 }
 
-.prior-auth, .step-therapy, .quantity-limit {
+.prior-auth, .step-therapy, .quantity-limit, 
+.prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
 	float: left;
 	display: inline block;
 	padding: 7px 15px;
-	margin-right: 10px;
-	margin-bottom: 10px;
 	border-radius: 20px;
 }
 
-.prior-auth {
+.prior-auth, .step-therapy, .quantity-limit {
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
+	margin: 0pt auto;
+}
+
+.prior-auth, .prior-auth-compare {
 	background-color: #c44;
 }
 
-.step-therapy {
+.step-therapy, .step-therapy-compare {
 	background-color: #494;
 }
 
-.quantity-limit {
+.quantity-limit, .quantity-limit-compare {
 	background-color: #39b;
+}
+
+.compare-buffer {
+	margin-top: 3pt;
 }
 
 .messages {
@@ -113,6 +132,69 @@ table {
 
 .no-formularies {
 	margin-top: 100pt;
+}
+
+.compare-page-search {
+	margin: 75pt auto 5pt;
+}
+
+#compare-progress-bar-container {
+	width: 90%;
+	margin: 8pt auto 3pt;
+}
+
+.compare-table-container {
+	width: 90%;
+	height: calc(100% - 185pt);
+	height: -webkit-calc(100% - 185pt);
+	height: -moz-calc(100% - 185pt);
+	height: -o-calc(100% - 185pt);
+	position: fixed;
+	overflow: auto;
+	margin: 0 5% 75pt;
+}
+
+.compare-table {
+	width: inherit;
+	table-layout: fixed;
+	margin: 0 auto;
+	th {
+		background-color: #343A40
+	}
+}
+
+.compare-drug-col{
+	width: 275pt;
+	position: sticky;
+	left: 0;
+	z-index: 1;
+	background-color: #343A40;
+}
+
+thead tr th.compare-table-header {
+	position: sticky;
+	top: 0;
+	border-width: 1px;
+	border-color: #454D55;
+	border-top: 0;
+	text-align: center;
+}
+
+.compare-col {
+	width: 150pt;
+}
+
+#compare-drug-header {
+	z-index: 2;
+	background: #242A30
+}
+
+.drug-in-plan {
+	background-color: #06e080
+}
+
+.drug-not-in-plan {
+	background-color: #c45b67
 }
 
 @media (min-width: 200px) and (max-width: 767px) {
@@ -125,13 +207,24 @@ table {
 			margin-bottom: 10px;
 		}
 
-		.col-md-3 { // restores bootstrap class to original state
-			padding-left: 15px;
-		}
-
 		.btn {
 			margin-left: 15px;
 		}
+
+		.col-md-3 { // restores bootstrap class to original state
+			padding-left: 15px;
+		}
  
+	}
+
+	.compare-table-container {
+		height: calc(100% - 235pt);
+		height: -webkit-calc(100% - 235pt);
+		height: -moz-calc(100% - 235pt);
+		height: -o-calc(100% - 235pt);
+	}
+
+	.compare-drug-col {
+		width: 190pt;
 	}
 }

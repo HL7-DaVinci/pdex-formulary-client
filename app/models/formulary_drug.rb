@@ -10,7 +10,7 @@ class FormularyDrug < Resource
 
   include ActiveModel::Model
 
-	attr_accessor :drug_name, :drug_tier, :drug_class, :rxnorm_code, :id, 
+	attr_accessor :drug_name, :drug_tier, :drug_class, :rxnorm_code, :id, :plan_id, 
 									:prior_auth, :step_therapy, :quantity_limit, :errors, 
 									:warnings
 
@@ -90,6 +90,8 @@ class FormularyDrug < Resource
 					@step_therapy = extension.valueBoolean
 				elsif extension.url.include?("QuantityLimit")
 					@quantity_limit = extension.valueBoolean
+				elsif extension.url.include?("PlanID")
+					@plan_id = extension.valueString
 				end
 			end
 		else
@@ -116,7 +118,7 @@ class FormularyDrug < Resource
 	#-----------------------------------------------------------------------------
 
 	def display_list(list)
-		list.map{ |element| element.display ? element.display : "Non-preferred Brand Specialty" }.join(', ')
+		list.map{ |element| element.display }.join(', ')
 	end
 
 	#-----------------------------------------------------------------------------

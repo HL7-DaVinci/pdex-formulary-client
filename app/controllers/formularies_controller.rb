@@ -28,7 +28,6 @@ class FormulariesController < ApplicationController
 			reply = @client.search(FHIR::MedicationKnowledge, search: search )
 			@@bundle = reply.resource
 		end
-
 		@fhir_formularies = @@bundle.entry.map(&:resource)
 	end
 
@@ -38,8 +37,6 @@ class FormulariesController < ApplicationController
 
 	def show
 		reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { id: params[:id] } })
-		byebug
-		byebug
 	end
 
 	#-----------------------------------------------------------------------------
@@ -57,7 +54,7 @@ class FormulariesController < ApplicationController
 
 	#-----------------------------------------------------------------------------
 
-	# Performs pagination on the drug formulary list, reading 10 formularies from
+	# Performs pagination on the drug formulary list, reading 20 formularies from
 	# the server at a time.
 
 	def update_page(page, bundle)
@@ -67,7 +64,7 @@ class FormulariesController < ApplicationController
 
 	#-----------------------------------------------------------------------------
 
-	# Retrieves the previous 10 formularies from the current position in the 
+	# Retrieves the previous 20 formularies from the current position in the 
 	# bundle.  FHIR::Bundle in the fhir-client gem only provides direct support 
 	# for the next bundle, not the previous bundle.
 

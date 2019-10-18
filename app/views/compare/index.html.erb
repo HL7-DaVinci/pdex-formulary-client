@@ -1,0 +1,51 @@
+<section>
+    <div class='row compare-page-search'>
+		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-page-form' do %>
+			<div class='col'></div>
+			<div class='form-group col-md-7'>
+				<%= text_field_tag :search, params[:search], class: 'form-control', placeholder: 'Search by drug name' %>
+			</div>
+            <%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', 
+                    id: 'compare-page-url', disabled: @client.nil? %>
+			<div class='col'></div>
+		<% end %>
+	</div>
+    <div class='compare-table-container'>
+        <table class='table table-dark compare-table'>
+            <thead>
+    	        <tr>
+		            <th scope='col' class='compare-drug-col compare-table-header' id="compare-drug-header">Drug</th>
+                    <% @table_header.each do |cp| %>
+			            <th scope='col' class='compare-table-header compare-col'><%= cp.name -%></th>
+                    <% end %>
+    	    	</tr>
+            </thead>
+    		<% @table_rows.each do |code, plan_hash| %>
+	    	    <tr>
+	        	    <td class='compare-drug-col'>
+                        <%= plan_hash.values.first.drug_name -%>
+        		    </td>
+                    <% @table_header.each do |cp| %>
+						<% fd = plan_hash[cp.id] %>
+		                <td class="compare-col drug<%= "-not" unless fd -%>-in-plan">
+							<% if fd %>
+								<div style="display: grid;">
+								<% if fd.prior_auth %>
+									<span class='prior-auth-compare'>Prior Authorization</span>
+								<% end %>
+								<% if fd.step_therapy %>
+									<% mtop = fd.prior_auth ? 'compare-buffer' : '' %>
+									<span class='step-therapy-compare <%= mtop %>'>Step Therapy</span>
+								<% end %>
+								<% if fd.quantity_limit %>
+									<% mtop = fd.prior_auth || fd.step_therapy ? 'compare-buffer' : '' %>
+									<span class='quantity-limit-compare <%= mtop %>'>Quantity Limit</span>
+								<% end %>
+							<% end %>
+						</td>
+                    <% end %>
+	        	</tr>
+            <% end %>
+        </table>
+    </div>
+</section>
