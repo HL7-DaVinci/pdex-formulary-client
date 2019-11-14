@@ -22,7 +22,6 @@ class FormularyDrug < Resource
 		@rxnorm_code 			= parse_rxnorm_code(fhir_formulary)
 		#@drug_class				= parse_drug_class(fhir_formulary)
 		@rxnorm_path            = display_rxnorm_id_path
-		binding.pry
 		parse_extensions(fhir_formulary)
 	end
 	

@@ -51,6 +51,18 @@
 		Each of the above options can be left unspecified. 
 		Pressing "Lookup" will display the intersection of defined options.
 	</p>
+	<h2 class="text-light welcome-text">Review Coverage Plans</h2>
+	<section class='row mb-1'>
+		<%= form_tag coverageplans_path, method: 'get', class: 'form-inline welcome-form', id: 'coverageplan-form' do %>
+			<div class='col'></div>
+			<div class='form-group col-md-7'>
+				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Search by CoveragePlan name' %>
+			</div>
+			<%= button_tag 'Review CoveragePlans', class: 'btn btn-primary col-md-3', id: 'coverageplan-url', disabled: @client.nil? %>
+			<div class='col'></div>
+		<% end %>
+	</section>
+
 	<h2 class="text-light welcome-text">Compare Coverage Plan Formularies</h2>
 	<section class='row mb-1'>
 		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-form' do %>
@@ -73,7 +85,9 @@
 	<p class='text-light welcome-text ml-auto mr-auto mb-5'>
 		<% if @client %>
 			<% if @cache_nil %>
-				May load up to <%= @count %> FormularyDrugs from the server. Depending on the query, this could
+				May load up to <%= @count %> FormularyDrugs and <%= @cp_count %> CoveragePlans from the server. 
+				<br>
+				Depending on the query, this could
 				take an estimated <%= (@count * 0.0002 + 1).round / 2.0 %> minutes to build the comparison table.
 			<% else %>
 				All <%= @count %> Formularies are cached, should load quickly.
@@ -82,4 +96,4 @@
 			Must first connect to a Formulary server.
 		<% end %>
 	</p>
-</section>
+
