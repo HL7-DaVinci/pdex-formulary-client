@@ -12,7 +12,7 @@ class FormularyDrug < Resource
 
 	attr_accessor :drug_name, :drug_tier, :drug_class, :rxnorm_code, :id, :plan_id, 
 									:prior_auth, :step_therapy, :quantity_limit, :errors, 
-									:warnings
+									:warnings, :plan_id_path, :plan_id_name, :rxnorm_path 
 
 	#-----------------------------------------------------------------------------
 
@@ -21,7 +21,8 @@ class FormularyDrug < Resource
 		@drug_name				= parse_drug_name(fhir_formulary)
 		@rxnorm_code 			= parse_rxnorm_code(fhir_formulary)
 		#@drug_class				= parse_drug_class(fhir_formulary)
-
+		@rxnorm_path            = display_rxnorm_id_path
+		binding.pry
 		parse_extensions(fhir_formulary)
 	end
 	
@@ -92,6 +93,8 @@ class FormularyDrug < Resource
 					@quantity_limit = extension.valueBoolean
 				elsif extension.url.include?("PlanID")
 					@plan_id = extension.valueString
+					@plan_id_path = display_plan_id_path(@plan_id)
+					@plan_id_name = display_plan_id_name(@plan_id)
 				end
 			end
 		else
@@ -128,5 +131,24 @@ class FormularyDrug < Resource
 	def code_list(list)
 		list.map{ |element| element.code }.join(', ')
 	end
+
+	def display_plan_id_path(planid)
+		
+		ApplicationController::plansbyid[planid] [:url]
+
+	  end
+	  def display_plan_id_name(planid)
+		
+		ApplicationController::plansbyid[planid] [:name]
+
+	  end
+
+	  def display_rxnorm_id_path
+		
+		"https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=" + @rxnorm_code 
+
+	  end
+
+
 
 end

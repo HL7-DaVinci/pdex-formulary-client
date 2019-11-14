@@ -25,10 +25,12 @@ class FormulariesController < ApplicationController
 			search[:parameters][:DrugTier] = params[:drug_tier] if params[:drug_tier].present?
 			search[:parameters][:DrugPlan] = params[:coverage] if params[:coverage].present?
 			search[:parameters][:code] = params[:code] if params[:code].present?
+			search[:parameters]["DrugName:contains"] = params[:name] if params[:name].present?
 			reply = @client.search(FHIR::MedicationKnowledge, search: search )
 			@@bundle = reply.resource
 		end
-		@fhir_formularies = @@bundle.entry.map(&:resource)
+		@fhir_formularydrugs = @@bundle.entry.map(&:resource)
+		@plansbyid = @@plansbyid
 	end
 
 	#-----------------------------------------------------------------------------
@@ -43,6 +45,8 @@ class FormulariesController < ApplicationController
 	private
 	#-----------------------------------------------------------------------------
 
+	
+		
 	# Check that this session has an established FHIR client connection.
 	# Specifically, sets @client and redirects home if nil.
 

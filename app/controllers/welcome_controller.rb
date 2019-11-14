@@ -34,21 +34,6 @@ class WelcomeController < ApplicationController
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?
 	end
 
-	#-----------------------------------------------------------------------------
-
-	# Retrieves the names of the Coverage Plans from the server
-
-	def coverage_plans
-		begin
-			cp_profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-			reply = @client.read(FHIR::List, nil, nil, cp_profile).resource
-			options = reply.entry.collect{|entry| [entry.resource.title, entry.resource.identifier.first.value]}
-			options.unshift(["All", ""])
-		rescue => exception
-			options = [["N/A (Must connect first)", "-"]]
-		end
-		options
-	end
 
 	#-----------------------------------------------------------------------------
 
