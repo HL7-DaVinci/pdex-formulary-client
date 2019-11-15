@@ -93,7 +93,7 @@ table {
 	padding-left: 0;
 }
 
-.prior-auth, .step-therapy, .quantity-limit, 
+.prior-auth, .step-therapy, .quantity-limit, .mail-order,
 .prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
 	float: left;
 	display: inline block;
@@ -101,7 +101,7 @@ table {
 	border-radius: 20px;
 }
 
-.prior-auth, .step-therapy, .quantity-limit {
+.prior-auth, .step-therapy, .quantity-limit, .mail-order {
 	margin-right: 10px;
 	margin-bottom: 10px;
 }
@@ -114,11 +114,11 @@ table {
 	background-color: #c44;
 }
 
-.step-therapy, .step-therapy-compare {
+.step-therapy, .step-therapy-compare, .mail-order {
 	background-color: #494;
 }
 
-.quantity-limit, .quantity-limit-compare {
+.quantity-limit, .quantity-limit-compare, .mail-order {
 	background-color: #39b;
 }
 

@@ -1,12 +1,19 @@
 
  <section class='container'>
+	<div class='plan'>
 			<h3 class='float-left text-white'>CoveragePlan: 
 			<%= @plandata.name%>
 			</h3>
-   <section class='row col-12'>
+	</div>
+  <section class='row col-12'>
     <% unless @plandata.nil? %>
 	<% @plandata.tiers.each do | tiername, tierdesc| %>
 	<h2 class='float-left text-white'><%= tiername.split('-').map(&:capitalize).join(' ') %>	</h2>
+	<% if tierdesc[:mailorder] %>
+	<div class ='drug'>
+		<span class='mail-order'>Mail Order</span>
+	</div>
+	<% end %>
     <table class='table table-dark'>
       	<tr>
 		<th scope='col'>Pharmacy Type</th>
