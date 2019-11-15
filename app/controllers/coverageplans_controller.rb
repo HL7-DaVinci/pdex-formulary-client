@@ -27,6 +27,7 @@ class CoverageplansController < ApplicationController
 			@@bundle = reply.resource
 		end
 		@fhir_coverageplans = @@bundle.entry.map(&:resource)
+		coverage_plans 
 		@plansbyid = @@plansbyid
 	end
 
@@ -35,14 +36,27 @@ class CoverageplansController < ApplicationController
 	# GET /coverageplans/[id]
 
 	def show
-		reply = @client.search(FHIR::List, search: { parameters: { id: params[:id] } })
+		#--- show should work by planID, not the fhir ID....that is the way plansbyid is indexed
+		#--- there is no need to search for the data....it is already parsed and ready.
+		#reply = @client.search(FHIR::List, search: { parameters: { _id: params[:id] } })
+		#@coverageplan = CoveragePlan.new(@@bundle.entry.map(&:resource).first)
+
+		coverage_plans if !@@plansbyid 
+		@plandata = @@plansbyid[params[:id]]
 	end
 
 	#-----------------------------------------------------------------------------
 	private
 	#-----------------------------------------------------------------------------
 
-	
+	def testplandata
+		@plandata[:tiers].each do | tiername, tierdesc| 
+			puts tiername; 
+			tierdesc[:costshares].each do |pharmtype, costshare| 
+				puts pharmtype;puts costshare[:copay]; 
+			end
+		end
+	end
 		
 	# Check that this session has an established FHIR client connection.
 	# Specifically, sets @client and redirects home if nil.

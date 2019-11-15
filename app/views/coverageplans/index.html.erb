@@ -19,7 +19,7 @@
 			<% @fhir_coverageplans.each do |fhir_coverageplan| %>
 				<% coverageplan = CoveragePlan.new(fhir_coverageplan) %>
 				<tr>
-					<td>  <%= link_to sanitize(coverageplan.name), "/coverageplans/#{coverageplan.id}" %> </td>
+					<td>  <%= link_to sanitize(coverageplan.name), "/coverageplans/#{coverageplan.planid}" %> </td>
           <% if coverageplan.email %>
 					<td>  <a href=mailto:<%=coverageplan.email %> >e-mail </a>,
           <% end %>

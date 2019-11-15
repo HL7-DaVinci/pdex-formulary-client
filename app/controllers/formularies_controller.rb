@@ -30,6 +30,7 @@ class FormulariesController < ApplicationController
 			@@bundle = reply.resource
 		end
 		@fhir_formularydrugs = @@bundle.entry.map(&:resource)
+		coverage_plans 
 		@plansbyid = @@plansbyid
 	end
 

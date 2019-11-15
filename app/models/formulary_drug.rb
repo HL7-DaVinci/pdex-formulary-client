@@ -12,7 +12,8 @@ class FormularyDrug < Resource
 
 	attr_accessor :drug_name, :drug_tier, :drug_class, :rxnorm_code, :id, :plan_id, 
 									:prior_auth, :step_therapy, :quantity_limit, :errors, 
-									:warnings, :plan_id_path, :plan_id_name, :rxnorm_path 
+									:warnings, :plan_id_path, :plan_id_name, :rxnorm_path,
+									:copay, :coinsurancerate
 
 	#-----------------------------------------------------------------------------
 
@@ -23,6 +24,9 @@ class FormularyDrug < Resource
 		#@drug_class				= parse_drug_class(fhir_formulary)
 		@rxnorm_path            = display_rxnorm_id_path
 		parse_extensions(fhir_formulary)
+		# Test inclusion of drug tier info in formulary drug for display
+		@copay = ApplicationController::plansbyid[@plan_id].tiers[@drug_tier][:costshares]["1-month-in-retail"][:copay]
+		@coinsurancerate = ApplicationController::plansbyid[@plan_id].tiers[@drug_tier][:costshares]["1-month-in-retail"][:coinsurancerate]
 	end
 	
 	#-----------------------------------------------------------------------------
@@ -106,7 +110,7 @@ class FormularyDrug < Resource
 	def parse_drug_tier(extension)
 		if (concept = extension.valueCodeableConcept).present?
 			if (coding = concept.coding).present?
-				value = display_list(coding)
+				value = code_list(coding)
 			else
 				value = "Drug tier not specified"
 			end
@@ -133,12 +137,12 @@ class FormularyDrug < Resource
 
 	def display_plan_id_path(planid)
 		
-		ApplicationController::plansbyid[planid] [:url]
+		"/coverageplans/#{planid}"
 
 	  end
 	  def display_plan_id_name(planid)
 		
-		ApplicationController::plansbyid[planid] [:name]
+		ApplicationController::plansbyid[planid].name
 
 	  end
 

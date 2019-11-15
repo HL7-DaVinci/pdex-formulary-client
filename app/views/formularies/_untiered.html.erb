@@ -11,6 +11,8 @@
 			<tr>
 				<th scope='col'>Drug</th>
 				<th scope='col'>Tier</th>
+				<th scope='col'>Copay</th>
+				<th scope='col'>CoInsurance</th>
 				<th scope='col'>PlanID</th>
 				<th scope='col'>RxNorm</th>
 				<th scope='col'>ID</th>
@@ -32,7 +34,9 @@
 							<span class='quantity-limit'>Quantity Limit</span>
 						<% end %>
 					</td>
-					<td><%= formulary_drug.drug_tier %></td>
+					<td><%= formulary_drug.drug_tier.capitalize %> </td>
+					<td>$<%=formulary_drug.copay%></td>
+					<td> <%=formulary_drug.coinsurancerate%>%</td>
 					<td><%= link_to formulary_drug.plan_id_name , formulary_drug.plan_id_path %></td>
 					<td><%= link_to formulary_drug.rxnorm_code, formulary_drug.rxnorm_path %></td>
 					<td><%= formulary_drug.id %></td>
