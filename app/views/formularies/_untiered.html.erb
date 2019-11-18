@@ -1,7 +1,7 @@
 <section class='container'>
 	<section class='row col-12'>
 		<div class='col-12'>
-			<h3 class='float-left text-white'>Covered Drugs</h3>
+			<h3 class='float-left text-white'>Formulary Drugs</h3>
 			<div class='btn-group float-right mt-2' role='group'>
 				<%= link_to 'Previous', formularies_path(page: 'previous'), class: 'btn btn-outline-primary' %>
 				<%= link_to 'Next', 		formularies_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
@@ -22,7 +22,7 @@
 				<tr>
 					<td>
 						<div class='drug'>
-							<%= formulary_drug.drug_name %>
+							<%= link_to formulary_drug.drug_name, formulary_drug.formulary_id_path %>
 						</div>
 						<% if formulary_drug.prior_auth %>
 							<span class='prior-auth'>Prior Authorization</span>

@@ -39,7 +39,12 @@ class FormulariesController < ApplicationController
 	# GET /formularies/[id]
 
 	def show
-		reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { id: params[:id] } })
+		reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { _id: params[:id] } })
+		@@bundle = reply.resource
+		@fhir_formularydrug = @@bundle.entry.map(&:resource).first
+		@formulary_drug = FormularyDrug.new(@fhir_formularydrug)
+		coverage_plans
+		@plansbyid = @@plansbyid
 	end
 
 	#-----------------------------------------------------------------------------

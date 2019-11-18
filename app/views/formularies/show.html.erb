@@ -1,0 +1,74 @@
+
+ <section class='container'>
+   <div class='drug-head'>
+		<h3 class='float-left text-white'>Formulary Drug </h3>
+	<table class='table table-dark'>
+   <tbody>
+      <tr>
+        <th>Drug Name </th>
+			<td> <%= @formulary_drug.drug_name%> ( <%=@formulary_drug.rxnorm_code%>)
+			</td>
+	 </tr>
+	      <tr>
+        <th>Coverage Plan</th>
+		    <td>
+			<%= link_to @formulary_drug.plan_id_name , @formulary_drug.plan_id_path %>
+			</td>
+	 </tr>
+     <tr>
+        <th>Drug Tier</th>
+			<td> 
+			 <%= @formulary_drug.drug_tier.split('-').map(&:capitalize).join(' ')%>
+			</td>
+	 </tr>
+   </tbody>
+   </table>
+	</div>
+  <section class='row col-12'>
+  <div>
+     	<% if @formulary_drug.prior_auth %>
+		<span class='prior-auth'>Prior Authorization</span>
+	<% end %>
+	<% if @formulary_drug.step_therapy %>
+		<span class='step-therapy'>Step Therapy</span>
+	<%end%>
+	<% if @formulary_drug.quantity_limit %>
+		<span class='quantity-limit'>Quantity Limit</span>
+	<% end %>
+</div>
+   <%  plandata = @plansbyid[@formulary_drug.plan_id]%>
+	<%  tierdesc = plandata.tiers[@formulary_drug.drug_tier] %>
+    <%  if tierdesc %>
+		<div class ='drug'>  
+ 		<% if tierdesc[:mailorder] %>
+			<span class='mail-order'>Mail Order</span>
+		<% end %>
+    <table class='table table-dark'>
+      	<tr>
+		<th scope='col'>Pharmacy Type</th>
+		<th scope='col'>CoPay</th>
+        <th scope='col'>CoPay Option</th>
+		<th scope='col'>CoInsurance</th>
+        <th scope='col'>CoInsurance Option</th>
+	    </tr>
+	<% tierdesc[:costshares].each do |pharmtype, costshare| %>
+		<tr>
+		<td> <%= pharmtype.split('-').map(&:capitalize).join(' ') %> </td>
+		<td> $<%= costshare[:copay] %> </td>
+		<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
+		<td> <%= costshare[:coinsurancerate] %>% </td>
+		<td> <%= costshare[:coinsuranceoption].split('-').map(&:capitalize).join(' ') %> </td>
+		<tr>
+	<%  end %>
+	</table>
+	</div>
+
+	<%  else %>
+	<br>
+	<div class='row col-12'>
+	<h3 class='float-left text-white'> Tier Description Missing! </h3>
+	</div>
+	<%  end %>
+
+  </section>
+</section>

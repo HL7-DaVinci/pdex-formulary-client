@@ -19,7 +19,15 @@ class CoveragePlan
 		@planid = fhir_coverageplan.identifier.first.value 
 		parse_extensions(fhir_coverageplan)
 		@drugs = parse_drugs(fhir_coverageplan)
+		@drugsbyrxnorm = {}
 		@tiers = parse_tiers(fhir_coverageplan) 
+		#--- Collect the pharmacy types present in this coverage plan
+		@pharmacytypes = {}
+		@tiers.each do |tiername, tierdesc| 
+			tierdesc[:costshares].each do |pharmtype, costshare|  
+               @pharmacytypes[pharmtype] = true
+            end  
+		 end  
 	end
 
 
