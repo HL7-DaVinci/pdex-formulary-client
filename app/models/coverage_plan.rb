@@ -95,7 +95,7 @@ class CoveragePlan
                                     elsif costshare_extension.url.include?("CopayOption")
                                         copayoption = costshare_extension.valueCodeableConcept.coding[0].code
                                     else
-                                        binding.pry 
+										flash: { error: "Wierd stuff in Coverage_plan.rb" }
                                     end
 								end 
                                 costshare = {:pharmacytype => pharmacytype,

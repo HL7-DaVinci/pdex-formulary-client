@@ -2,14 +2,23 @@ class CompareController < ApplicationController
 
 	before_action :check_server_connection, only: [ :index ]
 
+	attr_accessor :drugname, :codes 
 	#-----------------------------------------------------------------------------
 
 	# GET /compare
 
 	def index
-		set_cache
-		set_table
-		@cache_nil = ClientConnections.cache_nil?(session.id)
+		@codes = nil
+		@params = nil 
+		if params[:search].length>0 or params[:code].length>0
+			@drugname = params[:search].split(' ').first 
+			@codes = params[:code].strip.split(',').map(&:strip).join(',')
+			set_cache
+			set_table
+			@cache_nil = ClientConnections.cache_nil?(session.id)
+		else
+			redirect_to root_path, flash: { error: "Please specify a (partial) drug name, or at least one rxnorm code" }
+		end
 	end
 
 	#-----------------------------------------------------------------------------
@@ -30,12 +39,18 @@ class CompareController < ApplicationController
 	# Sets @cache, either with already cached info or by retrieving info and caching it
 
 	def set_cache
-		unless @cache = ClientConnections.cache(session.id)
+	#	unless @cache = ClientConnections.cache(session.id)
 			@cache = Hash.new
 			@cache[:cps] = get_all(FHIR::List, { _count: 200 })
-			@cache[:fds] = get_all(FHIR::MedicationKnowledge, { _count: 200, "DrugName:contains" => params[:search] })
+			searchParams = {:_count => 200} 
+			searchParams[:code] = @codes if @codes and @codes.length > 0
+			searchParams["DrugName:contains"] = @drugname  if @drugname and @drugname.length>0
+			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			searchParams[:_profile] = profile 
+			
+			@cache[:fds] = get_all(FHIR::MedicationKnowledge, searchParams)
 			ClientConnections.cache(session.id, @cache) unless params[:search].present?
-		end
+	#	end
 	end
 
 	#-----------------------------------------------------------------------------
@@ -73,7 +88,7 @@ class CompareController < ApplicationController
 	# Sets @table_headers and @table_rows
 
 	def set_table
-		@table_header = @cache[:cps].collect{ |cp| CoveragePlan.new(cp.title , cp.identifier.first.value) }
+		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.title , cp.identifier.first.value) }
 		chosen = sift_fds
 		@table_rows = Hash.new
 		chosen.collect!{ |fd| FormularyDrug.new(fd) }

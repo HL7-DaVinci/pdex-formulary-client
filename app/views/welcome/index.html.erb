@@ -12,7 +12,7 @@
 			<div class='col'></div>
 			<div class='form-group col-md-7'>
 				<%= text_field_tag :server_url, nil, class: 'form-control',
-							placeholder: 'http://your-formulary-server.org' %>
+							placeholder: 'https://davinci-drug-formulary-ri.logicahealth.org/fhir' %>
 			</div>
 			<%= button_tag 'Connect', class: 'btn btn-primary col-md-2', id: 'server-url' %>
 			<div class='col'></div>
@@ -67,28 +67,21 @@
 	<section class='row mb-1'>
 		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-form' do %>
 			<div class='col'></div>
-			<div class='form-group col-md-7'>
+			<div class='form-group col-md-4'>
 				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Search by drug name' %>
+			</div>			
+			<div class='form-group col-md-4'>
+				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'List of RxNorm codes'%>
 			</div>
+
 			<%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', id: 'compare-url', disabled: @client.nil? %>
 			<div class='col'></div>
 		<% end %>
 	</section>
-	<div class='collapse' id='compare-progress-bar-container'>
-		<div class='progress'>
-			<div class="progress-bar compare-progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" 
-					aria-valuemin="0" aria-valuemax="100">
-				0%
-			</div>
-		</div>
-	</div>
-	<p class='text-light welcome-text ml-auto mr-auto mb-5'>
+		<p class='text-light welcome-text ml-auto mr-auto mb-5'>
 		<% if @client %>
 			<% if @cache_nil %>
 				May load up to <%= @count %> FormularyDrugs and <%= @cp_count %> CoveragePlans from the server. 
-				<br>
-				Depending on the query, this could
-				take an estimated <%= (@count * 0.0002 + 1).round / 2.0 %> minutes to build the comparison table.
 			<% else %>
 				All <%= @count %> Formularies are cached, should load quickly.
 			<% end %>

@@ -30,8 +30,7 @@ class FormulariesController < ApplicationController
 			@@bundle = reply.resource
 		end
 		@fhir_formularydrugs = @@bundle.entry.map(&:resource)
-		coverage_plans 
-		@plansbyid = @@plansbyid
+		@plansbyid = ApplicationController::plansbyid
 	end
 
 	#-----------------------------------------------------------------------------
@@ -43,8 +42,7 @@ class FormulariesController < ApplicationController
 		@@bundle = reply.resource
 		@fhir_formularydrug = @@bundle.entry.map(&:resource).first
 		@formulary_drug = FormularyDrug.new(@fhir_formularydrug)
-		coverage_plans
-		@plansbyid = @@plansbyid
+		@plansbyid = ApplicationController::plansbyid
 	end
 
 	#-----------------------------------------------------------------------------

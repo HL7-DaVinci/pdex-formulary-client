@@ -34,7 +34,7 @@
 							<span class='quantity-limit'>Quantity Limit</span>
 						<% end %>
 					</td>
-					<td><%= formulary_drug.drug_tier.capitalize %> </td>
+					<td><%= formulary_drug.drug_tier.split('-').map(&:capitalize).join(' ') %> </td>
 					<td>$<%=formulary_drug.copay%></td>
 					<td> <%=formulary_drug.coinsurancerate%>%</td>
 					<td><%= link_to formulary_drug.plan_id_name , formulary_drug.plan_id_path %></td>

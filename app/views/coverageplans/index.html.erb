@@ -16,8 +16,7 @@
 				<th scope='col'>Type</th>
         <th scope='col'>Drugs</th>
 			</tr>
-			<% @fhir_coverageplans.each do |fhir_coverageplan| %>
-				<% coverageplan = CoveragePlan.new(fhir_coverageplan) %>
+			<% @coverageplans.each do |coverageplan| %>
 				<tr>
 					<td>  <%= link_to sanitize(coverageplan.name), "/coverageplans/#{coverageplan.planid}" %> </td>
           <% if coverageplan.email %>
