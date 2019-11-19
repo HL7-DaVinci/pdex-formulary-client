@@ -51,17 +51,21 @@
 		Each of the above options can be left unspecified. 
 		Pressing "Lookup" will display the intersection of defined options.
 	</p>
-	<h2 class="text-light welcome-text">Review Coverage Plans</h2>
+	<h2 class="text-light welcome-text">Display Coverage Plans</h2>
 	<section class='row mb-1'>
 		<%= form_tag coverageplans_path, method: 'get', class: 'form-inline welcome-form', id: 'coverageplan-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-7'>
-				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Search by CoveragePlan name' %>
+				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Just Click the Button' %>
 			</div>
 			<%= button_tag 'Review CoveragePlans', class: 'btn btn-primary col-md-3', id: 'coverageplan-url', disabled: @client.nil? %>
 			<div class='col'></div>
 		<% end %>
 	</section>
+	<p class='text-light welcome-text ml-auto mr-auto mb-5'>
+		You can leave the field empty.
+		Pressing "Lookup" will display the plans.
+	</p>
 
 	<h2 class="text-light welcome-text">Compare Coverage Plan Formularies</h2>
 	<section class='row mb-1'>
@@ -79,12 +83,13 @@
 		<% end %>
 	</section>
 		<p class='text-light welcome-text ml-auto mr-auto mb-5'>
+		You must specify part of a drugname and/or a list of RxNorm codes.
+		Pressing "Lookup" will display the intersection of defined options.
+	</p>
+
+		<p class='text-light welcome-text ml-auto mr-auto mb-5'>
 		<% if @client %>
-			<% if @cache_nil %>
-				May load up to <%= @count %> FormularyDrugs and <%= @cp_count %> CoveragePlans from the server. 
-			<% else %>
-				All <%= @count %> Formularies are cached, should load quickly.
-			<% end %>
+            Connection with Formulary Server Established.
 		<% else  %>
 			Must first connect to a Formulary server.
 		<% end %>
