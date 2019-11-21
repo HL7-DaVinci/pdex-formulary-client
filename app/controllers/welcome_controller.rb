@@ -16,6 +16,7 @@ class WelcomeController < ApplicationController
 		@cp_count = coverageplan_count 
 		@cp_options = coverage_plans
 		@cache_nil = ClientConnections.cache_nil?(session.id)
+		get_plansbyid
 	end
 
 	#-----------------------------------------------------------------------------
@@ -30,6 +31,8 @@ class WelcomeController < ApplicationController
 			err = "Connection failed: Ensure provided url points to a valid FHIR server"
 			err += " that holds at least one Formulary"
 			redirect_to root_path, flash: { error: err }
+			session[:plansbyid] = nil
+			session[:cp_options] = [["N/A (Must connect first)", "-"]]
 			return nil
 		end
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?

@@ -10,6 +10,7 @@ class CompareController < ApplicationController
 	def index
 		@codes = nil
 		@params = nil 
+		get_plansbyid
 		if params[:search].length>0 or params[:code].length>0
 			@drugname = params[:search].split(' ').first 
 			@codes = params[:code].strip.split(',').map(&:strip).join(',')
@@ -91,7 +92,7 @@ class CompareController < ApplicationController
 		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.title , cp.identifier.first.value) }
 		chosen = sift_fds
 		@table_rows = Hash.new
-		chosen.collect!{ |fd| FormularyDrug.new(fd) }
+		chosen.collect!{ |fd| FormularyDrug.new(fd, @plansbyid) }
 		chosen.each do |fd|
 			code = fd.rxnorm_code
 			plan = fd.plan_id

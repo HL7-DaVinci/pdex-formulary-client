@@ -36,8 +36,8 @@
 		<span class='quantity-limit'>Quantity Limit</span>
 	<% end %>
 </div>
-   <%  plandata = @plansbyid[@formulary_drug.plan_id]%>
-	<%  tierdesc = plandata.tiers[@formulary_drug.drug_tier] %>
+   <%  plandata = @plansbyid[@formulary_drug.plan_id.to_sym]%>
+	<%  tierdesc = plandata[:tiers][@formulary_drug.drug_tier.to_sym] %>
     <%  if tierdesc %>
 		<div class ='drug'>  
  		<% if tierdesc[:mailorder] %>
@@ -53,7 +53,7 @@
 	    </tr>
 	<% tierdesc[:costshares].each do |pharmtype, costshare| %>
 		<tr>
-		<td> <%= pharmtype.split('-').map(&:capitalize).join(' ') %> </td>
+		<td> <%= pharmtype.to_s.split('-').map(&:capitalize).join(' ') %> </td>
 		<td> $<%= costshare[:copay] %> </td>
 		<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
 		<td> <%= costshare[:coinsurancerate] %>% </td>

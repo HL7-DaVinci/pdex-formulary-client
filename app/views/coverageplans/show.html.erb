@@ -2,13 +2,13 @@
  <section class='container'>
 	<div class='plan'>
 			<h3 class='float-left text-white'>CoveragePlan: 
-			<%= @plandata.name%>
+			<%= @plandata[:name]%>
 			</h3>
 	</div>
   <section class='row col-12'>
     <% unless @plandata.nil? %>
-	<% @plandata.tiers.each do | tiername, tierdesc| %>
-	<h2 class='float-left text-white'><%= tiername.split('-').map(&:capitalize).join(' ') %>	</h2>
+	<% @plandata[:tiers].each do | tiername, tierdesc| %>
+	<h2 class='float-left text-white'><%= tiername.to_s.split('-').map(&:capitalize).join(' ') %>	</h2>
 	<% if tierdesc[:mailorder] %>
 	<div class ='drug'>
 		<span class='mail-order'>Mail Order</span>
@@ -24,7 +24,7 @@
 	    </tr>
 	<% tierdesc[:costshares].each do |pharmtype, costshare| %>
 	<tr>
-	<td> <%= pharmtype.split('-').map(&:capitalize).join(' ') %> </td>
+	<td> <%= pharmtype.to_s.split('-').map(&:capitalize).join(' ') %> </td>
 	<td> $<%= costshare[:copay] %> </td>
 	<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
 	<td> <%= costshare[:coinsurancerate] %>% </td>

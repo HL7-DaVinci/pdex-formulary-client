@@ -29,8 +29,12 @@ class FormulariesController < ApplicationController
 			reply = @client.search(FHIR::MedicationKnowledge, search: search )
 			@@bundle = reply.resource
 		end
-		@fhir_formularydrugs = @@bundle.entry.map(&:resource)
-		@plansbyid = ApplicationController::plansbyid
+		get_plansbyid
+		fhir_formularydrugs = @@bundle.entry.map(&:resource)
+		@formularydrugs = []
+		fhir_formularydrugs.each do |fhir_formularydrug| 
+			@formularydrugs << FormularyDrug.new(fhir_formularydrug,@plansbyid)
+		end
 	end
 
 	#-----------------------------------------------------------------------------
@@ -40,9 +44,9 @@ class FormulariesController < ApplicationController
 	def show
 		reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { _id: params[:id] } })
 		@@bundle = reply.resource
-		@fhir_formularydrug = @@bundle.entry.map(&:resource).first
-		@formulary_drug = FormularyDrug.new(@fhir_formularydrug)
-		@plansbyid = ApplicationController::plansbyid
+		fhir_formularydrug = @@bundle.entry.map(&:resource).first
+		get_plansbyid
+		@formulary_drug = FormularyDrug.new(fhir_formularydrug,@plansbyid)
 	end
 
 	#-----------------------------------------------------------------------------

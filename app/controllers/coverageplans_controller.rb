@@ -17,7 +17,8 @@ class CoverageplansController < ApplicationController
 	# GET /coverageplans
 
 	def index
-		@coverageplans = ApplicationController::plansbyid.values
+		get_plansbyid
+		@coverageplans = @plansbyid.values
 	end
 
 	#-----------------------------------------------------------------------------
@@ -25,7 +26,8 @@ class CoverageplansController < ApplicationController
 	# GET /coverageplans/[id]
 
 	def show
-		@plandata = ApplicationController::plansbyid[params[:id]]
+		get_plansbyid
+		@plandata = @plansbyid[params[:id].to_sym]
 	end
 
 	#-----------------------------------------------------------------------------

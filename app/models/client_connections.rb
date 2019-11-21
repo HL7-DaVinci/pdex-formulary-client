@@ -4,6 +4,7 @@ class ClientConnections
 
     def self.set(id, url)
         begin
+            puts "ClientConnections:set  (#{id}, #{url})"
             client = FHIR::Client.new(url)
             client.use_r4
             FHIR::Model.client = client
@@ -12,6 +13,7 @@ class ClientConnections
             count = client.search(FHIR::MedicationKnowledge, search: search ).resource.total
             raise "No FormularyDrugs in server" unless count > 0
         rescue
+            puts "ClientConnections:set  -- returning nil"
             return nil
         end
         @clients[id] = Hash.new
@@ -37,9 +39,13 @@ class ClientConnections
     end
 
     def self.prune(protectID = nil)
+        puts "ClientConnect:prune (protectID = #{protectID} clients = #{@clients.keys}"
+        @clients.each {|key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}"} 
         @clients[protectID][:lastUsed] = Time.now if protectID && @clients[protectID]
         safeHours = 5
         @clients.delete_if { |id, connection| (Time.now - connection[:lastUsed]) > (safeHours * 60 * 60) }
+        puts "After #{@clients.keys}" 
+        @clients.each {|key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}"} 
     end
 
 end

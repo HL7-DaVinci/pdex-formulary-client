@@ -18,16 +18,19 @@ class CoveragePlan
 		@id = fhir_coverageplan.id 
 		@planid = fhir_coverageplan.identifier.first.value 
 		parse_extensions(fhir_coverageplan)
-		@drugs = parse_drugs(fhir_coverageplan)
-		@drugsbyrxnorm = {}
+
 		@tiers = parse_tiers(fhir_coverageplan) 
-		#--- Collect the pharmacy types present in this coverage plan
-		@pharmacytypes = {}
-		@tiers.each do |tiername, tierdesc| 
-			tierdesc[:costshares].each do |pharmtype, costshare|  
-               @pharmacytypes[pharmtype] = true
-            end  
-		 end  
+		#--- Collect the pharmacy types present in this coverage plan -- we don't use this
+		#@pharmacytypes = {}
+		#@tiers.each do |tiername, tierdesc| 
+		#	tierdesc[:costshares].each do |pharmtype, costshare|  
+        #       @pharmacytypes[pharmtype] = true
+         #   end  
+		# end  
+		
+		# We don't currently use the drug list that is part of the coverage plan.
+		# Since we want to save this in the session object and keep it small, we will not build this array.
+		# @drugs = parse_drugs(fhir_coverageplan)
 	end
 
 
@@ -87,9 +90,9 @@ class CoveragePlan
                                     if costshare_extension.url.include?("PharmacyType")
                                         pharmacytype = costshare_extension.valueCodeableConcept.coding[0].code
                                     elsif costshare_extension.url.include?("CopayAmount")
-                                        copay = costshare_extension.valueMoney.value
-                                    elsif costshare_extension.url.include?("CoInsuranceRate")
-                                        coinsurancerate = 100*costshare_extension.value
+                                        copay = "%d"% costshare_extension.valueMoney.value
+									elsif costshare_extension.url.include?("CoInsuranceRate")
+                                        coinsurancerate = "%d" % (costshare_extension.value.to_i * 100)
                                     elsif costshare_extension.url.include?("CoinsuranceOption")
                                         coinsuranceoption = costshare_extension.valueCodeableConcept.coding[0].code
                                     elsif costshare_extension.url.include?("CopayOption")
