@@ -46,6 +46,9 @@ class ClientConnections
         @clients.delete_if { |id, connection| (Time.now - connection[:lastUsed]) > (safeHours * 60 * 60) }
         puts "After #{@clients.keys}" 
         @clients.each {|key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}"} 
+       rescue => exception
+        puts "failure in Client:Connection.prune"
+
     end
 
 end
