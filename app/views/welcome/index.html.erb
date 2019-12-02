@@ -1,8 +1,16 @@
 <section class='container'>
 	<% if @client %>
 		<p class="text-success m-auto client-connected" style='text-align: center'>
-			Connected to <%= cookies[:server_url] -%>, which houses <%= @count %> Formulary Drugs
+			Connected to <%= cookies[:server_url] -%>
 		</p>
+		<div class='container col-5'>
+		<table class="table table-dark ">
+		<tr class="row">
+		<td class ="col-md-auto"><%= @count %>  <%= link_to "Formulary Drugs", formularies_path%></td>
+		<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Coverage Plans", coverageplans_path%> </td>
+		</tr>			
+		</table>
+		</div>
 	<%else%>
 		<p class="text-danger m-auto" style='text-align: center'>No Connection Established</p>
 	<% end %>
