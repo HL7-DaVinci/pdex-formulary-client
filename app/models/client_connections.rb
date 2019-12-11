@@ -7,6 +7,7 @@ class ClientConnections
             puts "ClientConnections:set  (#{id}, #{url})"
             client = FHIR::Client.new(url)
             client.use_r4
+            client.additional_headers = { 'Accept-Encoding' => 'identity' }  # 
             FHIR::Model.client = client
             profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
             search = { parameters: { _profile: profile, _summary: "count" } }
