@@ -60,8 +60,23 @@ footer {
 	text-align: center;
 }
 
-.welcome-text, .no-formularies {
+.welcome-text {
 	text-align: center;
+	margin-bottom: 30px;
+}
+
+.guidance {
+	text-align: center;
+	margin-top: 15px;
+}
+
+.no-formularies {
+	text-align: center;
+}
+
+.tab-pane {
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 
 #compare-url {

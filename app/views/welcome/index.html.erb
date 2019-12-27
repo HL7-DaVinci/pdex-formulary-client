@@ -1,21 +1,6 @@
 <section class='container'>
-	<% if @client %>
-		<p class="text-success m-auto client-connected" style='text-align: center'>
-			Connected to <%= cookies[:server_url] -%>
-		</p>
-		<div class='container col-5'>
-		<table class="table table-dark ">
-		<tr class="row">
-		<td class ="col-md-auto"><%= @count %>  <%= link_to "Formulary Drugs", formularies_path%></td>
-		<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Coverage Plans", coverageplans_path%> </td>
-		</tr>			
-		</table>
-		</div>
-	<%else%>
-		<p class="text-danger m-auto" style='text-align: center'>No Connection Established</p>
-	<% end %>
 	<h2 class="text-light welcome-text">Connect to a Formulary server</h2>
-	<section class='row mb-5'>
+	<div class='row'>
 		<%= form_tag root_path, method: 'get', class: 'form-inline welcome-form', id: 'server-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-7'>
@@ -25,82 +10,47 @@
 			<%= button_tag 'Connect', class: 'btn btn-primary col-md-2', id: 'server-url' %>
 			<div class='col'></div>
 		<% end %>
-	</section>
-	<h2 class="text-light welcome-text">Lookup FormularyDrugs by Plan, Tier, Name and/or RxNorm</h2>
-	<section class='row mb-1'>
-		<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
-			<div class='form-group col-md-3'>
-				<%= select_tag(:coverage, options_for_select(@cp_options), 
-								prompt: 'Coverage Plan', class: 'custom-select coverage-select') %>
-			</div>
-			<div class='form-group col-md-2'>
-				<%= select_tag(:drug_tier, options_for_select([['All', ''], 
-												['Generic', 'generic'],
-												['Medical Benefit', 'medical-benefit'],
-												['Preferred Brand', 'preferred-brand'], 
-												['Non-preferred Brand', 'non-preferred-brand'],
-												['Specialty', 'specialty'], 
-												['Non-preferred Brand Specialty', 'non-preferred-brand-specialty'],
-												['Zero-cost Share Preventive', 'zero-cost-share-preventive']]),
-												prompt: 'Drug Tier',
-												class: 'custom-select drug-tier-select') %>
-			</div>
-			<div class='form-group col-md-3'>
-				<%= text_field_tag :name, nil, class: 'form-control code-input', placeholder: 'Drug Name'%>
-			</div>
-
-			<div class='form-group col-md-2'>
-				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
-			</div>
-			<%= button_tag 'Lookup', class: 'btn btn-primary col-md-2', id: 'formulary-url', disabled: @client.nil? %>
-			<div class='col'></div>
-		<% end %>
-	</section>
-	<p class='text-light welcome-text ml-auto mr-auto mb-5'>
-		Each of the above options can be left unspecified. 
-		Pressing "Lookup" will display the intersection of defined options.
-	</p>
-	<h2 class="text-light welcome-text">Display Coverage Plans</h2>
-	<section class='row mb-1'>
-		<%= form_tag coverageplans_path, method: 'get', class: 'form-inline welcome-form', id: 'coverageplan-form' do %>
-			<div class='col'></div>
-			<div class='form-group col-md-7'>
-				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Just Click the Button' %>
-			</div>
-			<%= button_tag 'Review CoveragePlans', class: 'btn btn-primary col-md-3', id: 'coverageplan-url', disabled: @client.nil? %>
-			<div class='col'></div>
-		<% end %>
-	</section>
-	<p class='text-light welcome-text ml-auto mr-auto mb-5'>
-		You can leave the field empty.
-		Pressing "Lookup" will display the plans.
-	</p>
-
-	<h2 class="text-light welcome-text">Compare Coverage Plan Formularies</h2>
-	<section class='row mb-1'>
-		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-form' do %>
-			<div class='col'></div>
-			<div class='form-group col-md-4'>
-				<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Search by drug name' %>
-			</div>			
-			<div class='form-group col-md-4'>
-				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'List of RxNorm codes'%>
-			</div>
-
-			<%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', id: 'compare-url', disabled: @client.nil? %>
-			<div class='col'></div>
-		<% end %>
-	</section>
-		<p class='text-light welcome-text ml-auto mr-auto mb-5'>
-		You must specify part of a drugname and/or a list of RxNorm codes.
-		Pressing "Lookup" will display the intersection of defined options.
-	</p>
-
-		<p class='text-light welcome-text ml-auto mr-auto mb-5'>
+	</div>
+	<div class='ml-auto mr-auto mb-5'>
 		<% if @client %>
-            Connection with Formulary Server Established.
+			<p class="text-success m-auto client-connected" style='text-align: center'>
+				Connected to <%= cookies[:server_url] -%>
+			</p>
+			<div class='container col-5'>
+				<table class="table table-dark ">
+					<tr class="row">
+					<td class ="col-md-auto"><%= @count %>  <%= link_to "Formulary Drugs", formularies_path%></td>
+					<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Coverage Plans", coverageplans_path%> </td>
+					</tr>			
+				</table>
+			</div>
 		<% else  %>
-			Must first connect to a Formulary server.
+			<div class='text-warning guidance'>
+				Not connected - please connect to a Formulary server.
+			</div>
 		<% end %>
-	</p>
+	</div>
+	<ul class="nav nav-tabs bg-dark" id="myTab" role="tablist">
+		<li class="nav-item">
+			<a class="nav-link active" id="home-tab" data-toggle="tab" href="#drug-lookup" role="tab" aria-controls="home" aria-selected="true">Drug Lookup</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="profile-tab" data-toggle="tab" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Coverage Plans</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="contact-tab" data-toggle="tab" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Plans</a>
+		</li>
+	</ul>
+	<div class="tab-content" id="myTabContent">
+		<div class="tab-pane fade show active bg-dark" id="drug-lookup" role="tabpanel" aria-labelledby="drug-lookup-tab">
+			<%= render 'drug_lookup' %>
+		</div>
+		<div class="tab-pane fade bg-dark" id="coverage-plans" role="tabpanel" aria-labelledby="coverage-plans-tab">
+			<%= render 'coverage_plans' %>
+		</div>
+		<div class="tab-pane fade bg-dark" id="compare-plans" role="tabpanel" aria-labelledby="compare-plans-tab">
+			<%= render 'compare_plans' %>
+		</div>
+	</div>	
+</section>
 

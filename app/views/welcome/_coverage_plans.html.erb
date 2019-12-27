@@ -1,0 +1,15 @@
+<h2 class="text-light welcome-text">Lookup Coverage Plans</h2>
+<div class='row mb-1'>
+	<%= form_tag coverageplans_path, method: 'get', class: 'form-inline welcome-form', id: 'coverageplan-form' do %>
+		<div class='col'></div>
+		<div class='form-group col-md-7'>
+			<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Just Click the Button' %>
+		</div>
+		<%= button_tag 'Review CoveragePlans', class: 'btn btn-primary col-md-3', id: 'coverageplan-url', disabled: @client.nil? %>
+		<div class='col'></div>
+	<% end %>
+</div>
+<p class='text-info guidance ml-auto mr-auto mb-5'>
+	You can leave the field empty.
+	Pressing "Lookup" will display the plans.
+</p>

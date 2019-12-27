@@ -1,0 +1,19 @@
+<h2 class="text-light welcome-text">Compare Coverage Plan Formularies</h2>
+<div class='row mb-1'>
+	<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-form' do %>
+		<div class='col'></div>
+		<div class='form-group col-md-4'>
+			<%= text_field_tag :search, nil, class: 'form-control', placeholder: 'Search by drug name' %>
+		</div>			
+		<div class='form-group col-md-4'>
+			<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'List of RxNorm codes'%>
+		</div>
+
+		<%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', id: 'compare-url', disabled: @client.nil? %>
+		<div class='col'></div>
+	<% end %>
+</div>
+<p class='text-info guidance ml-auto mr-auto mb-5'>
+	Please specify part of a drugname and/or a list of RxNorm codes.
+	Pressing "Lookup" will display the intersection of defined options.
+</p>
