@@ -1,7 +1,7 @@
 FROM ruby:2.6.3
 MAINTAINER Preston Lee
 
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y build-essential
+# RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y build-essential
 
 # Default shell as bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
@@ -38,6 +38,4 @@ COPY . .
 
 # Showtime!
 EXPOSE 3000
-CMD puma
-# CMD bundle exec rails s
-#puma -C puma.rb
+CMD '/usr/local/bin/bundle exec puma'
