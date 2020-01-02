@@ -38,4 +38,4 @@ COPY . .
 
 # Showtime!
 EXPOSE 3000
-CMD '/usr/local/bin/bundle exec puma'
+CMD ["/usr/local/bin/bundle", "exec", "puma"]
