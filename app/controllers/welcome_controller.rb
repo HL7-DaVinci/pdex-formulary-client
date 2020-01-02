@@ -11,11 +11,11 @@ class WelcomeController < ApplicationController
 	before_action :connect_to_server, only: [:index]
 
 	def index
-		@client = ClientConnections.get(session.id)
+		@client = ClientConnections.get(session.id.public_id)
 		@count = formulary_count
 		@cp_count = coverageplan_count 
 		@cp_options = coverage_plans
-		@cache_nil = ClientConnections.cache_nil?(session.id)
+		@cache_nil = ClientConnections.cache_nil?(session.id.public_id)
 		get_plansbyid
 	end
 
@@ -27,7 +27,7 @@ class WelcomeController < ApplicationController
 	# for future requests.
 
 	def connect_to_server
-		if params[:server_url].present? && !ClientConnections.set(session.id, params[:server_url])
+		if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])
 			err = "Connection failed: Ensure provided url points to a valid FHIR server"
 			err += " that holds at least one Formulary"
 			redirect_to root_path, flash: { error: err }

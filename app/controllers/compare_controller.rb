@@ -16,7 +16,7 @@ class CompareController < ApplicationController
 			@codes = params[:code].strip.split(',').map(&:strip).join(',')
 			set_cache
 			set_table
-			@cache_nil = ClientConnections.cache_nil?(session.id)
+			@cache_nil = ClientConnections.cache_nil?(session.id.public_id)
 		else
 			redirect_to root_path, flash: { error: "Please specify a (partial) drug name, or at least one rxnorm code" }
 		end
@@ -30,7 +30,7 @@ class CompareController < ApplicationController
 	# Specifically, sets @client and redirects home if nil.
 
 	def check_server_connection
-		unless @client = ClientConnections.get(session.id)
+		unless @client = ClientConnections.get(session.id.public_id)
 			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
 		end
 	end
@@ -40,7 +40,7 @@ class CompareController < ApplicationController
 	# Sets @cache, either with already cached info or by retrieving info and caching it
 
 	def set_cache
-	#	unless @cache = ClientConnections.cache(session.id)
+	#	unless @cache = ClientConnections.cache(session.id.public_id)
 			@cache = Hash.new
 			@cache[:cps] = get_all(FHIR::List, { _count: 200 })
 			searchParams = {:_count => 200} 
@@ -50,7 +50,7 @@ class CompareController < ApplicationController
 			searchParams[:_profile] = profile 
 			
 			@cache[:fds] = get_all(FHIR::MedicationKnowledge, searchParams)
-			ClientConnections.cache(session.id, @cache) unless params[:search].present?
+			ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
 	#	end
 	end
 
@@ -105,7 +105,7 @@ class CompareController < ApplicationController
 	# Sifts through formulary drugs based on search term, returns chosen fds
 
 	def sift_fds
-		return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id)
+		return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id.public_id)
 		@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
 	end
 

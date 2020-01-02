@@ -39,7 +39,7 @@ class CoverageplansController < ApplicationController
 	# Specifically, sets @client and redirects home if nil.
 
 	def check_server_connection
-		unless @client = ClientConnections.get(session.id)
+		unless @client = ClientConnections.get(session.id.public_id)
 			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
 		end
 	end
