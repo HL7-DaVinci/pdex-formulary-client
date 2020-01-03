@@ -11,6 +11,8 @@ class WelcomeController < ApplicationController
 	before_action :connect_to_server, only: [:index]
 
 	def index
+		# solution from https://stackoverflow.com/questions/30772737/rails-4-session-id-occasionally-nil
+		session[:foo] = "bar" unless session.id   
 		@client = ClientConnections.get(session.id.public_id)
 		@count = formulary_count
 		@cp_count = coverageplan_count 
