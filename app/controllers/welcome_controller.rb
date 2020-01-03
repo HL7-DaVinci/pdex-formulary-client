@@ -30,6 +30,7 @@ class WelcomeController < ApplicationController
 
 	def connect_to_server
 		session[:foo] = "bar" unless session.id   
+		raise "session.id is nil"  unless session.id
 		if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])
 			err = "Connection failed: Ensure provided url points to a valid FHIR server"
 			err += " that holds at least one Formulary"
