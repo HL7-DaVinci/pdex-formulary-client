@@ -104,8 +104,12 @@ table {
 	width: inherit !important;
 }
 
-.col-md-3 { // partially overrides a bootstrap class, not ideal but works
-	padding-left: 0;
+.form-group { // partially overrides a bootstrap class, not ideal but works
+	padding-right: 0;
+}
+
+.last {
+	padding-right: 15px;
 }
 
 .prior-auth, .step-therapy, .quantity-limit, .mail-order,
