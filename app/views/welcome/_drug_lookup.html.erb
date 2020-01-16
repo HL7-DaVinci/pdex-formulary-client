@@ -1,5 +1,5 @@
 <h2 class="text-light welcome-text">Lookup Drugs by Plan, Tier, Name and/or RxNorm</h2>
-<div class='row mb-1'>
+<div class='row mb-1 col-md-12'>
 	<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
 		<div class='form-group col-md-3'>
 			<%= select_tag(:coverage, options_for_select(@cp_options), 
@@ -21,7 +21,7 @@
 			<%= text_field_tag :name, nil, class: 'form-control code-input', placeholder: 'Drug Name'%>
 		</div>
 
-		<div class='form-group col-md-2'>
+		<div class='form-group col-md-2 last'>
 			<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
 		</div>
 		<%= button_tag 'Lookup', class: 'btn btn-primary col-md-2', id: 'formulary-url', disabled: @client.nil? %>
