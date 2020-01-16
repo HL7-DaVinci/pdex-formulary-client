@@ -75,11 +75,11 @@ class CoveragePlan
                         mailorder= false
 						costshares = {}
                         extension.extension.each do |drugtier_extension|
-                            if drugtier_extension.url.include?("DrugTierID")
+                            if drugtier_extension.url.include?("drugTierID")
 								tiername = drugtier_extension.valueCodeableConcept.coding[0].code
-                            elsif drugtier_extension.url.include?("MailOrder")
+                            elsif drugtier_extension.url.include?("mailOrder")
                                 mailorder = drugtier_extension.valueBoolean
-							elsif drugtier_extension.url.include?("CostSharing")
+							elsif drugtier_extension.url.include?("costSharing")
                                 costshare = {}
                                 copay = 0
                                 coinsurancerate = 0
@@ -87,15 +87,15 @@ class CoveragePlan
                                 coinsuranceoption = ""
 								pharmacytype = ""
                                 drugtier_extension.extension.each do |costshare_extension|
-                                    if costshare_extension.url.include?("PharmacyType")
+                                    if costshare_extension.url.include?("pharmacyType")
                                         pharmacytype = costshare_extension.valueCodeableConcept.coding[0].code
-                                    elsif costshare_extension.url.include?("CopayAmount")
+                                    elsif costshare_extension.url.include?("copayAmount")
                                         copay = "%d"% costshare_extension.valueMoney.value
-									elsif costshare_extension.url.include?("CoInsuranceRate")
+									elsif costshare_extension.url.include?("coinsuranceRate")
                                         coinsurancerate = "%d" % (costshare_extension.value.to_i * 100)
-                                    elsif costshare_extension.url.include?("CoinsuranceOption")
+                                    elsif costshare_extension.url.include?("coinsuranceOption")
                                         coinsuranceoption = costshare_extension.valueCodeableConcept.coding[0].code
-                                    elsif costshare_extension.url.include?("CopayOption")
+                                    elsif costshare_extension.url.include?("copayOption")
                                         copayoption = costshare_extension.valueCodeableConcept.coding[0].code
                                     else
 										puts "Wierd stuff in coverage_plan.rb"
