@@ -44,8 +44,6 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    archive-zip (0.12.0)
-      io-like (~> 0.3.0)
     arel (9.0.0)
     autoprefixer-rails (9.7.3)
       execjs
@@ -68,10 +66,6 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (~> 1.5)
       xpath (~> 3.2)
-    childprocess (3.0.0)
-    chromedriver-helper (2.1.1)
-      archive-zip (~> 0.10)
-      nokogiri (~> 1.8)
     coderay (1.1.2)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
@@ -123,7 +117,6 @@ GEM
       domain_name (~> 0.5)
     i18n (1.7.0)
       concurrent-ruby (~> 1.0)
-    io-like (0.3.0)
     jbuilder (2.9.1)
       activesupport (>= 4.2.0)
     jquery-rails (4.3.5)
@@ -212,7 +205,6 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     ruby_dep (1.5.0)
-    rubyzip (2.0.0)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -232,9 +224,6 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    selenium-webdriver (3.142.7)
-      childprocess (>= 0.5, < 4.0)
-      rubyzip (>= 1.2.2)
     spring (2.1.0)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -267,7 +256,7 @@ GEM
       railties (>= 5.0)
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.4)
+    websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zlib (1.1.0)
@@ -280,7 +269,6 @@ DEPENDENCIES
   bootstrap (~> 4.3.1)
   byebug
   capybara (>= 2.15)
-  chromedriver-helper
   coffee-rails (~> 4.2)
   fhir_client
   jbuilder (~> 2.5)
@@ -291,7 +279,6 @@ DEPENDENCIES
   puma (>= 3.12.2)
   rails (~> 5.2.4.1)
   sass-rails (~> 5.0)
-  selenium-webdriver
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3
