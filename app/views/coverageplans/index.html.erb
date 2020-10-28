@@ -2,6 +2,7 @@
 	<section class='row col-12'>
 		<div class='col-12'>
 			<h3 class='float-left text-white'>CoveragePlans - Index</h3>
+      <%= render 'partials/query' %>
 			<div class='btn-group float-right mt-2' role='group'>
 				<%= link_to 'Previous', coverageplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
 				<%= link_to 'Next', 		coverageplans_path(page: 'next'), 		class: 'btn btn-outline-primary' %>

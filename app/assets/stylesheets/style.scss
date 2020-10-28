@@ -92,6 +92,18 @@ table {
 	margin-top: 20px;
 }
 
+.query {
+  border-color: #454d55; 
+  background-color: #343a40;
+  color: white; 
+  padding: 10px;
+  word-wrap: break-word !important;
+}
+
+div.query {
+  margin-left: 0px;
+}
+
 .btn-group {
 	float: right;
 }

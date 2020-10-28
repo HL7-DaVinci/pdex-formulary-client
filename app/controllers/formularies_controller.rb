@@ -31,10 +31,15 @@ class FormulariesController < ApplicationController
 		end
 		get_plansbyid
 		fhir_formularydrugs = @@bundle.entry.map(&:resource)
+
 		@formularydrugs = []
 		fhir_formularydrugs.each do |fhir_formularydrug| 
 			@formularydrugs << FormularyDrug.new(fhir_formularydrug,@plansbyid)
 		end
+
+		# Prepare the query string for display on the page
+  	@search = "<Search String in Returned Bundle is empty>"
+  	@search = URI.decode(@@bundle.link.select { |l| l.relation === "self"}.first.url) if @@bundle.link.first 
 	end
 
 	#-----------------------------------------------------------------------------
@@ -47,14 +52,16 @@ class FormulariesController < ApplicationController
 		fhir_formularydrug = @@bundle.entry.map(&:resource).first
 		get_plansbyid
 		@formulary_drug = FormularyDrug.new(fhir_formularydrug,@plansbyid)
+
+		# Prepare the query string for display on the page
+  	@search = "<Search String in Returned Bundle is empty>"
+  	@search = URI.decode(@@bundle.link.select { |l| l.relation === "self"}.first.url) if @@bundle.link.first 
 	end
 
 	#-----------------------------------------------------------------------------
 	private
 	#-----------------------------------------------------------------------------
 
-	
-		
 	# Check that this session has an established FHIR client connection.
 	# Specifically, sets @client and redirects home if nil.
 

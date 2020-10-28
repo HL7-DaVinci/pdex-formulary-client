@@ -1,8 +1,17 @@
+################################################################################
+#
+# Compare Controller
+#
+# Copyright (c) 2019 The MITRE Corporation.  All rights reserved.
+#
+################################################################################
+
 class CompareController < ApplicationController
 
 	before_action :check_server_connection, only: [ :index ]
 
 	attr_accessor :drugname, :codes 
+
 	#-----------------------------------------------------------------------------
 
 	# GET /compare
@@ -10,6 +19,7 @@ class CompareController < ApplicationController
 	def index
 		@codes = nil
 		@params = nil 
+
 		get_plansbyid
 		if params[:search].length>0 or params[:code].length>0
 			@drugname = params[:search].split(' ').first 
@@ -32,6 +42,7 @@ class CompareController < ApplicationController
 	def check_server_connection
 		session[:foo] = "bar" unless session.id   
 		raise "session.id is nil"  unless session.id
+
 		unless @client = ClientConnections.get(session.id.public_id)
 			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
 		end
@@ -60,30 +71,35 @@ class CompareController < ApplicationController
 
 	# Gets all instances of klass from server
 
-    def get_all(klass = nil, search_params = {})
-        replies = get_all_bundles(klass, search_params)
-        return nil unless replies
-        resources = []
+  def get_all(klass = nil, search_params = {})
+    replies = get_all_bundles(klass, search_params)
+    return nil unless replies
+
+    resources = []
 		replies.each do |reply|
-            resources.push(reply.entry.collect{ |singleEntry| singleEntry.resource })
-        end
-        resources.compact!
-        resources.flatten(1)
+      resources.push(reply.entry.collect{ |singleEntry| singleEntry.resource })
+    end
+
+    resources.compact!
+    resources.flatten(1)
 	end
 	
 	#-----------------------------------------------------------------------------
 
 	# Gets all bundles from server when querying for klass
 
-    def get_all_bundles(klass = nil, search_params = {})
+  def get_all_bundles(klass = nil, search_params = {})
 		return nil unless klass
+
 		search = { search: { parameters: search_params } }
-        replies = [].push(@client.search(klass, search).resource)
+    replies = [].push(@client.search(klass, search).resource)
+
 		while replies.last
 			replies.push(replies.last.next_bundle)
-        end
-        replies.compact!
-        replies.present? ? replies : nil
+    end
+
+    replies.compact!
+    replies.present? ? replies : nil
 	end
 	
 	#-----------------------------------------------------------------------------
@@ -94,6 +110,7 @@ class CompareController < ApplicationController
 		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.title , cp.identifier.first.value) }
 		chosen = sift_fds
 		@table_rows = Hash.new
+
 		chosen.collect!{ |fd| FormularyDrug.new(fd, @plansbyid) }
 		chosen.each do |fd|
 			code = fd.rxnorm_code

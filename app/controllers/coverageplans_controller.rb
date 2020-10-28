@@ -34,7 +34,6 @@ class CoverageplansController < ApplicationController
 	private
 	#-----------------------------------------------------------------------------
 
-			
 	# Check that this session has an established FHIR client connection.
 	# Specifically, sets @client and redirects home if nil.
 
@@ -45,6 +44,5 @@ class CoverageplansController < ApplicationController
 			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
 		end
 	end
-
 	
 end

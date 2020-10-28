@@ -12,12 +12,14 @@ class WelcomeController < ApplicationController
 
 	def index
 		# solution from https://stackoverflow.com/questions/30772737/rails-4-session-id-occasionally-nil
-		session[:foo] = "bar" unless session.id   
-		@client = ClientConnections.get(session.id.public_id)
-		@count = formulary_count
-		@cp_count = coverageplan_count 
-		@cp_options = coverage_plans
-		@cache_nil = ClientConnections.cache_nil?(session.id.public_id)
+		session[:foo] = "bar" unless session.id 
+
+		@client       = ClientConnections.get(session.id.public_id)
+		@count        = formulary_count
+		@cp_count     = coverageplan_count 
+		@cp_options   = coverage_plans
+		@cache_nil    = ClientConnections.cache_nil?(session.id.public_id)
+
 		get_plansbyid
 	end
 
@@ -57,6 +59,8 @@ class WelcomeController < ApplicationController
 		end
 		count
 	end
+
+  #-----------------------------------------------------------------------------
 
 	def coverageplan_count
 		begin
