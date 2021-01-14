@@ -9,7 +9,7 @@ class ClientConnections
             client.use_r4
             client.additional_headers = { 'Accept-Encoding' => 'identity' }  # 
             FHIR::Model.client = client
-            profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+            profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
             search = { parameters: { _profile: profile, _summary: "count" } }
             count = client.search(FHIR::MedicationKnowledge, search: search ).resource.total
             raise "No FormularyDrugs in server" unless count > 0

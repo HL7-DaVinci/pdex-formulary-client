@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
 
   def coverage_plans
     # Read all of the coverage plans from the server
-    cp_profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
+    cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
     reply = @client.read(FHIR::List, nil, nil, cp_profile).resource
     @plansbyid  = build_coverage_plans(reply)
     options = build_coverage_plan_options(reply)

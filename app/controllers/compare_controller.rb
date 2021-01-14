@@ -59,7 +59,7 @@ class CompareController < ApplicationController
 			searchParams = {:_count => 200} 
 			searchParams[:code] = @codes if @codes and @codes.length > 0
 			searchParams["DrugName:contains"] = @drugname  if @drugname and @drugname.length>0
-			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
 			searchParams[:_profile] = profile 
 			
 			@cache[:fds] = get_all(FHIR::MedicationKnowledge, searchParams)

@@ -20,7 +20,7 @@ class FormulariesController < ApplicationController
 		if params[:page].present?
 			@@bundle = update_page(params[:page], @@bundle)
 		else
-			profile = "http://hl7.org/fhir/us/Davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
 			search = { parameters: { _profile: profile } }
 			search[:parameters][:DrugTier] = params[:drug_tier] if params[:drug_tier].present?
 			search[:parameters][:DrugPlan] = params[:coverage] if params[:coverage].present?
