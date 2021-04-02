@@ -10,7 +10,7 @@ require 'json'
 	
 class FormulariesController < ApplicationController
 
-	before_action :check_server_connection, only: [ :index, :show ]
+	before_action :connect_to_server 
 
 	#-----------------------------------------------------------------------------
 

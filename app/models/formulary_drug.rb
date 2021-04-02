@@ -26,12 +26,12 @@ class FormularyDrug < Resource
 		@rxnorm_path            =    "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=" + @rxnorm_code 
 		@formulary_id_path            = "/formularies/#{@id}"
 		parse_extensions(fhir_formulary)
-		@plan = plansbyid[@plan_id.to_sym]
+		@plan = plansbyid[@plan_id]
 		# Test inclusion of drug tier info in formulary drug for display
-		@tier = @plan[:tiers][@drug_tier.to_sym]
+		@tier = @plan.tiers[@drug_tier]
 		if @tier
-			@copay = @tier[:costshares]["1-month-in-retail".to_sym][:copay]
-			@coinsurancerate = @tier[:costshares]["1-month-in-retail".to_sym][:coinsurancerate]			
+			@copay = @tier[:costshares]["1-month-in-retail"][:copay]
+			@coinsurancerate = @tier[:costshares]["1-month-in-retail"][:coinsurancerate]			
 		else
 			@copay = "missing"
 			@coinsurancerate = "missing"
@@ -105,9 +105,9 @@ class FormularyDrug < Resource
 					@quantity_limit = extension.valueBoolean
 				elsif extension.url.include?("PlanID")
 					@plan_id = extension.valueString
-					@plan = plansbyid[plan_id.to_sym]
+					@plan = plansbyid[plan_id]
 					@plan_id_path = "/coverageplans/#{plan_id}"
-					@plan_id_name = plan[:name]
+					@plan_id_name = plan.name 
 				end
 			end
 		else

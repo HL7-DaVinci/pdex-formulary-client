@@ -10,7 +10,7 @@ require 'json'
 	
 class CoverageplansController < ApplicationController
 
-	before_action :check_server_connection, only: [ :index, :show ]
+	before_action :connect_to_server, only: [ :index, :show ]
 
 	#-----------------------------------------------------------------------------
 
@@ -19,6 +19,7 @@ class CoverageplansController < ApplicationController
 	def index
 		get_plansbyid
 		@coverageplans = @plansbyid.values
+		binding.pry 
 	end
 
 	#-----------------------------------------------------------------------------
@@ -28,6 +29,7 @@ class CoverageplansController < ApplicationController
 	def show
 		get_plansbyid
 		@plandata = @plansbyid[params[:id].to_sym]
+		binding.pry 
 	end
 
 	#-----------------------------------------------------------------------------
