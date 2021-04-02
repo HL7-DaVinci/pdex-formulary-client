@@ -36,17 +36,6 @@ class CompareController < ApplicationController
 	private
 	#-----------------------------------------------------------------------------
 
-	# Check that this session has an established FHIR client connection.
-	# Specifically, sets @client and redirects home if nil.
-
-	def check_server_connection
-		session[:foo] = "bar" unless session.id   
-		raise "session.id is nil"  unless session.id
-
-		unless @client = ClientConnections.get(session.id.public_id)
-			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
-		end
-	end
 
 	#-----------------------------------------------------------------------------
 
@@ -61,7 +50,6 @@ class CompareController < ApplicationController
 			searchParams["DrugName:contains"] = @drugname  if @drugname and @drugname.length>0
 			#profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
 			#searchParams[:_profile] = profile 
-			
 			@cache[:fds] = get_all(FHIR::MedicationKnowledge, searchParams)
 			#ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
 	#	end
@@ -113,7 +101,8 @@ class CompareController < ApplicationController
 
 	def set_table
 		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.title , cp.identifier.first.value) }
-		chosen = sift_fds
+		#chosen = sift_fds   # not convinced this is necessary
+		chosen = @cache[:fds].clone 
 		@table_rows = Hash.new
 
 		chosen.collect!{ |fd| FormularyDrug.new(fd, @plansbyid) }
@@ -129,7 +118,8 @@ class CompareController < ApplicationController
 	# Sifts through formulary drugs based on search term, returns chosen fds
 
 	def sift_fds
-		return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id.public_id)
+		return @cache[:fds].clone if params[:search].blank? 
+		binding.pry 
 		@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
 	end
 

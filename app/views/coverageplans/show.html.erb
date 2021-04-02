@@ -2,12 +2,12 @@
  <section class='container'>
 	<div class='plan'>
 			<h3 class='float-left text-white'>CoveragePlan: 
-			<%= @plandata[:name]%>
+			<%= @plandata.name%>
 			</h3>
 	</div>
   <section class='row col-12'>
     <% unless @plandata.nil? %>
-	<% @plandata[:tiers].each do | tiername, tierdesc| %>
+	<% @plandata.tiers.each do | tiername, tierdesc| %>
 	<h2 class='float-left text-white'><%= tiername.to_s.split('-').map(&:capitalize).join(' ') %>	</h2>
 	<% if tierdesc[:mailorder] %>
 	<div class ='drug'>

@@ -19,7 +19,7 @@ class CoverageplansController < ApplicationController
 	def index
 		get_plansbyid
 		@coverageplans = @plansbyid.values
-		binding.pry 
+
 	end
 
 	#-----------------------------------------------------------------------------
@@ -28,8 +28,8 @@ class CoverageplansController < ApplicationController
 
 	def show
 		get_plansbyid
-		@plandata = @plansbyid[params[:id].to_sym]
 		binding.pry 
+		@plandata = @plansbyid[params[:id]]
 	end
 
 	#-----------------------------------------------------------------------------
