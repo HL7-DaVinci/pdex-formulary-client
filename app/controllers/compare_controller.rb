@@ -8,7 +8,7 @@
 
 class CompareController < ApplicationController
 
-	before_action :check_server_connection, only: [ :index ]
+	before_action :connect_to_server, only: [ :index ]
 
 	attr_accessor :drugname, :codes 
 
@@ -26,7 +26,7 @@ class CompareController < ApplicationController
 			@codes = params[:code].strip.split(',').map(&:strip).join(',')
 			set_cache
 			set_table
-			@cache_nil = ClientConnections.cache_nil?(session.id.public_id)
+			#@cache_nil = ClientConnections.cache_nil?(session.id.public_id)
 		else
 			redirect_to root_path, flash: { error: "Please specify a (partial) drug name, or at least one rxnorm code" }
 		end
@@ -36,17 +36,6 @@ class CompareController < ApplicationController
 	private
 	#-----------------------------------------------------------------------------
 
-	# Check that this session has an established FHIR client connection.
-	# Specifically, sets @client and redirects home if nil.
-
-	def check_server_connection
-		session[:foo] = "bar" unless session.id   
-		raise "session.id is nil"  unless session.id
-
-		unless @client = ClientConnections.get(session.id.public_id)
-			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
-		end
-	end
 
 	#-----------------------------------------------------------------------------
 
@@ -59,34 +48,38 @@ class CompareController < ApplicationController
 			searchParams = {:_count => 200} 
 			searchParams[:code] = @codes if @codes and @codes.length > 0
 			searchParams["DrugName:contains"] = @drugname  if @drugname and @drugname.length>0
-			profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			searchParams[:_profile] = profile 
-			
+			#profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			#searchParams[:_profile] = profile 
 			@cache[:fds] = get_all(FHIR::MedicationKnowledge, searchParams)
-			ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
+			#ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
 	#	end
 	end
 
 	#-----------------------------------------------------------------------------
 
 	# Gets all instances of klass from server
+	# first call get_all_bundles to get all pages of response
+	# Then iterate through the responses,and pull out the resources returned
 
   def get_all(klass = nil, search_params = {})
     replies = get_all_bundles(klass, search_params)
     return nil unless replies
 
     resources = []
-		replies.each do |reply|
+	# Create an array of resources from each bundle and insert it into resources
+	replies.each do |reply|
       resources.push(reply.entry.collect{ |singleEntry| singleEntry.resource })
     end
-
-    resources.compact!
-    resources.flatten(1)
+    # At this point resources is an array of arrays
+    resources.compact!   
+	# Now resources is an array.
+    resources.flatten(1) 
 	end
 	
 	#-----------------------------------------------------------------------------
 
 	# Gets all bundles from server when querying for klass
+	# replies is an array of all of the bundles
 
   def get_all_bundles(klass = nil, search_params = {})
 		return nil unless klass
@@ -98,7 +91,7 @@ class CompareController < ApplicationController
 			replies.push(replies.last.next_bundle)
     end
 
-    replies.compact!
+    replies.compact! # eliminates nulls
     replies.present? ? replies : nil
 	end
 	
@@ -108,7 +101,8 @@ class CompareController < ApplicationController
 
 	def set_table
 		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.title , cp.identifier.first.value) }
-		chosen = sift_fds
+		#chosen = sift_fds   # not convinced this is necessary
+		chosen = @cache[:fds].clone 
 		@table_rows = Hash.new
 
 		chosen.collect!{ |fd| FormularyDrug.new(fd, @plansbyid) }
@@ -124,7 +118,8 @@ class CompareController < ApplicationController
 	# Sifts through formulary drugs based on search term, returns chosen fds
 
 	def sift_fds
-		return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id.public_id)
+		return @cache[:fds].clone if params[:search].blank? 
+		binding.pry 
 		@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
 	end
 

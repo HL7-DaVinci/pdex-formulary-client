@@ -10,7 +10,7 @@ require 'json'
 	
 class FormulariesController < ApplicationController
 
-	before_action :check_server_connection, only: [ :index, :show ]
+	before_action :connect_to_server 
 
 	#-----------------------------------------------------------------------------
 
@@ -20,8 +20,8 @@ class FormulariesController < ApplicationController
 		if params[:page].present?
 			@@bundle = update_page(params[:page], @@bundle)
 		else
-			profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			search = { parameters: { _profile: profile } }
+			#profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			search = { parameters: { } }
 			search[:parameters][:DrugTier] = params[:drug_tier] if params[:drug_tier].present?
 			search[:parameters][:DrugPlan] = params[:coverage] if params[:coverage].present?
 			search[:parameters][:code] = params[:code] if params[:code].present?
