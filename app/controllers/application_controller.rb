@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
   private
   #-----------------------------------------------------------------------------
 
+  def get_patient
+    Patient.init 
+  end
+  
   def coverage_plans
     # Read all of the coverage plans from the server
     cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
