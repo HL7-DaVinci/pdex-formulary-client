@@ -31,7 +31,6 @@ class DashboardController < ApplicationController
                                   parameters: { identifier: coverage_plan_id } 
                                 }).resource
     @coverage_plan = coverage_plan_bundle.entry.first.resource
-    
     puts "==>DashboardController.index"
   end
 
