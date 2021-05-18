@@ -8,7 +8,7 @@
 
 class CompareController < ApplicationController
 
-	before_action :check_server_connection, only: [ :index ]
+	before_action :check_formulary_server_connection, only: [ :index ]
 
 	attr_accessor :drugname, :codes 
 
@@ -34,20 +34,6 @@ class CompareController < ApplicationController
 
 	#-----------------------------------------------------------------------------
 	private
-	#-----------------------------------------------------------------------------
-
-	# Check that this session has an established FHIR client connection.
-	# Specifically, sets @client and redirects home if nil.
-
-	def check_server_connection
-		session[:foo] = "bar" unless session.id   
-		raise "session.id is nil"  unless session.id
-
-		unless @client = ClientConnections.get(session.id.public_id)
-			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
-		end
-	end
-
 	#-----------------------------------------------------------------------------
 
 	# Sets @cache, either with already cached info or by retrieving info and caching it

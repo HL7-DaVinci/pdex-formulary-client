@@ -15,6 +15,7 @@ gem 'mini_racer', platforms: :ruby    # Minimal embedded v8 engine for Ruby
 gem 'coffee-rails', '~> 4.2'    # Use CoffeeScript for .coffee assets and views
 gem 'turbolinks', '~> 5'        # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'jbuilder', '~> 2.5'        # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'dalli'                     # Memcache client
 
 # gem 'redis', '~> 4.0'         # Use Redis adapter to run Action Cable in production
 # gem 'bcrypt', '~> 3.1.7'      # Use ActiveModel has_secure_password

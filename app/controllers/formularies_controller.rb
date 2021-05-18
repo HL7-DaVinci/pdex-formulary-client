@@ -10,7 +10,7 @@ require 'json'
 	
 class FormulariesController < ApplicationController
 
-	before_action :check_server_connection, only: [ :index, :show ]
+	before_action :check_formulary_server_connection, only: [ :index, :show ]
 
 	#-----------------------------------------------------------------------------
 
@@ -60,19 +60,6 @@ class FormulariesController < ApplicationController
 
 	#-----------------------------------------------------------------------------
 	private
-	#-----------------------------------------------------------------------------
-
-	# Check that this session has an established FHIR client connection.
-	# Specifically, sets @client and redirects home if nil.
-
-	def check_server_connection
-		session[:foo] = "bar" unless session.id   
-		raise "session.id is nil"  unless session.id
-		unless @client = ClientConnections.get(session.id.public_id)
-			redirect_to root_path, flash: { error: "Please connect to a formulary server" }
-		end
-	end
-
 	#-----------------------------------------------------------------------------
 
 	# Performs pagination on the drug formulary list, reading 20 formularies from

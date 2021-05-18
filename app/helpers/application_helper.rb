@@ -95,7 +95,7 @@ module ApplicationHelper
     if address.text.present?
     	address_text = address.text
     else
-    	address_text = (address.lines + 
+    	address_text = (address.line + 
     										[ address.city, address.state, address.postalCode ]).join(', ')
     end
 

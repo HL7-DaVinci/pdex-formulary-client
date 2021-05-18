@@ -1,9 +1,9 @@
 <div class='card bg-dark text-white'>
   <div class='card-body'>
-    <h2 class="text-light"><%= @patient.coverage_plan.first %></h2>
+    <h2 class="text-light"><%= @coverage_plan.title %></h2>
     <div class='row mb-1 col-md-12'>
       <%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
-        <%= hidden_field_tag :coverage, @patient.coverage_plan.last %>
+        <%= hidden_field_tag :coverage, @coverage_plan %>
         <div class='form-group col-md-3'>
           <%= select_tag(:drug_tier, options_for_select([['All', ''], 
                           ['Generic', 'generic'],

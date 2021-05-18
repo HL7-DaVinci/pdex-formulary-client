@@ -8,7 +8,7 @@
 
 class WelcomeController < ApplicationController
 
-	before_action :connect_to_server, only: [:index]
+	before_action :connect_to_formulary_server, only: [:index]
 
 	def index
 		# solution from https://stackoverflow.com/questions/30772737/rails-4-session-id-occasionally-nil
@@ -30,7 +30,7 @@ class WelcomeController < ApplicationController
 	# Connect the FHIR client with the specified server and save the connection
 	# for future requests.
 
-	def connect_to_server
+	def connect_to_formulary_server
 		session[:foo] = "bar" unless session.id   
 		raise "session.id is nil"  unless session.id
 		if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])

@@ -22,29 +22,17 @@
           </tr>
           <tr>
             <td>DOB</td>
-            <td><%= display_date(@patient.birthDate) %></td>
-          </tr>
-          <tr>
-            <td>Marital Status</td>
-            <td><%= sanitize(@patient.maritalStatus) %></td>
-          </tr>
-          <tr>
-            <td>Phone</td>
-            <td>
-              <% @patient.telecoms.each do |telecom| %>
-                <%= display_telecom(telecom) %><br />
-              <% end %>
-            </td>
+            <td><%= sanitize(@patient.birthDate) %></td>
           </tr>
         </table>
       </div>
     </div>
     <div class='row address'>
       <p>
-        <%= 'Address'.pluralize(@patient.addresses.count) %>
+        <%= 'Address'.pluralize(@patient.address.count) %>
       </p>
       <table class='table table-striped table-dark status'>
-        <% @patient.addresses.each do |address| %>
+        <% @patient.address.each do |address| %>
           <%= render partial: 'partials/address', locals: { address: address } %>
         <% end %>
        </table>

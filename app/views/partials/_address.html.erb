@@ -8,7 +8,7 @@
 	</td>
 	<td>
 		<%= link_to google_maps(address), target: '_blank' do %>
-		  <% address.lines.each do |line| %>
+		  <% address.line.each do |line| %>
 		    <%= sanitize(line) %><br />
 		  <% end %>
 		  <%= sanitize(address.city) %>, 

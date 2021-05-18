@@ -11,13 +11,35 @@ class DashboardController < ApplicationController
   require 'json'
   require 'base64'
 
+  before_action :check_formulary_server_connection, only: [ :index ]
+
+  #-----------------------------------------------------------------------------
+
   def index
     connect_to_patient_server if @patient_client == nil
+
     @patient = @patient_client.read(FHIR::Patient, 'PDexPatient1').resource
+    pdex_coverage_bundle = @patient_client.search(FHIR::Coverage, 
+                          search: { 
+                            parameters: { patient: @patient.id }
+                          }).resource
+    pdex_coverage = pdex_coverage_bundle.entry.first.resource
+
+    coverage_plan_id = CoveragePlan.find_formulary_coverage_plan(pdex_coverage)
+    coverage_plan_bundle = @client.search(FHIR::List, 
+                                search: { 
+                                  parameters: { identifier: coverage_plan_id } 
+                                }).resource
+    @coverage_plan = coverage_plan_bundle.entry.first.resource
+    
     puts "==>DashboardController.index"
   end
 
-  # launch:  Pass either params or hardcoded server and client data to the auth_url via redirection
+  #-----------------------------------------------------------------------------
+
+  # launch:  Pass either params or hardcoded server and client data to the 
+  # auth_url via redirection
+
   def launch
     #reset_session    # Get a completely fresh session for each launch.  This is a rails method.
     if params[:client_id].length == 0   #this is a sentinel for unauthenticated access with the patient ID in the client_secret
@@ -69,9 +91,12 @@ class DashboardController < ApplicationController
   end
 
 
+  #-----------------------------------------------------------------------------
+
   # login:  Once authorization has happened, auth server redirects to here.   
   #         Use the returned info to get a token  
   #         Use the returned token and patientID to get the patient info
+
   def login
     if params[:error].present?   # Authentication Failure
       ## binding.pry 
