@@ -44,7 +44,6 @@ class WelcomeController < ApplicationController
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?
 	end
 
-
 	#-----------------------------------------------------------------------------
 
 	# Gets count of formularies in server

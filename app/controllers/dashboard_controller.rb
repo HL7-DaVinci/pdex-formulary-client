@@ -12,8 +12,8 @@ class DashboardController < ApplicationController
   require 'base64'
 
   def index
-    #connect_to_server if @client == nil
-    @patient = get_patient
+    connect_to_patient_server if @patient_client == nil
+    @patient = @patient_client.read(FHIR::Patient, 'PDexPatient1').resource
     puts "==>DashboardController.index"
   end
 
@@ -24,8 +24,8 @@ class DashboardController < ApplicationController
       session[:client_secret] = session[:patient_id] = params[:client_secret]
       session[:client_id] = params[:client_id]
       session[:iss_url]  = params[:iss_url]
-      @client = FHIR::Client.new(session[:iss_url])
-      @client.use_r4
+      @patient_client = FHIR::Client.new(session[:iss_url])
+      @patient_client.use_r4
       # @client.set_bearer_token(session[:access_token])
       puts "==>redirect_to #{dashboard_url}"
       redirect_to patients_path, alert: "Please provide a client id and secret"
@@ -109,10 +109,10 @@ class DashboardController < ApplicationController
       session[:token_expiration] = Time.now.to_i + rcResult["expires_in"].to_i
       @patient = session[:patient_id] = rcResult["patient"]
 
-      @client = FHIR::Client.new(session[:iss_url])
-      @client.use_r4
-      @client.set_bearer_token(session[:access_token])
-      @client.default_json
+      @patient_client = FHIR::Client.new(session[:iss_url])
+      @patient_client.use_r4
+      @patient_client.set_bearer_token(session[:access_token])
+      @patient_client.default_json
   
       redirect_to dashboard_url, notice: "Signed in"
     end
@@ -122,22 +122,34 @@ class DashboardController < ApplicationController
   private
   #-----------------------------------------------------------------------------
 
-  # Connect the FHIR client with the specified server and save the connection
+  # Connect the FHIR client with the specified patient server and save the connection
   # for future requests.
 
-  def connect_to_server
-    session[:foo] = "bar" unless session.id   
-    raise "session.id is nil"  unless session.id
-    if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])
-      err = "Connection failed: Ensure provided url points to a valid FHIR server"
-      err += " that holds at least one Formulary"
-      redirect_to root_path, flash: { error: err }
-      session[:plansbyid] = nil
-      session[:cp_options] = [["N/A (Must connect first)", "-"]]
-      return nil
+  def connect_to_patient_server
+    puts "==>connect_to_patient_server"
+    if session[:client_id].length == 0 
+      @patient_client = FHIR::Client.new(session[:iss_url])
+      @patient_client.use_r4
+      return  # We do not have authentication
     end
-    cookies[:server_url] = params[:server_url] if params[:server_url].present?
+    if session.empty? 
+      err = "Session Expired"
+      #     binding.pry 
+      redirect_to root_path, alert: err
+    end
+    if session[:iss_url].present?
+      @patient_client = FHIR::Client.new(session[:iss_url])
+      @patient_client.use_r4
+      token_expires_in = session[:token_expiration] - Time.now.to_i
+      if token_expires_in.to_i < 10   # if we are less than 10s from an expiration, refresh
+        get_new_token
+      end
+      @patient_client.set_bearer_token(session[:access_token])
+    end
+  rescue StandardError => exception
+    reset_session
+    err = "Failed to connect: " + exception.message
+    redirect_to root_path, alert: err
   end
-
 
 end

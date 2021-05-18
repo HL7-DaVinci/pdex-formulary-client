@@ -2,12 +2,12 @@
   <div class='card-header'>
     Patient: 
     <h2>
-      <% @patient.names.each do |name| %>
-        <%= name %><br />
+      <% @patient.name.each do |name| %>
+        <%= display_human_name(name) %><br />
       <% end %>
     </h2>
-    <br />Patient ID:
-      <%= sanitize(@patient.id) %> <br />
+    <br />
+    Patient ID: <%= sanitize(@patient.id) %> <br />
   </div>
   <div class='card-body'>
     <div class='row patient-info'>
@@ -21,16 +21,12 @@
             <td><%= sanitize(@patient.gender) %></td>
           </tr>
           <tr>
-            <td>Age</td>
-            <td><%= sanitize(@patient.age) %> years old</td>
-          </tr>
-          <tr>
             <td>DOB</td>
-            <td><%= display_date(@patient.birth_date) %></td>
+            <td><%= display_date(@patient.birthDate) %></td>
           </tr>
           <tr>
             <td>Marital Status</td>
-            <td><%= sanitize(@patient.marital_status) %></td>
+            <td><%= sanitize(@patient.maritalStatus) %></td>
           </tr>
           <tr>
             <td>Phone</td>

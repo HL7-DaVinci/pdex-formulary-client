@@ -10,7 +10,7 @@ class PatientsController < ApplicationController
 
   def index
     puts "==>PatientsController.index"
-    redirect_to '/dashboard'
+    #redirect_to '/dashboard'
   end
 
 end
