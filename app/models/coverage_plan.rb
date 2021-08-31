@@ -48,13 +48,13 @@ class CoveragePlan
 		if extensions.present?
 				extensions.each do |extension|
 					if extension.url.include?("SummaryURL")
-						@summaryurl = extension.valueString
+						@summaryurl = extension.valueUrl
 					elsif extension.url.include?("MarketingURL")
-						@marketingurl = extension.valueString
+						@marketingurl = extension.valueUrl
 					elsif extension.url.include?("EmailPlanContact")
-						@email = extension.valueString
+						@email = extension.valueUrl
 					elsif extension.url.include?("FormularyURL")
-						@formularyurl = extension.valueString
+						@formularyurl = extension.valueUrl
 					elsif extension.url.include?("PlanID")
 						@planidtype  = extension.valueString
 					elsif extension.url.include?("Network")

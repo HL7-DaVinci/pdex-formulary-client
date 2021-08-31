@@ -20,19 +20,20 @@
 			<% @coverageplans.each do |coverageplan| %>
 				<tr>
 					<td>  <%= link_to sanitize(coverageplan[:name]), "/coverageplans/#{coverageplan[:planid]}" %> </td>
-          <% if coverageplan[:email] %>
-					<td>  <a href=mailto:<%=coverageplan[:email] %> >e-mail </a>,
-          <% end %>
-          <% if coverageplan[:marketingurl]%>
-					<td>  <a href=<%=coverageplan[:marketingurl] %> >marketing </a>,
-          <% end %>
-         <% if coverageplan[:formularyurl] %>
-					<td>  <a href=<%=coverageplan[:formularyurl] %> >formulary </a>,
-          <% end %>
-         <% if coverageplan[:summaryurl] %>
-			    <a href=<%=coverageplan[:summaryurl] %> >summary </a> 
-          <% end %>     
-           </td>
+          <td>
+            <% if coverageplan[:email] %>
+              <a href=mailto:<%=coverageplan[:email] %> >e-mail </a>,
+            <% end %>
+            <% if coverageplan[:marketingurl]%>
+              <a href=<%=coverageplan[:marketingurl] %> >marketing </a>,
+            <% end %>
+            <% if coverageplan[:formularyurl] %>
+              <a href=<%=coverageplan[:formularyurl] %> >formulary </a>,
+            <% end %>
+            <% if coverageplan[:summaryurl] %>
+              <a href=<%=coverageplan[:summaryurl] %> >summary </a> 
+            <% end %>     
+          </td>
 					<td> <%= coverageplan[:network] %></td>
 					<td> <%= coverageplan[:planid] %></td>
           <td> <%= coverageplan[:planidtype] %></td>
