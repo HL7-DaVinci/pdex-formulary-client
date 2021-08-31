@@ -50,8 +50,8 @@ class WelcomeController < ApplicationController
 
 	def formulary_count
 		begin
-			profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			search = { parameters: { _profile: profile, _summary: "count" } }
+			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+			search = { parameters: { _summary: "count" } }
 			count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
 		rescue => exception
 			count = 0
@@ -63,8 +63,9 @@ class WelcomeController < ApplicationController
 
 	def coverageplan_count
 		begin
-			profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-			search = { parameters: { _profile: profile, _summary: "count" } }
+			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
+      code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+			search = { parameters: { code: code, _summary: "count" } }
 			count = @client.search(FHIR::List, search: search ).resource.total
 		rescue => exception
 			count = 0

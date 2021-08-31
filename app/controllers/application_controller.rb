@@ -24,8 +24,9 @@ class ApplicationController < ActionController::Base
   
   def coverage_plans
     # Read all of the coverage plans from the server
-    cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-    reply = @client.read(FHIR::List, nil, nil, cp_profile).resource
+    cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
+    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code}}).resource
     @plansbyid  = build_coverage_plans(reply)
     options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
