@@ -31,6 +31,11 @@ class ApplicationController < ActionController::Base
     options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
     session[:cp_options] = compress_hash(options)
+
+    # Prepare the query string for display on the page
+  	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
+    session[:query] = @search
+
     options
     rescue => exception
       puts "coverage_plans fails:  not connected"
@@ -43,6 +48,7 @@ class ApplicationController < ActionController::Base
     if session[:plansbyid]
       @plansbyid = JSON.parse(decompress_hash(session[:plansbyid])).deep_symbolize_keys
       @cp_options = decompress_hash(session[:cp_options])
+      @search = session[:query]
     else
       puts "get_plansbyid:  session[:plansbyid] is nil, calling coverage_plans "
       @plansbyid = nil
