@@ -20,12 +20,10 @@ class CoveragePlan
 		@id 		           = fhir_coverageplan.id 
 		@planid            = fhir_coverageplan.identifier.first.value 
     @period            = fhir_coverageplan.period
-    @coverage_area_ids = parse_coverage_area_ids(fhir_coverageplan)
-    @contacts           = parse_contacts(fhir_coverageplan)
-		
-    # parse_extensions(fhir_coverageplan)
 
-		@tiers = parse_tiers(fhir_coverageplan) 
+    @coverage_area_ids = parse_coverage_area_ids(fhir_coverageplan)
+    @contacts          = parse_contacts(fhir_coverageplan)
+		@tiers             = parse_tiers(fhir_coverageplan) 
 
 		
 	end
@@ -53,33 +51,6 @@ class CoveragePlan
     
     return contacts
   end
-  
-  #-----------------------------------------------------------------------------
-
- 	#--- Parses the values within the extensions defined by the formulary drug 
-	#--- resource.
-	#  def parse_extensions(fhir_coverageplan)
-	# 	extensions = fhir_coverageplan.extension
-	# 	if extensions.present?
-	# 			extensions.each do |extension|
-	# 				if extension.url.include?("SummaryURL")
-	# 					@summaryurl = extension.valueUrl
-	# 				elsif extension.url.include?("MarketingURL")
-	# 					@marketingurl = extension.valueUrl
-	# 				elsif extension.url.include?("EmailPlanContact")
-	# 					@email = extension.valueUrl
-	# 				elsif extension.url.include?("FormularyURL")
-	# 					@formularyurl = extension.valueUrl
-	# 				elsif extension.url.include?("PlanID")
-	# 					@planidtype  = extension.valueString
-	# 				elsif extension.url.include?("Network")
-	# 					@network = extension.valueString
-	# 				end
-	# 			end
-	# 	else
-	# 		@planid = "Required extensions not specified"
-	# 	end
-	# end
 	 
 	#-----------------------------------------------------------------------------
 
@@ -94,61 +65,33 @@ class CoveragePlan
 		tiers = {}
 		if plans.present?
 			plans.each do |plan|
-        plan.specificCost.each do |cost|
-          tiername = ""
-          mailorder= false
-          costshares = {}
-          tiername = cost.category.coding[0].code
+        pharmacyType = plan.type.coding[0].display
+        
+        plan.specificCost.each do |tier|
+          tiername = tier.category.coding[0].code
+          costshare = {}
+          tier.benefit[0].cost.each do |share|
+            type = share.type.coding[0].code
+            if type == "copay"
+              costshare[:copayoption] = share.qualifiers[0].coding[0].code
+              costshare[:copay] = share.value&.value
+            else
+              costshare[:coinsuranceoption] = share.qualifiers[0].coding[0].code
+              costshare[:coinsurancerate] = share.value&.value
+            end
+          end
+          
+          if tiers[tiername]
+            tiers[tiername][pharmacyType] = costshare
+          else
+            tiers[tiername] = {pharmacyType => costshare}
+          end
         end
 
-				if extension.url.include?("DrugTierDefinition")
-          tiername = ""
-         	mailorder= false
-					costshares = {}
-          extension.extension.each do |drugtier_extension|
-            if drugtier_extension.url.include?("drugTierID")
-							tiername = drugtier_extension.valueCodeableConcept.coding[0].code
-            elsif drugtier_extension.url.include?("mailOrder")
-              mailorder = drugtier_extension.valueBoolean
-						elsif drugtier_extension.url.include?("costSharing")
-              costshare = {}
-              copay = 0
-              coinsurancerate = 0
-              copayoption = ""
-              coinsuranceoption = ""
-							pharmacytype = ""
-              drugtier_extension.extension.each do |costshare_extension|
-                if costshare_extension.url.include?("pharmacyType")
-                  pharmacytype = costshare_extension.valueCodeableConcept.coding[0].code
-                elsif costshare_extension.url.include?("copayAmount")
-                  copay = "%d"% costshare_extension.valueMoney.value
-								elsif costshare_extension.url.include?("coinsuranceRate")
-                  coinsurancerate = "%d" % (costshare_extension.value.to_i * 100)
-                elsif costshare_extension.url.include?("coinsuranceOption")
-                  coinsuranceoption = costshare_extension.valueCodeableConcept.coding[0].code
-                elsif costshare_extension.url.include?("copayOption")
-                  copayoption = costshare_extension.valueCodeableConcept.coding[0].code
-                else
-									puts "Weird stuff in coverage_plan.rb"
-                end
-							end 
-
-              costshare = {
-              	:pharmacytype 			=> pharmacytype,
-                :copay 							=> copay,
-                :coinsurancerate 		=> coinsurancerate,
-                :copayoption 				=> copayoption ,
-                :coinsuranceoption 	=> coinsuranceoption
-              }
-
-							costshares[pharmacytype] = costshare
-            end 
-					end 
-          tiers[tiername] = {:mailorder => mailorder, :costshares => costshares}
-				end
 			end
-			return tiers 
+			 
 		end
+    return tiers
 	end
 
 	#-----------------------------------------------------------------------------

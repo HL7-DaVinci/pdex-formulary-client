@@ -50,6 +50,7 @@ class ApplicationController < ActionController::Base
     rescue => exception
       puts "coverage_plans fails:  not connected"
       options = [["N/A (Must connect first)", "-"]]
+      puts exception
   end
 
   #-----------------------------------------------------------------------------

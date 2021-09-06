@@ -22,9 +22,9 @@
 		<th scope='col'>CoInsurance</th>
         <th scope='col'>CoInsurance Option</th>
 	    </tr>
-	<% tierdesc[:costshares].each do |pharmtype, costshare| %>
+	<% tierdesc.each do |pharmtype, costshare| %>
 	<tr>
-	<td> <%= pharmtype.to_s.split('-').map(&:capitalize).join(' ') %> </td>
+	<td> <%= pharmtype.to_s.split(' ').map(&:capitalize).join(' ') %> </td>
 	<td> $<%= costshare[:copay] %> </td>
 	<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
 	<td> <%= costshare[:coinsurancerate] %>% </td>
