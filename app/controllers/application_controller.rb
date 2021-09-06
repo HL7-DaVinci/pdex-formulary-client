@@ -22,20 +22,30 @@ class ApplicationController < ActionController::Base
     Patient.init 
   end
   
+  #-----------------------------------------------------------------------------
+
+  def payer_plans
+    
+  end
+  
+  #-----------------------------------------------------------------------------
+
   def coverage_plans
     # Read all of the coverage plans from the server
-    cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-    # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code}}).resource
+    cp_type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    
+    reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
     @plansbyid  = build_coverage_plans(reply)
+    @locationsbyid  = locations
     options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
+    session[:locationsbyid] = compress_hash(@locationsbyid.to_json)
     session[:cp_options] = compress_hash(options)
 
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
     session[:query] = @search
-
+    
     options
     rescue => exception
       puts "coverage_plans fails:  not connected"
@@ -47,6 +57,7 @@ class ApplicationController < ActionController::Base
   def get_plansbyid
     if session[:plansbyid]
       @plansbyid = JSON.parse(decompress_hash(session[:plansbyid])).deep_symbolize_keys
+      @locationsbyid = JSON.parse(decompress_hash(session[:locationsbyid])).deep_symbolize_keys
       @cp_options = decompress_hash(session[:cp_options])
       @search = session[:query]
     else
@@ -57,6 +68,18 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #-----------------------------------------------------------------------------
+
+  def locations
+    profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-InsurancePlanLocation"
+    bundle = @client.search(FHIR::Location, search: { parameters: { _profile: profile}}).resource&.entry || []
+    areas = bundle.each_with_object({}) do | entry, areahashbyid |
+      areahashbyid[entry.resource.id] = Location.new(entry.resource)
+    end
+    
+    areas.deep_symbolize_keys
+  end
+  
   #-----------------------------------------------------------------------------
 
   def compress_hash(h)
@@ -73,7 +96,7 @@ class ApplicationController < ActionController::Base
 
   def build_coverage_plan_options(fhir_list_reply)
     options = fhir_list_reply.entry.collect do |entry| 
-      [entry.resource.title, entry.resource.identifier.first.value]
+      [entry.resource.name, entry.resource.id]
     end
     options.unshift(["All", ""])
   end
@@ -82,7 +105,7 @@ class ApplicationController < ActionController::Base
 
   def build_coverage_plans (fhir_list_reply)
     coverageplans = fhir_list_reply.entry.each_with_object({}) do | entry, planhashbyid |
-      planhashbyid[entry.resource.identifier.first.value] = CoveragePlan.new(entry.resource)
+      planhashbyid[entry.resource.id] = CoveragePlan.new(entry.resource)
     end
     coverageplans.deep_symbolize_keys
   end

@@ -11,74 +11,96 @@ class CoveragePlan
 
   include ActiveModel::Model
 
-	attr_accessor :name, :id, :summaryurl, :network, :formularyurl, :email, 
-									:marketingurl, :planidtype, :planid, :drugs, :tiers
+	# attr_accessor :name, :id, :summaryurl, :network, :formularyurl, :email, 
+	# 								:marketingurl, :planidtype, :planid, :drugs, :tiers
+  attr_accessor :name, :id, :planid, :period, :contacts, :coverage_area_ids, :tiers
 
 	def initialize(fhir_coverageplan)
-		@name 	= fhir_coverageplan.title
-		@id 		= fhir_coverageplan.id 
-		@planid = fhir_coverageplan.identifier.first.value 
-
-		parse_extensions(fhir_coverageplan)
+		@name 	           = fhir_coverageplan.name
+		@id 		           = fhir_coverageplan.id 
+		@planid            = fhir_coverageplan.identifier.first.value 
+    @period            = fhir_coverageplan.period
+    @coverage_area_ids = parse_coverage_area_ids(fhir_coverageplan)
+    @contacts           = parse_contacts(fhir_coverageplan)
+		
+    # parse_extensions(fhir_coverageplan)
 
 		@tiers = parse_tiers(fhir_coverageplan) 
 
-		#--- Collect the pharmacy types present in this coverage plan -- we don't use this
-		# @pharmacytypes = {}
-		# @tiers.each do |tiername, tierdesc| 
-		#	  tierdesc[:costshares].each do |pharmtype, costshare|  
-    #     @pharmacytypes[pharmtype] = true
-    #   end  
-		# end  
 		
-		# We don't currently use the drug list that is part of the coverage plan.
-		# Since we want to save this in the session object and keep it small, we 
-		# will not build this array.
-		#
-		# @drugs = parse_drugs(fhir_coverageplan)
 	end
 
 
 	#-----------------------------------------------------------------------------
+
+  def parse_coverage_area_ids(fhir_coverageplan)
+    fhir_coverageplan.coverageArea&.map { |location| location.reference.split('/').last }
+  end
+  
+  #-----------------------------------------------------------------------------
+
+  def parse_contacts(fhir_coverageplan)
+    contacts = {}
+    if fhir_coverageplan.contact
+      fhir_coverageplan.contact.each do |contact_info|
+        telecom = {}
+        contact_info.telecom&.each do |type|
+          telecom[type.system] = type.value
+        end
+        contacts[contact_info&.name&.text] = telecom
+      end
+    end
+    
+    return contacts
+  end
+  
+  #-----------------------------------------------------------------------------
 
  	#--- Parses the values within the extensions defined by the formulary drug 
 	#--- resource.
-	 def parse_extensions(fhir_coverageplan)
-		extensions = fhir_coverageplan.extension
-		if extensions.present?
-				extensions.each do |extension|
-					if extension.url.include?("SummaryURL")
-						@summaryurl = extension.valueUrl
-					elsif extension.url.include?("MarketingURL")
-						@marketingurl = extension.valueUrl
-					elsif extension.url.include?("EmailPlanContact")
-						@email = extension.valueUrl
-					elsif extension.url.include?("FormularyURL")
-						@formularyurl = extension.valueUrl
-					elsif extension.url.include?("PlanID")
-						@planidtype  = extension.valueString
-					elsif extension.url.include?("Network")
-						@network = extension.valueString
-					end
-				end
-		else
-			@planid = "Required extensions not specified"
-		end
-	end
+	#  def parse_extensions(fhir_coverageplan)
+	# 	extensions = fhir_coverageplan.extension
+	# 	if extensions.present?
+	# 			extensions.each do |extension|
+	# 				if extension.url.include?("SummaryURL")
+	# 					@summaryurl = extension.valueUrl
+	# 				elsif extension.url.include?("MarketingURL")
+	# 					@marketingurl = extension.valueUrl
+	# 				elsif extension.url.include?("EmailPlanContact")
+	# 					@email = extension.valueUrl
+	# 				elsif extension.url.include?("FormularyURL")
+	# 					@formularyurl = extension.valueUrl
+	# 				elsif extension.url.include?("PlanID")
+	# 					@planidtype  = extension.valueString
+	# 				elsif extension.url.include?("Network")
+	# 					@network = extension.valueString
+	# 				end
+	# 			end
+	# 	else
+	# 		@planid = "Required extensions not specified"
+	# 	end
+	# end
 	 
 	#-----------------------------------------------------------------------------
 
-	def parse_drugs(fhir_coverageplan)
-		fhir_coverageplan.entry.map(&:item).map(&:reference)
-	end
+	# def parse_drugs(fhir_coverageplan)
+	# 	fhir_coverageplan.entry.map(&:item).map(&:reference)
+	# end
 
 	#-----------------------------------------------------------------------------
 
 	def parse_tiers(entry)
-	  extensions = entry.extension
+	  plans = entry.plan
 		tiers = {}
-		if extensions.present?
-			extensions.each do |extension|
+		if plans.present?
+			plans.each do |plan|
+        plan.specificCost.each do |cost|
+          tiername = ""
+          mailorder= false
+          costshares = {}
+          tiername = cost.category.coding[0].code
+        end
+
 				if extension.url.include?("DrugTierDefinition")
           tiername = ""
          	mailorder= false

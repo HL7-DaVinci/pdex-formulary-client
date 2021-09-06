@@ -64,9 +64,9 @@ class WelcomeController < ApplicationController
 	def coverageplan_count
 		begin
 			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-      code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-			search = { parameters: { code: code, _summary: "count" } }
-			count = @client.search(FHIR::List, search: search ).resource.total
+      type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+			search = { parameters: { type: type, _summary: "count" } }
+			count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
 		rescue => exception
 			count = 0
 		end
