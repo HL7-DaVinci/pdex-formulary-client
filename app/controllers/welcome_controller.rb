@@ -18,8 +18,10 @@ class WelcomeController < ApplicationController
 		@count        = formulary_count
 		@cp_count     = coverageplan_count 
 		@cp_options   = coverage_plans
+    @payers_count = payerplans_count
 		@cache_nil    = ClientConnections.cache_nil?(session.id.public_id)
 
+    get_payers_byid
 		get_plansbyid
 	end
 
@@ -39,6 +41,8 @@ class WelcomeController < ApplicationController
 			redirect_to root_path, flash: { error: err }
 			session[:plansbyid] = nil
 			session[:cp_options] = [["N/A (Must connect first)", "-"]]
+      session[:payersbyid] = nil
+      session[:locationsbyid] = nil
 			return nil
 		end
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?
@@ -72,5 +76,18 @@ class WelcomeController < ApplicationController
 		end
 		count
 	end
+
+  #-----------------------------------------------------------------------------
+
+  def payerplans_count
+    begin
+      type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
+      search = { parameters: { type: type, _summary: "count" } }
+      count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
+    rescue => exception
+      count = 0
+    end
+    count
+  end
 
 end

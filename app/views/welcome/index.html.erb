@@ -16,11 +16,12 @@
 			<p class="text-success m-auto client-connected" style='text-align: center'>
 				Connected to <%= cookies[:server_url] -%>
 			</p>
-			<div class='container col-5'>
-				<table class="table table-dark ">
-					<tr class="row">
+			<div class='container col-6'>
+				<table class="table ">
+					<tr class="row table-secondary">
 					<td class ="col-md-auto"><%= @count %>  <%= link_to "Formulary Drugs", formularies_path%></td>
-					<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Coverage Plans", coverageplans_path%> </td>
+					<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Insurance Drug Plans", coverageplans_path%> </td>
+          <td class ="col-md-auto "><%=@payers_count %>  <%= link_to "Payer Insurance Plans", payerplans_path%> </td>
 					</tr>			
 				</table>
 			</div>

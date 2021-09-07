@@ -24,14 +24,8 @@ class ApplicationController < ActionController::Base
   
   #-----------------------------------------------------------------------------
 
-  def payer_plans
-    
-  end
-  
-  #-----------------------------------------------------------------------------
-
   def coverage_plans
-    # Read all of the coverage plans from the server
+    # Read all of the insurance drug plans from the server
     cp_type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
     
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
@@ -82,6 +76,38 @@ class ApplicationController < ActionController::Base
   end
   
   #-----------------------------------------------------------------------------
+  
+  def payer_plans
+    # Read all payer insurance plans from the server
+    payerplan_type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
+
+    reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: payerplan_type}}).resource
+    @payersbyid  = build_payer_plans(reply)
+    session[:payersbyid] = compress_hash(@payersbyid.to_json)
+    
+    # Prepare the query string for display on the page
+  	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
+    session[:payersplan_query] = @search
+  
+    rescue => exception
+      puts "payer plans fails: #{exception}"
+  end
+
+  #-----------------------------------------------------------------------------
+
+  def get_payers_byid
+    if session[:payersbyid]
+      @payersbyid = JSON.parse(decompress_hash(session[:payersbyid])).deep_symbolize_keys
+      @search = session[:payersplan_query]
+    else
+      puts "get_payers_byid:  session[:payersbyid] is nil, calling payer_plans "
+      @payersbyid = nil
+      payer_plans 
+    end
+    
+  end
+
+  #-----------------------------------------------------------------------------
 
   def compress_hash(h)
     zh = Base64.encode64(Zlib::Deflate.deflate(h.to_json))
@@ -113,6 +139,14 @@ class ApplicationController < ActionController::Base
 
   #-----------------------------------------------------------------------------
 
+  def build_payer_plans (fhir_list_reply)
+    payerplans = fhir_list_reply.entry.each_with_object({}) do | entry, payerhashbyid |
+      payerhashbyid[entry.resource.id] = PayerPlan.new(entry.resource)
+    end
+    payerplans.deep_symbolize_keys
+  end
+
+  #-----------------------------------------------------------------------------
   # Check that this session has an established FHIR client connection.
   # Specifically, sets @client and redirects home if nil.
 
