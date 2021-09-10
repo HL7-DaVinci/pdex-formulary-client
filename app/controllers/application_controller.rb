@@ -56,7 +56,7 @@ class ApplicationController < ActionController::Base
       @cp_options = decompress_hash(session[:cp_options])
       @search = session[:query]
     else
-      puts "get_plansbyid:  session[:plansbyid] is nil, calling coverage_plans "
+      puts "get_plansbyid:  session[:plansbyid] is #{session[:plansbyid]}, calling coverage_plans "
       @plansbyid = nil
       @cp_options = [["N/A (Must connect first)", "-"]]
       coverage_plans 
@@ -100,7 +100,7 @@ class ApplicationController < ActionController::Base
       @payersbyid = JSON.parse(decompress_hash(session[:payersbyid])).deep_symbolize_keys
       @search = session[:payersplan_query]
     else
-      puts "get_payers_byid:  session[:payersbyid] is nil, calling payer_plans "
+      puts "get_payers_byid:  session[:payersbyid] is #{session[:payersbyid]}, calling payer_plans "
       @payersbyid = nil
       payer_plans 
     end
@@ -154,6 +154,7 @@ class ApplicationController < ActionController::Base
     session[:foo] = "bar" unless session.id   
     raise "session.id is nil"  unless session.id
     unless @client = ClientConnections.get(session.id.public_id)
+      session.clear
       redirect_to root_path, flash: { error: "Please connect to a formulary server" }
     end
   end

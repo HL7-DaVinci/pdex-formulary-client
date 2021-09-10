@@ -38,11 +38,9 @@ class WelcomeController < ApplicationController
 		if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])
 			err = "Connection failed: Ensure provided url points to a valid FHIR server"
 			err += " that holds at least one Formulary"
+      
+      session.clear
 			redirect_to root_path, flash: { error: err }
-			session[:plansbyid] = nil
-			session[:cp_options] = [["N/A (Must connect first)", "-"]]
-      session[:payersbyid] = nil
-      session[:locationsbyid] = nil
 			return nil
 		end
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?
