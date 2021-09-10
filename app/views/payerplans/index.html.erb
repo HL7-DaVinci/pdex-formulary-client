@@ -46,6 +46,10 @@
           </td>
           <td>
             
+            <% if !payerplan[:coverage_area_ids].present? %>
+              Not available
+            <% end %>
+            
             <% payerplan[:coverage_area_ids]&.each do |id| %>
               <% location = @locationsbyid[id.to_sym] %>
               <% address_text = location[:address]&.values&.join(',') %>
@@ -63,6 +67,8 @@
             
             <% if payerplan[:period].present? %>
               <%= display_raw_date(payerplan[:period][:start]) %> - <%= display_raw_date(payerplan[:period][:end]) %>
+            <% else %>
+              Not available
             <% end %>
             
           </td>
