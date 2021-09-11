@@ -147,6 +147,17 @@ class ApplicationController < ActionController::Base
   end
 
   #-----------------------------------------------------------------------------
+
+  # Formulary drugs 
+  def build_formulary_drugs(fhir_formularydrugs)
+    formulary_drugs = fhir_formularydrugs.each_with_object({}) do | resource, drughashbyid |
+      drughashbyid[resource.id] = FormularyDrug.new(resource)
+    end
+    JSON.parse(formulary_drugs.to_json).deep_symbolize_keys
+  end
+  
+  #-----------------------------------------------------------------------------
+  
   # Check that this session has an established FHIR client connection.
   # Specifically, sets @client and redirects home if nil.
 

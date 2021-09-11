@@ -39,18 +39,29 @@ class CompareController < ApplicationController
 	# Sets @cache, either with already cached info or by retrieving info and caching it
 
 	def set_cache
-	#	unless @cache = ClientConnections.cache(session.id.public_id)
-			@cache = Hash.new
-			@cache[:cps] = get_all(FHIR::List, { _count: 200 })
-			searchParams = {:_count => 200} 
-			searchParams[:code] = @codes if @codes and @codes.length > 0
-			searchParams["DrugName:contains"] = @drugname  if @drugname and @drugname.length>0
-			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			# searchParams[:_profile] = profile 
+		@cache = Hash.new
 			
-			@cache[:fds] = get_all(FHIR::MedicationKnowledge, searchParams)
-			ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
-	#	end
+		searchParams = { _count: 200, _include: ["Basic:subject", "Basic:drug-plan"] } 
+		searchParams["subject:MedicationKnowledge.code"] = @codes if @codes and @codes.length > 0
+		searchParams["subject:MedicationKnowledge.drug-name"] = @drugname  if @drugname and @drugname.length>0
+		searchParams[:code] = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
+
+    @cache[:cps] = []
+    @cache[:fds] = []
+    @cache[:fis] = []
+    get_all(FHIR::Basic, searchParams).each do |resource|
+      if resource.resourceType == "Basic"
+        @cache[:fis] << resource
+      elsif resource.resourceType == "InsurancePlan"
+        @cache[:cps] << resource
+      else
+        @cache[:fds] << resource
+      end
+      
+    end
+      
+		ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
+	
 	end
 
 	#-----------------------------------------------------------------------------
@@ -65,7 +76,7 @@ class CompareController < ApplicationController
 		replies.each do |reply|
       resources.push(reply.entry.collect{ |singleEntry| singleEntry.resource })
     end
-
+    
     resources.compact!
     resources.flatten(1)
 	end
@@ -78,8 +89,9 @@ class CompareController < ApplicationController
 		return nil unless klass
 
 		search = { search: { parameters: search_params } }
-    replies = [].push(@client.search(klass, search).resource)
-
+    reply = @client.search(klass, search).resource
+    replies = [].push(reply)
+    @search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
 		while replies.last
 			replies.push(replies.last.next_bundle)
     end
@@ -93,15 +105,16 @@ class CompareController < ApplicationController
 	# Sets @table_headers and @table_rows
 
 	def set_table
-		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.title , cp.identifier.first.value) }
-		chosen = sift_fds
+		@table_header = @cache[:cps].collect{ |cp| CoveragePlanOld.new(cp.name , cp.id) }
+		chosen = @cache[:fis]
+    @drugsbyid = build_formulary_drugs(@cache[:fds])
 		@table_rows = Hash.new
 
-		chosen.collect!{ |fd| FormularyDrug.new(fd, @plansbyid) }
-		chosen.each do |fd|
-			code = fd.rxnorm_code
-			plan = fd.plan_id
-			@table_rows.has_key?(code) ? @table_rows[code][plan] = fd : @table_rows[code] = { plan => fd }
+		chosen.collect!{ |fi| FormularyItem.new(fi, @plansbyid, @drugsbyid) }
+		chosen.each do |fi|
+			code = fi.rxnorm_code
+			plan = fi.plan_id
+			@table_rows.has_key?(code) ? @table_rows[code][plan] = fi : @table_rows[code] = { plan => fi }
 		end
 	end
 	
@@ -109,9 +122,9 @@ class CompareController < ApplicationController
 
 	# Sifts through formulary drugs based on search term, returns chosen fds
 
-	def sift_fds
-		return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id.public_id)
-		@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
-	end
+	# def sift_fds
+	# 	return @cache[:fds].clone if params[:search].blank? || ClientConnections.cache_nil?(session.id.public_id)
+	# 	@cache[:fds].select{ |fd| fd.code.coding.first.display.upcase.include?(params[:search].upcase) }
+	# end
 
 end
