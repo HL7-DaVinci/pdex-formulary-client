@@ -20,21 +20,30 @@ class FormulariesController < ApplicationController
 		if params[:page].present?
 			@@bundle = update_page(params[:page], @@bundle)
 		else
-			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
-			search = { parameters: {  } }
-			search[:parameters][:DrugTier] = params[:drug_tier] if params[:drug_tier].present?
-			search[:parameters][:DrugPlan] = params[:coverage] if params[:coverage].present?
-			search[:parameters][:code] = params[:code] if params[:code].present?
-			search[:parameters]["DrugName:contains"] = params[:name] if params[:name].present?
-			reply = @client.search(FHIR::MedicationKnowledge, search: search )
+			drug_tier_system = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-DrugTierCS|"
+      rxnorm_code_system = "http://www.nlm.nih.gov/research/umls/rxnorm|"
+      code = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
+			search = { parameters: { _include: "Basic:subject", code: code } }
+			search[:parameters]["drug-tier"] = "#{drug_tier_system}#{params[:drug_tier]}" if params[:drug_tier].present?
+			search[:parameters]["drug-plan"] = "InsurancePlan/#{params[:coverage]}" if params[:coverage].present?
+			search[:parameters]["subject:MedicationKnowledge.code"] = "#{rxnorm_code_system}#{params[:code]}" if params[:code].present?
+			search[:parameters]["subject:MedicationKnowledge.drug-name"] = params[:name] if params[:name].present?
+			reply = @client.search(FHIR::Basic, search: search )
 			@@bundle = reply.resource
 		end
 		get_plansbyid
-		fhir_formularydrugs = @@bundle.entry.map(&:resource)
+		fhir_formularyitems = []
+    fhir_formularydrugs = []
 
+    @@bundle.entry.each do |entry|
+      resource = entry.resource
+      resource.resourceType == "Basic" ? fhir_formularyitems << resource : fhir_formularydrugs << resource
+    end
+
+    @drugsbyid =  build_formulary_drugs(fhir_formularydrugs)
 		@formularydrugs = []
-		fhir_formularydrugs.each do |fhir_formularydrug| 
-			@formularydrugs << FormularyDrug.new(fhir_formularydrug,@plansbyid)
+		fhir_formularyitems.each do |fhir_formularyitem| 
+			@formularydrugs << FormularyItem.new(fhir_formularyitem,@plansbyid, @drugsbyid)
 		end
 
 		# Prepare the query string for display on the page
@@ -47,11 +56,19 @@ class FormulariesController < ApplicationController
 	# GET /formularies/[id]
 
 	def show
-		reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { _id: params[:id] } })
+    code = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
+		reply = @client.search(FHIR::Basic, search: { parameters: { _id: params[:id], code: code, _include: "Basic:subject" } })
 		@@bundle = reply.resource
-		fhir_formularydrug = @@bundle.entry.map(&:resource).first
+    fhir_formularydrugs = []
+    fhir_formularyitem = {}
+    @@bundle.entry.each do |entry|
+      resource = entry.resource
+      resource.resourceType == "Basic" ? fhir_formularyitem = resource : fhir_formularydrugs << resource
+    end
+		# fhir_formularydrug = @@bundle.entry.map(&:resource).first
 		get_plansbyid
-		@formulary_drug = FormularyDrug.new(fhir_formularydrug,@plansbyid)
+    @drugsbyid =  build_formulary_drugs(fhir_formularydrugs)
+		@formulary_drug = FormularyItem.new(fhir_formularyitem, @plansbyid, @drugsbyid)
 
 		# Prepare the query string for display on the page
   	@search = "<Search String in Returned Bundle is empty>"
@@ -87,5 +104,17 @@ class FormulariesController < ApplicationController
 
 		return bundle
 	end
+
+  #-----------------------------------------------------------------------------
+  # Formulary drugs 
+  def build_formulary_drugs(fhir_formularydrugs)
+    formulary_drugs = fhir_formularydrugs.each_with_object({}) do | resource, drughashbyid |
+      drughashbyid[resource.id] = FormularyDrug.new(resource)
+    end
+    JSON.parse(formulary_drugs.to_json).deep_symbolize_keys
+  end
+  
+  #-----------------------------------------------------------------------------
+
 
 end
