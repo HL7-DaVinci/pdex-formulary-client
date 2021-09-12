@@ -31,19 +31,19 @@ class ApplicationController < ActionController::Base
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
     @plansbyid  = build_coverage_plans(reply)
     @locationsbyid  = locations
-    options = build_coverage_plan_options(reply)
+    @cp_options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
     session[:locationsbyid] = compress_hash(@locationsbyid.to_json)
-    session[:cp_options] = compress_hash(options)
+    session[:cp_options] = compress_hash(@cp_options)
 
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
     session[:query] = @search
     
-    options
+    @cp_options
     rescue => exception
       puts "coverage_plans fails:  not connected"
-      options = [["N/A (Must connect first)", "-"]]
+      @cp_options = [["N/A (Must connect first)", "-"]]
       puts exception
   end
 
@@ -122,10 +122,10 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
 
   def build_coverage_plan_options(fhir_list_reply)
-    options = fhir_list_reply.entry.collect do |entry| 
+    @cp_options = fhir_list_reply.entry.collect do |entry| 
       [entry.resource.name, entry.resource.id]
     end
-    options.unshift(["All", ""])
+    @cp_options.unshift(["All", ""])
   end
 
   #-----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ class ApplicationController < ActionController::Base
   end
   
   #-----------------------------------------------------------------------------
-  
+
   # Check that this session has an established FHIR client connection.
   # Specifically, sets @client and redirects home if nil.
 
