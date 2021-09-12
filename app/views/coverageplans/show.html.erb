@@ -17,6 +17,7 @@
     <table class='table table-dark'>
       	<tr>
 		<th scope='col'>Pharmacy Type</th>
+    <th scope='col'>Network</th>
 		<th scope='col'>CoPay</th>
         <th scope='col'>CoPay Option</th>
 		<th scope='col'>CoInsurance</th>
@@ -25,6 +26,7 @@
 	<% tierdesc.each do |pharmtype, costshare| %>
 	<tr>
 	<td> <%= pharmtype.to_s.split(' ').map(&:capitalize).join(' ') %> </td>
+  <td><%= costshare[:network] %></td>
 	<td> $<%= costshare[:copay] %> </td>
 	<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
 	<td> <%= costshare[:coinsurancerate] %>% </td>

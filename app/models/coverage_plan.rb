@@ -66,21 +66,22 @@ class CoveragePlan
 		if plans.present?
 			plans.each do |plan|
         pharmacyType = plan.type.coding[0].display
-        
+        network = plan.network.present? ? plan.network.map(&:display).join(',') : "missing"
         plan.specificCost.each do |tier|
           tiername = tier.category.coding[0].code
           costshare = {}
           tier.benefit[0].cost.each do |share|
             type = share.type.coding[0].code
+            value = share.value&.value&.to_i
             if type == "copay"
               costshare[:copayoption] = share.qualifiers[0].coding[0].code
-              costshare[:copay] = share.value&.value
+              costshare[:copay] = value
             else
               costshare[:coinsuranceoption] = share.qualifiers[0].coding[0].code
-              costshare[:coinsurancerate] = share.value&.value
+              costshare[:coinsurancerate] = value
             end
           end
-          
+          costshare[:network] = network
           if tiers[tiername]
             tiers[tiername][pharmacyType] = costshare
           else
