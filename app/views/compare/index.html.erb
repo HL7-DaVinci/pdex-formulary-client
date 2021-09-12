@@ -61,9 +61,16 @@
 								<% if fd.prior_auth %>
 									<span class='prior-auth-compare'>Prior Authorization</span>
 								<% end %>
+                <% if fd.prior_auth_newstart %>
+									&nbsp;<span class='prior-auth-compare'>Prior Auth New Starts Only</span>
+								<% end %>
 								<% if fd.step_therapy %>
 									<% mtop = fd.prior_auth ? 'compare-buffer' : '' %>
 									<span class='step-therapy-compare <%= mtop %>'>Step Therapy</span>
+								<% end %>
+                <% if fd.step_therapy_newstart %>
+									<% mtop = fd.prior_auth_newstart ? 'compare-buffer' : '' %>
+									&nbsp;<span class='step-therapy-compare <%= mtop %>'>Step Therapy New Starts Only</span>
 								<% end %>
 								<% if fd.quantity_limit %>
 									<% mtop = fd.prior_auth || fd.step_therapy ? 'compare-buffer' : '' %>
