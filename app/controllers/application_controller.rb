@@ -31,10 +31,14 @@ class ApplicationController < ActionController::Base
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
     @plansbyid  = build_coverage_plans(reply)
     @locationsbyid  = locations
+    @formulary_items = formulary_items
+    @formulary_drugs = formulary_drugs
     options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
     session[:locationsbyid] = compress_hash(@locationsbyid.to_json)
     session[:cp_options] = compress_hash(options)
+    session[:formularyitemsbyid] = compress_hash(@formulary_items.to_json)
+    session[:formularydrugsbyid] = compress_hash(@formulary_drugs.to_json)
 
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
@@ -65,6 +69,37 @@ class ApplicationController < ActionController::Base
 
   #-----------------------------------------------------------------------------
 
+  def get_formularyItemsById
+    if session[:formularyitemsbyid]
+      @formularyitemsbyid = JSON.parse(decompress_hash(session[:formularyitemsbyid]))
+      @cp_options = decompress_hash(session[:cp_options])
+      @search = session[:query]
+    else
+      puts "get_formularyItemsById: session[:formularyitemsbyid] is nil, calling formulary_items "
+      @formularyitemsbyid = nil
+      @cp_options = [["N/A (Must connect first)", "-"]]
+      formulary_items
+    end
+  end
+
+  #-----------------------------------------------------------------------------
+
+
+  def get_formularyDrugsById
+    if session[:formularydrugsbyid]
+      @formularydrugsbyid = JSON.parse(decompress_hash(session[:formularydrugsbyid]))
+      @cp_options = decompress_hash(session[:cp_options])
+      @search = session[:query]
+    else
+      puts "get_formularyDrugsById: session[:formularydrugsbyid] is nil, calling formulary_drugs "
+      @formularydrugsbyid = nil
+      @cp_options = [["N/A (Must connect first)", "-"]]
+      formulary_items
+    end
+  end
+
+  #-----------------------------------------------------------------------------
+
   def locations
     profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-InsurancePlanLocation"
     bundle = @client.search(FHIR::Location, search: { parameters: { _profile: profile}}).resource&.entry || []
@@ -76,7 +111,30 @@ class ApplicationController < ActionController::Base
   end
   
   #-----------------------------------------------------------------------------
+
+  def formulary_items
+    profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyItem"
+    bundle = @client.search(FHIR::Basic, search: { parameters: {_profile: profile}}).resource&.entry || []
+    formulary_items = bundle.each_with_object({}) do | entry, formularyItemById |
+      formularyItemById[entry.resource.id] = FormularyItem.new(entry.resource)
+    end
+
+    formulary_items.deep_symbolize_keys
+  end
   
+  #-----------------------------------------------------------------------------
+
+  def formulary_drugs
+    profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+    bundle = @client.search(FHIR::MedicationKnowledge, search: { parameters: {_profile: profile}}).resource&.entry || []
+    formulary_drugs = bundle.each_with_object({}) do | entry, formularyDrugById |
+      formularyDrugById[entry.resource.id] = MedicationKnowledge.new(entry.resource)
+    end
+    formulary_drugs.deep_symbolize_keys
+  end
+
+  #-----------------------------------------------------------------------------
+
   def payer_plans
     # Read all payer insurance plans from the server
     payerplan_type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"

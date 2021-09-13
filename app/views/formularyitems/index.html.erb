@@ -1,0 +1,53 @@
+<% if @formulary_items.empty? %>  
+    <%= render partial: "formularies/no_formularies" %>
+<% else %>
+  <section class='container'>
+	<section class='row col-12'>
+		<div class='col-12'>
+			<h3 class='float-left text-white'>Formulary Drugs</h3>
+      <%= render 'partials/query' %>
+			<div class='btn-group float-right mt-2' role='group'>
+				<%= link_to 'Previous', formularyitems_path(page: 'previous'), class: 'btn btn-outline-primary' %>
+				<%= link_to 'Next', 		formularyitems_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
+			</div>
+		</div>
+		<table class='table table-dark'>
+			<tr>
+				<th scope='col'>Drug</th>
+				<th scope='col'>Tier</th>
+				<th scope='col'>Copay</th>
+				<th scope='col'>ID</th>
+			</tr>
+			<% @formulary_items.each do |formulary_item| %>
+        <% formulary_drug = @formularydrugsbyid.values.find {|drug| formulary_item["subject"]["reference"] == "MedicationKnowledge/" + drug["id"]}%>
+				<tr>
+					<td>
+						<div class='drug'>
+							<%= formulary_drug["code"]["coding"].first["display"] %>
+						</div>
+						<% if formulary_item["prior_authorization"] %>
+							<span class='prior-auth'>Prior Authorization</span>
+						<% end %>
+						<% if formulary_item["step_therapy"] %>
+							<span class='step-therapy'>Step Therapy</span>
+						<% end %>
+						<% if formulary_item["quantity_limit"] %>
+							<span class='quantity-limit'>Quantity Limit</span>
+						<% end %>
+					</td>
+					<td><%= formulary_item["drug_tier"]["display"].split('-').map(&:capitalize).join(' ') %> </td>
+					<td><%= link_to @plansbyid.values.find { |plan| formulary_item["formulary"]["reference"] == "InsurancePlan/" + plan[:id]}[:name] , formulary_item["formulary"] %></td>
+					<td><%= formulary_item["id"] %></td>
+				</tr>
+			<% end %>
+		</table>
+		<div class='col-12'>
+			<div class='btn-group float-right mt-2' role='group'>
+				<%= link_to 'Previous', formularyitems_path(page: 'previous'), class: 'btn btn-outline-primary' %>
+				<%= link_to 'Next', 		formularyitems_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
+			</div>
+		</div>
+	</section>
+</section>
+
+<% end %>
