@@ -31,8 +31,9 @@ class ApplicationController < ActionController::Base
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
     @plansbyid  = build_coverage_plans(reply)
     @locationsbyid  = locations
-    @formulary_items = formulary_items
-    @formulary_drugs = formulary_drugs
+    @formulary_items_and_drugs = formulary_items_and_drugs
+    @formulary_items = @formulary_items_and_drugs[:formulary_items]
+    @formulary_drugs = @formulary_items_and_drugs[:formulary_drugs]
     options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
     session[:locationsbyid] = compress_hash(@locationsbyid.to_json)
@@ -78,7 +79,7 @@ class ApplicationController < ActionController::Base
       puts "get_formularyItemsById: session[:formularyitemsbyid] is nil, calling formulary_items "
       @formularyitemsbyid = nil
       @cp_options = [["N/A (Must connect first)", "-"]]
-      formulary_items
+      formulary_items_and_drugs
     end
   end
 
@@ -94,7 +95,7 @@ class ApplicationController < ActionController::Base
       puts "get_formularyDrugsById: session[:formularydrugsbyid] is nil, calling formulary_drugs "
       @formularydrugsbyid = nil
       @cp_options = [["N/A (Must connect first)", "-"]]
-      formulary_items
+      formulary_items_and_drugs
     end
   end
 
@@ -112,14 +113,18 @@ class ApplicationController < ActionController::Base
   
   #-----------------------------------------------------------------------------
 
-  def formulary_items
+  def formulary_items_and_drugs
     profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyItem"
-    bundle = @client.search(FHIR::Basic, search: { parameters: {_profile: profile}}).resource&.entry || []
+    bundle = @client.search(FHIR::Basic, search: { parameters: {_profile: profile, _include: "Basic:subject", _count: 500 }}).resource&.entry || []
+    formulary_drugs = {}
     formulary_items = bundle.each_with_object({}) do | entry, formularyItemById |
-      formularyItemById[entry.resource.id] = FormularyItem.new(entry.resource)
+      if entry.search.mode == "match"
+        formularyItemById[entry.resource.id] = FormularyItem.new(entry.resource)
+      else
+        formulary_drugs[entry.resource.id] = MedicationKnowledge.new(entry.resource)
+      end
     end
-
-    formulary_items.deep_symbolize_keys
+    @formulary_items_and_drugs = {formulary_items: formulary_items.deep_symbolize_keys, formulary_drugs: formulary_drugs.deep_symbolize_keys}
   end
   
   #-----------------------------------------------------------------------------

@@ -20,13 +20,10 @@
 			</tr>
 			<% @formulary_items.each do |formulary_item| %>
         <% formulary_drug = @formularydrugsbyid.values.find {|drug| formulary_item["subject"]["reference"] == "MedicationKnowledge/" + drug["id"]}%>
-        <% if formulary_drug.nil? %>
-          <% formulary_drug = @client.search(FHIR::MedicationKnowledge, search: { parameters: {_id: formulary_item["subject"]["reference"].split('/')[1]} } ).resource.entry[0].resource%>
-        <% end %>
 				<tr>
 					<td>
 						<div class='drug'>
-							<%= formulary_drug.code.coding.first.display %>
+							<%= formulary_drug["code"]["display"] %>
 						</div>
 						<% if formulary_item["prior_authorization"] %>
 							<span class='prior-auth'>Prior Authorization</span>

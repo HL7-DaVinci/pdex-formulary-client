@@ -14,7 +14,7 @@ class MedicationKnowledge
 
   def initialize(fhir_medicationknowledge)
 		@id 		                      = fhir_medicationknowledge.id 
-    @code                         = fhir_medicationknowledge.code
+    @code                         = fhir_medicationknowledge.code.coding.first
     @status                       = fhir_medicationknowledge.status
     @synonym                      = fhir_medicationknowledge.synonym
     @dose_form                    = fhir_medicationknowledge.doseForm
