@@ -22,7 +22,11 @@ class FormularyitemsController < ApplicationController
     get_formularyItemsById
     get_formularyDrugsById
     @formulary_items = @formularyitemsbyid.values.select do |formulary_item|
-      formulary_item["formulary"]["reference"] == "InsurancePlan/" + params[:coverage] if params[:coverage].present?
+      if params[:coverage].present?
+        formulary_item["formulary"]["reference"] == "InsurancePlan/" + params[:coverage]
+      else
+        true
+      end
     end
 	end
 
