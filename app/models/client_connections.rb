@@ -15,6 +15,7 @@ class ClientConnections
             raise "No FormularyDrugs in server" unless count > 0
         rescue
             puts "ClientConnections:set  -- returning nil"
+            session.clear
             return nil
         end
         @clients[id] = Hash.new

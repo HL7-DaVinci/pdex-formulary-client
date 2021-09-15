@@ -18,7 +18,8 @@ class CoverageplansController < ApplicationController
 
 	def index
 		get_plansbyid
-		@coverageplans = @plansbyid.values
+    # TODO: temporary reversing the plans array to show the plans with coverage areas and period first
+		@coverageplans = @plansbyid.values.reverse()
 	end
 
 	#-----------------------------------------------------------------------------

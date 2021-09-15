@@ -15,10 +15,10 @@ class WelcomeController < ApplicationController
 		session[:foo] = "bar" unless session.id 
 
 		@client       = ClientConnections.get(session.id.public_id)
-		@count        = formulary_count
-		@cp_count     = coverageplan_count 
-		@cp_options   = coverage_plans
-    @payers_count = payerplans_count
+		@count        = session[:formulary_count] || formulary_count
+		@cp_count     = session[:drugplans_count] || drugplans_count 
+		# @cp_options   = session[:cp_options] || coverage_plans
+    @payers_count = session[:payerplans_count] || payerplans_count
 		@cache_nil    = ClientConnections.cache_nil?(session.id.public_id)
 
     get_payers_byid
@@ -38,11 +38,9 @@ class WelcomeController < ApplicationController
 		if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])
 			err = "Connection failed: Ensure provided url points to a valid FHIR server"
 			err += " that holds at least one Formulary"
+      
+      session.clear
 			redirect_to root_path, flash: { error: err }
-			session[:plansbyid] = nil
-			session[:cp_options] = [["N/A (Must connect first)", "-"]]
-      session[:payersbyid] = nil
-      session[:locationsbyid] = nil
 			return nil
 		end
 		cookies[:server_url] = params[:server_url] if params[:server_url].present?
@@ -57,6 +55,7 @@ class WelcomeController < ApplicationController
 			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
 			search = { parameters: { _summary: "count" } }
 			count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
+      session[:formulary_count] = count
 		rescue => exception
 			count = 0
 		end
@@ -65,12 +64,13 @@ class WelcomeController < ApplicationController
 
   #-----------------------------------------------------------------------------
 
-	def coverageplan_count
+	def drugplans_count
 		begin
 			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
       type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
 			search = { parameters: { type: type, _summary: "count" } }
 			count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
+      session[:drugplans_count] = count
 		rescue => exception
 			count = 0
 		end
@@ -84,6 +84,7 @@ class WelcomeController < ApplicationController
       type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
       search = { parameters: { type: type, _summary: "count" } }
       count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
+      session[:payerplans_count] = count
     rescue => exception
       count = 0
     end

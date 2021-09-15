@@ -14,7 +14,7 @@
 				<th scope='col'>Tier</th>
 				<th scope='col'>Copay</th>
 				<th scope='col'>CoInsurance</th>
-				<th scope='col'>PlanID</th>
+				<th scope='col'>Drug Plan</th>
 				<th scope='col'>RxNorm</th>
 				<th scope='col'>ID</th>
 			</tr>
@@ -27,9 +27,15 @@
 						<% if formulary_drug.prior_auth %>
 							<span class='prior-auth'>Prior Authorization</span>
 						<% end %>
+            <% if formulary_drug.prior_auth_newstart %>
+		          <span class='prior-auth'>Prior Authorization New Starts Only</span>
+            <% end %>
 						<% if formulary_drug.step_therapy %>
 							<span class='step-therapy'>Step Therapy</span>
 						<% end %>
+            <% if formulary_drug.step_therapy_newstart %>
+		          <span class='step-therapy'>Step Therapy New Starts Only</span>
+            <%end%>
 						<% if formulary_drug.quantity_limit %>
 							<span class='quantity-limit'>Quantity Limit</span>
 						<% end %>

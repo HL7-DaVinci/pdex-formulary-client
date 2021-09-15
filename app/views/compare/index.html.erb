@@ -1,5 +1,8 @@
 <section>
-    <div class='row compare-page-search'>
+  <div class='row compare-page-search'>
+    <div class="mb-2 mx-5 justify-content-end">
+      <%= render 'partials/query' %>
+    </div>
 		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-page-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-4'>
@@ -8,8 +11,8 @@
 			<div class='form-group col-md-4'>
 				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'List of RxNorm codes'%>
 			</div>
-            <%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', 
-                    id: 'compare-page-url', disabled: @client.nil? %>
+      <%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', 
+        id: 'compare-page-url', disabled: @client.nil? %>
 			<div class='col'></div>
 		<% end %>
 	</div>
@@ -58,9 +61,16 @@
 								<% if fd.prior_auth %>
 									<span class='prior-auth-compare'>Prior Authorization</span>
 								<% end %>
+                <% if fd.prior_auth_newstart %>
+									&nbsp;<span class='prior-auth-compare'>Prior Auth New Starts Only</span>
+								<% end %>
 								<% if fd.step_therapy %>
 									<% mtop = fd.prior_auth ? 'compare-buffer' : '' %>
 									<span class='step-therapy-compare <%= mtop %>'>Step Therapy</span>
+								<% end %>
+                <% if fd.step_therapy_newstart %>
+									<% mtop = fd.prior_auth_newstart ? 'compare-buffer' : '' %>
+									&nbsp;<span class='step-therapy-compare <%= mtop %>'>Step Therapy New Starts Only</span>
 								<% end %>
 								<% if fd.quantity_limit %>
 									<% mtop = fd.prior_auth || fd.step_therapy ? 'compare-buffer' : '' %>

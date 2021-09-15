@@ -31,24 +31,19 @@ class ApplicationController < ActionController::Base
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
     @plansbyid  = build_coverage_plans(reply)
     @locationsbyid  = locations
-    @formulary_items_and_drugs = formulary_items_and_drugs
-    @formulary_items = @formulary_items_and_drugs[:formulary_items]
-    @formulary_drugs = @formulary_items_and_drugs[:formulary_drugs]
-    options = build_coverage_plan_options(reply)
+    @cp_options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
     session[:locationsbyid] = compress_hash(@locationsbyid.to_json)
-    session[:cp_options] = compress_hash(options)
-    session[:formularyitemsbyid] = compress_hash(@formulary_items.to_json)
-    session[:formularydrugsbyid] = compress_hash(@formulary_drugs.to_json)
+    session[:cp_options] = compress_hash(@cp_options)
 
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
     session[:query] = @search
     
-    options
+    @cp_options
     rescue => exception
       puts "coverage_plans fails:  not connected"
-      options = [["N/A (Must connect first)", "-"]]
+      @cp_options = [["N/A (Must connect first)", "-"]]
       puts exception
   end
 
@@ -61,7 +56,7 @@ class ApplicationController < ActionController::Base
       @cp_options = decompress_hash(session[:cp_options])
       @search = session[:query]
     else
-      puts "get_plansbyid:  session[:plansbyid] is nil, calling coverage_plans "
+      puts "get_plansbyid:  session[:plansbyid] is #{session[:plansbyid]}, calling coverage_plans "
       @plansbyid = nil
       @cp_options = [["N/A (Must connect first)", "-"]]
       coverage_plans 
@@ -163,7 +158,7 @@ class ApplicationController < ActionController::Base
       @payersbyid = JSON.parse(decompress_hash(session[:payersbyid])).deep_symbolize_keys
       @search = session[:payersplan_query]
     else
-      puts "get_payers_byid:  session[:payersbyid] is nil, calling payer_plans "
+      puts "get_payers_byid:  session[:payersbyid] is #{session[:payersbyid]}, calling payer_plans "
       @payersbyid = nil
       payer_plans 
     end
@@ -185,10 +180,10 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
 
   def build_coverage_plan_options(fhir_list_reply)
-    options = fhir_list_reply.entry.collect do |entry| 
+    @cp_options = fhir_list_reply.entry.collect do |entry| 
       [entry.resource.name, entry.resource.id]
     end
-    options.unshift(["All", ""])
+    @cp_options.unshift(["All", ""])
   end
 
   #-----------------------------------------------------------------------------
@@ -210,6 +205,17 @@ class ApplicationController < ActionController::Base
   end
 
   #-----------------------------------------------------------------------------
+
+  # Formulary drugs 
+  def build_formulary_drugs(fhir_formularydrugs)
+    formulary_drugs = fhir_formularydrugs.each_with_object({}) do | resource, drughashbyid |
+      drughashbyid[resource.id] = FormularyDrug.new(resource)
+    end
+    JSON.parse(formulary_drugs.to_json).deep_symbolize_keys
+  end
+  
+  #-----------------------------------------------------------------------------
+
   # Check that this session has an established FHIR client connection.
   # Specifically, sets @client and redirects home if nil.
 
@@ -217,6 +223,7 @@ class ApplicationController < ActionController::Base
     session[:foo] = "bar" unless session.id   
     raise "session.id is nil"  unless session.id
     unless @client = ClientConnections.get(session.id.public_id)
+      session.clear
       redirect_to root_path, flash: { error: "Please connect to a formulary server" }
     end
   end
