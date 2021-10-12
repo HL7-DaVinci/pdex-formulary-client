@@ -27,14 +27,18 @@ class ApplicationController < ActionController::Base
   def coverage_plans
     # Read all of the insurance drug plans from the server
     cp_type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-    
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
-    @plansbyid  = build_coverage_plans(reply)
+    @plansbyid  = JSON.parse(build_coverage_plans(reply).to_json).deep_symbolize_keys
+    @formulary_items_and_drugs = formulary_items_and_drugs
+    @formulary_items = @formulary_items_and_drugs[:formulary_items]
+    @formulary_drugs = @formulary_items_and_drugs[:formulary_drugs]
     @locationsbyid  = locations
     @cp_options = build_coverage_plan_options(reply)
     session[:plansbyid] = compress_hash(@plansbyid.to_json)
     session[:locationsbyid] = compress_hash(@locationsbyid.to_json)
     session[:cp_options] = compress_hash(@cp_options)
+    session[:formularyitemsbyid] = compress_hash(@formulary_items.to_json)
+    session[:formularydrugsbyid] = compress_hash(@formulary_drugs.to_json)
 
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
@@ -114,7 +118,7 @@ class ApplicationController < ActionController::Base
     formulary_drugs = {}
     formulary_items = bundle.each_with_object({}) do | entry, formularyItemById |
       if entry.search.mode == "match"
-        formularyItemById[entry.resource.id] = FormularyItem.new(entry.resource)
+        formularyItemById[entry.resource.id] = FormularyItem.new(entry.resource, @plansbyid)
       else
         formulary_drugs[entry.resource.id] = MedicationKnowledge.new(entry.resource)
       end

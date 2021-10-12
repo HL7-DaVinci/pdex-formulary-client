@@ -19,7 +19,6 @@ class CompareController < ApplicationController
 	def index
 		@codes = nil
 		@params = nil 
-
 		get_plansbyid
 		if params[:search].length>0 or params[:code].length>0
 			@drugname = params[:search].split(' ').first 
@@ -109,12 +108,14 @@ class CompareController < ApplicationController
 		chosen = @cache[:fis]
     @drugsbyid = build_formulary_drugs(@cache[:fds])
 		@table_rows = Hash.new
-
-		chosen.collect!{ |fi| FormularyItem.new(fi, @plansbyid, @drugsbyid) }
+		chosen.collect!{ |fi| FormularyItem.new(fi, @plansbyid)}
 		chosen.each do |fi|
-			code = fi.rxnorm_code
-			plan = fi.plan_id
+			fd = FormularyDrug.new(@cache[:fds].find { |drug| drug.id == fi.subject.reference.split('/')[1] })
+			code = fi.subject.reference.split('/')[1]
+			plan = fi.formulary.reference.split('/')[1]
 			@table_rows.has_key?(code) ? @table_rows[code][plan] = fi : @table_rows[code] = { plan => fi }
+			@table_rows[code][code] = fd
+
 		end
 	end
 	

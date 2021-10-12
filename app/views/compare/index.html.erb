@@ -29,43 +29,36 @@
     		<% @table_rows.each do |code, plan_hash| %>
 	    	  <tr>
 	        	<td class='compare-drug-col'>
-              <%= plan_hash.values.first.drug_name -%> (<%= link_to code, "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=" + code  %>)
+              <%= plan_hash[code].drug_name -%> (<%= link_to code, "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=" + code  %>)
             </td>
             <% @table_header.each do |cp| %>
-						  <% fd = plan_hash[cp.id] %>
-              <% c = (fd ? "table table-dark": "drug-not-in-plan") %>
+						  <% fi = plan_hash[cp.id] %>
+              <% c = (fi ? "table table-dark": "drug-not-in-plan") %>
 		          <td class= <%= c %> >
- 							  <% if fd %>
+ 							  <% if fi %>
                   <table class='table table-dark'>
                     <tr>
                       <td>  Tier:</td> 
-                      <td>  <%= link_to fd.drug_tier.split('-').map(&:capitalize).join(' ') , fd.formulary_id_path%></td>
+                      <td>  <%= link_to fi.drug_tier.code.split('-').map(&:capitalize).join(' ') , "/formularies/" + fi.id%></td>
                     </tr>
                     <tr>
                       <td> Copay</td>
-                      <td>$<%= '%.2f' % fd.copay %></td>
+                      <td>$<%= '%.2f' % fi.copay %></td>
                     </tr>
                     <tr>
                       <td> CoInsurance</td>
-                      <td><%= fd.coinsurancerate * 100 %>%</td>
+                      <td><%= fi.coinsurancerate * 100 %>%</td>
                     </tr>
                   </table>
   								<div style="display: grid;">
-  								<% if fd.prior_auth %>
+  								<% if fi.prior_authorization %>
   									<span class='prior-auth-compare'>Prior Authorization</span>
   								<% end %>
-                  <% if fd.prior_auth_newstart %>
-  									&nbsp;<span class='prior-auth-compare'>Prior Auth New Starts Only</span>
-  								<% end %>
-  								<% if fd.step_therapy %>
+  								<% if fi.step_therapy_limit %>
   									<% mtop = fd.prior_auth ? 'compare-buffer' : '' %>
   									<span class='step-therapy-compare <%= mtop %>'>Step Therapy</span>
   								<% end %>
-                  <% if fd.step_therapy_newstart %>
-  									<% mtop = fd.prior_auth_newstart ? 'compare-buffer' : '' %>
-  									&nbsp;<span class='step-therapy-compare <%= mtop %>'>Step Therapy New Starts Only</span>
-  								<% end %>
-  								<% if fd.quantity_limit %>
+  								<% if fi.quantity_limit %>
   									<% mtop = fd.prior_auth || fd.step_therapy ? 'compare-buffer' : '' %>
   									<span class='quantity-limit-compare <%= mtop %>'>Quantity Limit</span>
   								<% end %>

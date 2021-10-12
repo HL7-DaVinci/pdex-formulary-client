@@ -43,7 +43,7 @@ class FormulariesController < ApplicationController
     @drugsbyid =  build_formulary_drugs(fhir_formularydrugs)
 		@formularydrugs = []
 		fhir_formularyitems.each do |fhir_formularyitem| 
-			@formularydrugs << FormularyItem.new(fhir_formularyitem,@plansbyid, @drugsbyid)
+			@formularydrugs << FormularyItem.new(fhir_formularyitem, @plansbyid)
 		end
 
 		# Prepare the query string for display on the page
@@ -68,7 +68,7 @@ class FormulariesController < ApplicationController
 		# fhir_formularydrug = @@bundle.entry.map(&:resource).first
 		get_plansbyid
     @drugsbyid =  build_formulary_drugs(fhir_formularydrugs)
-		@formulary_drug = FormularyItem.new(fhir_formularyitem, @plansbyid, @drugsbyid)
+		@formulary_drug = FormularyItem.new(fhir_formularyitem, @plansbyid)
 
 		# Prepare the query string for display on the page
   	@search = "<Search String in Returned Bundle is empty>"
