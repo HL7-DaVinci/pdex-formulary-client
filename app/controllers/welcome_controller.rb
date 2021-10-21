@@ -35,11 +35,12 @@ class WelcomeController < ApplicationController
 	def connect_to_formulary_server
 		session[:foo] = "bar" unless session.id   
 		raise "session.id is nil"  unless session.id
+    # Clear sessions if new server_url provided
+    session.clear if params[:server_url].present?
 		if params[:server_url].present? && !ClientConnections.set(session.id.public_id, params[:server_url])
 			err = "Connection failed: Ensure provided url points to a valid FHIR server"
 			err += " that holds at least one Formulary"
       
-      session.clear
 			redirect_to root_path, flash: { error: err }
 			return nil
 		end
@@ -54,8 +55,7 @@ class WelcomeController < ApplicationController
 		begin
       # Query/requery the total formulary count if server-url given
 			search = { parameters: { _summary: "count" } }
-			params[:server_url].present? ? count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
-                                   : count = session[:formulary_count]
+			count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
       session[:formulary_count] = count
 		rescue => exception
 			count = 0
@@ -70,8 +70,7 @@ class WelcomeController < ApplicationController
       type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
 			search = { parameters: { type: type, _summary: "count" } }
       # Query/requery the total drug plan count if server-url given
-			params[:server_url].present? ? count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
-                                   : count = session[:drugplans_count]
+			count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
       session[:drugplans_count] = count
 		rescue => exception
 			count = 0
