@@ -52,9 +52,10 @@ class WelcomeController < ApplicationController
 
 	def formulary_count
 		begin
-			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
+      # Query/requery the total formulary count if server-url given
 			search = { parameters: { _summary: "count" } }
-			count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
+			params[:server_url].present? ? count = @client.search(FHIR::MedicationKnowledge, search: search ).resource.total
+                                   : count = session[:formulary_count]
       session[:formulary_count] = count
 		rescue => exception
 			count = 0
@@ -66,10 +67,11 @@ class WelcomeController < ApplicationController
 
 	def drugplans_count
 		begin
-			# profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
       type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
 			search = { parameters: { type: type, _summary: "count" } }
-			count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
+      # Query/requery the total drug plan count if server-url given
+			params[:server_url].present? ? count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
+                                   : count = session[:drugplans_count]
       session[:drugplans_count] = count
 		rescue => exception
 			count = 0
@@ -83,6 +85,7 @@ class WelcomeController < ApplicationController
     begin
       type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
       search = { parameters: { type: type, _summary: "count" } }
+      # Query/requery the total payer plan count if server-url given
       count = @client.search(FHIR::InsurancePlan, search: search ).resource.total
       session[:payerplans_count] = count
     rescue => exception
