@@ -4,7 +4,6 @@ class ClientConnections
 
   def self.set(id, url)
     begin
-
       puts "ClientConnections:set  (#{id}, #{url})"
       client = FHIR::Client.new(url)
       client.use_r4
@@ -16,7 +15,6 @@ class ClientConnections
       raise "No FormularyDrugs in server" unless count > 0
     rescue
       puts "ClientConnections:set  -- returning nil"
-      session.clear
       return nil
     end
     @clients[id] = Hash.new
