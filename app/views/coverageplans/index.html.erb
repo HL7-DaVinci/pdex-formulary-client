@@ -48,17 +48,19 @@
           <td>
             
             <% if !coverageplan[:coverage_area_ids].present? %>
-              Not available
+              Not provided
             <% end %>
             
             <% coverageplan[:coverage_area_ids]&.each do |id| %>
               <% location = @locationsbyid[id.to_sym] %>
-              <% address_text = location[:address]&.values&.join(',') %>
+              <% address_text = location[:address]&.values&.join(',') if location.present? %>
               
               <% if address_text.present? %>
                 <a href="https://www.google.com/maps/search/<%= html_escape(address_text)%>" target="_blank" rel="noopener noreferrer">
                   <%= location[:name] %>
                 </a><br>
+              <% else %>
+                Not provided
               <% end %>
               
             <% end %>
@@ -70,7 +72,7 @@
             <% if coverageplan[:period].present? %>
               <%= display_raw_date(coverageplan[:period][:start]) %> - <%= display_raw_date(coverageplan[:period][:end]) %>
             <% else %>
-              Not available
+              Not provided
             <% end %>
             
           </td>
