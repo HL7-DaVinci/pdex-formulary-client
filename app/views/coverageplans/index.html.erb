@@ -1,7 +1,7 @@
 <section class='container'>
 	<section class='row col-12'>
 		<div class='col-12'>
-			<h3 class='float-left text-white'>Insurance Drug Plans - Index</h3>
+			<h3 class='float-left text-white'>Formularies - Index</h3>
       <%= render 'partials/query' %>
 			<div class='btn-group float-right mt-2' role='group'>
 				<%= link_to 'Previous', coverageplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
@@ -10,9 +10,7 @@
 		</div>
 		<table class='table table-dark'>
 			<tr>
-				<th scope='col'>Name</th>
-				<th scope='col'>Contacts</th>
-				<th scope='col'>Coverage Area</th>
+				<th scope='col'>Formularies</th>
         <th scope='col'>ID</th>
 				<th scope='col'>Period</th>
         <th scope='col'>Drugs</th>
@@ -20,63 +18,15 @@
 			<% @coverageplans.each do |coverageplan| %>
 				<tr>
 					<td>  <%= link_to sanitize(coverageplan[:name]), "/coverageplans/#{coverageplan[:id]}" %> </td>
+					<td> <%= sanitize(coverageplan[:planid]) %></td>
           <td>
-            
-            <% coverageplan[:contacts].each do |name, telecom| %>
-              
-              <% if name.present? && telecom[:url].present? %>
-                <small>
-                  <a href=<%= telecom[:url] %> target="_blank" rel="noopener noreferrer"><%= name %></a>
-                </small><br>
-              <% end %>
-              
-              <% if telecom[:email].present? %>
-                <a href="mailto:<%= telecom[:email] %>">e-mail</a><br>
-              <% end %>
-              
-              <% if telecom[:phone].present? %>
-                <b>Phone</b>:  <%= telecom[:phone] %><br>
-              <% end %>
-              
-              <% if telecom[:fax].present? %>
-                <b>Fax</b>: <%= telecom[:fax] %><br>
-              <% end %>
-              
-            <% end %>
-                 
-          </td>
-          <td>
-            
-            <% if !coverageplan[:coverage_area_ids].present? %>
-              Not provided
-            <% end %>
-            
-            <% coverageplan[:coverage_area_ids]&.each do |id| %>
-              <% location = @locationsbyid[id.to_sym] %>
-              <% address_text = location[:address]&.values&.join(',') if location.present? %>
-              
-              <% if address_text.present? %>
-                <a href="https://www.google.com/maps/search/<%= html_escape(address_text)%>" target="_blank" rel="noopener noreferrer">
-                  <%= location[:name] %>
-                </a><br>
-              <% else %>
-                Not provided
-              <% end %>
-              
-            <% end %>
-            
-          </td>
-					<td> <%= coverageplan[:planid] %></td>
-          <td> 
-            
             <% if coverageplan[:period].present? %>
               <%= display_raw_date(coverageplan[:period][:start]) %> - <%= display_raw_date(coverageplan[:period][:end]) %>
             <% else %>
               Not provided
             <% end %>
-            
           </td>
-          <td> <a href=/formularies?coverage=<%=coverageplan[:id]%>>drugs </a> </td>
+          <td> <a href="/formularies?coverage=<%=coverageplan[:id]%>">drugs </a> </td>
 				</tr>
 			<% end %>
 		</table>

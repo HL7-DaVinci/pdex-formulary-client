@@ -1,42 +1,46 @@
 
- <section class='container'>
-	<div class='plan'>
-			<h3 class='float-left text-white'>CoveragePlan: 
-			<%= @plandata[:name]%>
-			</h3>
+<section class='container'>
+	<div class='d-flex flex-column justify-content-center mb-4'>
+		<h2 class='float-left text-white'>
+      Coverage:&nbsp;<%= sanitize(@plandata[:name]) %>
+		</h2>
+    <div class='card bg-transparent text-white'>
+      <div class='card-body text-center'>
+        <table class='table table-bordered text-white'>
+          <colgroup>
+            <col style='width: 20px;%'>
+            <col style='width: 20px;%'>
+            <col style='width: 60px;%'>
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Identifier</th>
+              <th>Payers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><%= sanitize(@plandata[:type]) %></td>
+              <td><%= sanitize(@plandata[:planid]) %></td>
+              <td>
+                <% @plandata[:payers].each do |payer| %>
+                  <%= link_to sanitize(payer[:name]), "/payerplans/#{payer[:id]}" %><br/>
+                <% end %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 	</div>
-  <section class='row col-12'>
-    <% unless @plandata.nil? %>
-	<% @plandata[:tiers].each do | tiername, tierdesc| %>
-	<h2 class='float-left text-white'><%= tiername.to_s.split('-').map(&:capitalize).join(' ') %>	</h2>
-	<% if tierdesc[:mailorder] %>
-	<div class ='drug'>
-		<span class='mail-order'>Mail Order</span>
-	</div>
-	<% end %>
-    <table class='table table-dark'>
-      	<tr>
-		<th scope='col'>Pharmacy Type</th>
-    <th scope='col'>Network</th>
-		<th scope='col'>CoPay</th>
-        <th scope='col'>CoPay Option</th>
-		<th scope='col'>CoInsurance</th>
-        <th scope='col'>CoInsurance Option</th>
-	    </tr>
-	<% tierdesc.each do |pharmtype, costshare| %>
-	<tr>
-	<td> <%= pharmtype.to_s.split(' ').map(&:capitalize).join(' ') %> </td>
-  <td><%= costshare[:network] %></td>
-	<td> $<%= costshare[:copay] %> </td>
-	<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
-	<td> <%= costshare[:coinsurancerate] %>% </td>
-	<td> <%= costshare[:coinsuranceoption].split('-').map(&:capitalize).join(' ') %> </td>
-	<tr>
-    <%  end %>
- 	</table>
-	<%  end %>
-    <% else %>
-      Not available
-    <% end %>
+  <section class='col-12'>
+    <div class='row'>
+      <%= form_tag "/formularies?coverage=#{@plandata[:id]}", method: 'get', class: 'form-inline welcome-form' do %>
+        <div class='col'></div>
+          <%= button_tag 'View Formulary Drugs', class: 'btn btn-primary col-md-12', id: 'coverageplan-url' %>
+        <div class='col'></div>
+      <% end %>
+    </div>
   </section>
 </section>
