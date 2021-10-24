@@ -1,7 +1,7 @@
 <section class='container'>
 	<div class='d-flex flex-column justify-content-center mb-4'>
 		<h1 class='float-left text-white'>Payer:&nbsp;
-			<%= @payerplan[:name]%>
+			<%= sanitize(@payerplan[:name])%>
 		</h1>
     <div class='card bg-transparent text-white'>
       <div class='card-body'>
@@ -16,51 +16,8 @@
     </div>
 	</div>
   <div class='col-12 card-group'>
-
     <% @payerplan[:plans].each do |plan| %>
-    <!-- group start -->
-      <div class='card'>
-        <h2 class='card-header'>Plan Type: <%= plan[:type] %></h2>
-        <div class='card-body'>
-
-          <% plan[:tiers].each do |tiername, tierdesc| %>
-            <h3 class='card-title'><%= tiername.to_s %></h3>
-            <% if tierdesc[:mailorder] %>
-              <div class='drug'>
-                <span class='mail-order'>Mail Order</span>
-              </div>
-            <% end %>
-            <table class='table table-dark'>
-              <thead>
-                <tr>
-                  <th scope='col'>Pharmacy Type</th>
-                  <th scope='col'>CoPay</th>
-                  <th scope='col'>CoPay Option</th>
-                  <th scope='col'>CoInsurance</th>
-                  <th scope='col'>CoInsurance Option</th>
-                </tr>
-              </thead>
-              <tbody>
-
-                <% tierdesc.each do |pharmtype, costshare| %>
-                  <tr>
-                    <td><%= pharmtype.to_s.titlecase %></td>
-                    <td><%= costshare[:copay] %></td>
-                    <td><%= costshare[:copay_option] %></td>
-                    <td><%= costshare[:coinsurance] %></td>
-                    <td><%= costshare[:coinsurance_option] %></td>
-                  </tr>
-                <% end %>
-
-              </tbody>
-            </table>
-          <% end %>
-
-        </div>
-      </div>
-    <!-- group end -->
+      <%= render 'plan-card', plan: plan %>
     <% end %>
-
   </div>
-  <!-- old version below -->
 </section>
