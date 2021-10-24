@@ -10,35 +10,35 @@
   <section class='row col-12'>
     <table class='table table-dark'>
 			<tr>
-				<th scope='col'>Payer</th>
+				<th scope='col'>Payers</th>
 				<th scope='col'>Contacts</th>
 				<th scope='col'>Coverage Area</th>
 				<th scope='col'>Period</th>
-        <th scope='col'>Drug Plans</th>
+        <th scope='col'>Coverages</th>
 			</tr>
 			<% @payerplans.each do |payerplan| %>
 				<tr>
-					<th> <%= sanitize(payerplan[:name]) %> </th>
+					<th> <%= link_to sanitize(payerplan[:name]), "/payerplans/#{payerplan[:id]}" %> </th>
           <td>
 
             <% payerplan[:contacts].each do |name, telecom| %>
 
-              <% if name.present? && telecom[:url].present? %>
+              <% if telecom[:url].present? %>
                 <small>
                   <a href=<%= telecom[:url] %> target="_blank" rel="noopener noreferrer"><%= name %></a>
                 </small><br>
               <% end %>
 
               <% if telecom[:email].present? %>
-                <a href="mailto:<%= telecom[:email] %>">e-mail</a><br>
+                <a href="mailto:<%= telecom[:email] %>"><%= "e-mail (#{name})" %></a><br>
               <% end %>
 
               <% if telecom[:phone].present? %>
-                <b>Phone</b>:  <%= telecom[:phone] %><br>
+                <b><%= "Phone (#{name})" %></b>:  <%= telecom[:phone] %><br>
               <% end %>
 
               <% if telecom[:fax].present? %>
-                <b>Fax</b>: <%= telecom[:fax] %><br>
+                <b><%= "Fax (#{name})" %></b>: <%= telecom[:fax] %><br>
               <% end %>
 
             <% end %>

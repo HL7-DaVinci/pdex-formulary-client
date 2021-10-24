@@ -19,15 +19,13 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
 
   def get_patient
-    Patient.init 
+    Patient.init
   end
-  
-  #-----------------------------------------------------------------------------
 
+  #-----------------------------------------------------------------------------
+  # Read all of the insurance drug plans (Formularies) from the server
   def coverage_plans
-    # Read all of the insurance drug plans from the server
     cp_type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-    
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type}}).resource
     @plansbyid  = build_coverage_plans(reply)
     @locationsbyid  = locations
@@ -39,7 +37,7 @@ class ApplicationController < ActionController::Base
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
     session[:query] = @search
-    
+
     @cp_options
     rescue => exception
       puts "coverage_plans fails:  not connected"
@@ -48,7 +46,7 @@ class ApplicationController < ActionController::Base
   end
 
   #-----------------------------------------------------------------------------
-
+  # Retrieving Formularies by id from session object
   def get_plansbyid
     if session[:plansbyid]
       @plansbyid = JSON.parse(decompress_hash(session[:plansbyid])).deep_symbolize_keys
@@ -59,42 +57,40 @@ class ApplicationController < ActionController::Base
       puts "get_plansbyid:  session[:plansbyid] is #{session[:plansbyid]}, calling coverage_plans "
       @plansbyid = nil
       @cp_options = [["N/A (Must connect first)", "-"]]
-      coverage_plans 
+      coverage_plans
     end
   end
 
   #-----------------------------------------------------------------------------
-
+  # Read all Locations from the server
   def locations
     profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-InsurancePlanLocation"
     bundle = @client.search(FHIR::Location, search: { parameters: { _profile: profile}}).resource&.entry || []
     areas = bundle.each_with_object({}) do | entry, areahashbyid |
       areahashbyid[entry.resource.id] = Location.new(entry.resource)
     end
-    
+
     areas.deep_symbolize_keys
   end
-  
-  #-----------------------------------------------------------------------------
-  
-  def payer_plans
-    # Read all payer insurance plans from the server
-    payerplan_type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
 
+  #-----------------------------------------------------------------------------
+  # Read all payer insurance plans from the server
+  def payer_plans
+    payerplan_type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: payerplan_type}}).resource
     @payersbyid  = build_payer_plans(reply)
     session[:payersbyid] = compress_hash(@payersbyid.to_json)
-    
+
     # Prepare the query string for display on the page
   	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
     session[:payersplan_query] = @search
-  
+
     rescue => exception
       puts "payer plans fails: #{exception}"
   end
 
   #-----------------------------------------------------------------------------
-
+  # Retrieving payers by id from session object
   def get_payers_byid
     if session[:payersbyid]
       @payersbyid = JSON.parse(decompress_hash(session[:payersbyid])).deep_symbolize_keys
@@ -102,9 +98,8 @@ class ApplicationController < ActionController::Base
     else
       puts "get_payers_byid:  session[:payersbyid] is #{session[:payersbyid]}, calling payer_plans "
       @payersbyid = nil
-      payer_plans 
+      payer_plans
     end
-    
   end
 
   #-----------------------------------------------------------------------------
@@ -122,7 +117,7 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
 
   def build_coverage_plan_options(fhir_list_reply)
-    @cp_options = fhir_list_reply.entry.collect do |entry| 
+    @cp_options = fhir_list_reply.entry.collect do |entry|
       [entry.resource.name, entry.resource.id]
     end
     @cp_options.unshift(["All", ""])
@@ -148,21 +143,21 @@ class ApplicationController < ActionController::Base
 
   #-----------------------------------------------------------------------------
 
-  # Formulary drugs 
+  # Formulary drugs
   def build_formulary_drugs(fhir_formularydrugs)
     formulary_drugs = fhir_formularydrugs.each_with_object({}) do | resource, drughashbyid |
       drughashbyid[resource.id] = FormularyDrug.new(resource)
     end
     JSON.parse(formulary_drugs.to_json).deep_symbolize_keys
   end
-  
+
   #-----------------------------------------------------------------------------
 
   # Check that this session has an established FHIR client connection.
   # Specifically, sets @client and redirects home if nil.
 
   def check_formulary_server_connection
-    session[:foo] = "bar" unless session.id   
+    session[:foo] = "bar" unless session.id
     raise "session.id is nil"  unless session.id
     unless @client = ClientConnections.get(session.id.public_id)
       session.clear
