@@ -40,7 +40,7 @@ class PayerPlan < Resource
           costshare = {}
           benefit.cost&.each do |share|
             share_type = coding_to_string(share.type&.coding)
-            value = share.value&.code == '%' ? "#{'%d' % (share.value&.value * 100)}%" : "$#{'%.2f' % share.value&.value}"
+            value = share.value&.code == '%' ? "#{'%d' % (share.value&.value)}%" : "$#{'%.2f' % share.value&.value}"
             option = share.qualifiers&.map { |e| coding_to_string(e.coding)  }&.join(',')
 
             if share_type.downcase == 'copay'

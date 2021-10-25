@@ -10,7 +10,7 @@ class CompareController < ApplicationController
 
 	before_action :check_formulary_server_connection, only: [ :index ]
 
-	attr_accessor :drugname, :codes 
+	attr_accessor :drugname, :codes
 
 	#-----------------------------------------------------------------------------
 
@@ -18,11 +18,11 @@ class CompareController < ApplicationController
 
 	def index
 		@codes = nil
-		@params = nil 
-
+		@params = nil
 		get_plansbyid
+    get_payers_byid
 		if params[:search].length>0 or params[:code].length>0
-			@drugname = params[:search].split(' ').first 
+			@drugname = params[:search].strip.split(' ').first
 			@codes = params[:code].strip.split(',').map(&:strip).join(',')
 			set_cache
 			set_table
@@ -40,10 +40,10 @@ class CompareController < ApplicationController
 
 	def set_cache
 		@cache = Hash.new
-			
-		searchParams = { _count: 200, _include: ["Basic:subject", "Basic:drug-plan"] } 
-		searchParams["subject:MedicationKnowledge.code"] = @codes if @codes and @codes.length > 0
-		searchParams["subject:MedicationKnowledge.drug-name"] = @drugname  if @drugname and @drugname.length>0
+
+		searchParams = { _count: 200, _include: ["Basic:subject", "Basic:formulary"] }
+		searchParams["subject:MedicationKnowledge.code"] = @codes if (@codes && @codes.length > 0)
+		searchParams["subject:MedicationKnowledge.drug-name:contains"] = @drugname  if (@drugname && @drugname.length>0)
 		searchParams[:code] = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
 
     @cache[:cps] = []
@@ -57,11 +57,11 @@ class CompareController < ApplicationController
       else
         @cache[:fds] << resource
       end
-      
+
     end
-      
+
 		ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
-	
+
 	end
 
 	#-----------------------------------------------------------------------------
@@ -70,28 +70,29 @@ class CompareController < ApplicationController
 
   def get_all(klass = nil, search_params = {})
     replies = get_all_bundles(klass, search_params)
-    return nil unless replies
+    return [] unless replies.present?
 
     resources = []
 		replies.each do |reply|
       resources.push(reply.entry.collect{ |singleEntry| singleEntry.resource })
     end
-    
+
     resources.compact!
     resources.flatten(1)
 	end
-	
+
 	#-----------------------------------------------------------------------------
 
 	# Gets all bundles from server when querying for klass
 
   def get_all_bundles(klass = nil, search_params = {})
-		return nil unless klass
+		return [] unless klass.present?
 
 		search = { search: { parameters: search_params } }
     reply = @client.search(klass, search).resource
     replies = [].push(reply)
-    @search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
+    @search = URI.decode(reply&.link&.select { |l| l.relation === "self"}.first&.url) if reply&.link&.first
+    replies.compact!
 		while replies.last
 			replies.push(replies.last.next_bundle)
     end
@@ -99,7 +100,7 @@ class CompareController < ApplicationController
     replies.compact!
     replies.present? ? replies : nil
 	end
-	
+
 	#-----------------------------------------------------------------------------
 
 	# Sets @table_headers and @table_rows
@@ -110,14 +111,14 @@ class CompareController < ApplicationController
     @drugsbyid = build_formulary_drugs(@cache[:fds])
 		@table_rows = Hash.new
 
-		chosen.collect!{ |fi| FormularyItem.new(fi, @plansbyid, @drugsbyid) }
+		chosen.collect!{ |fi| FormularyItem.new(fi, @payersbyid, @plansbyid, @drugsbyid) }
 		chosen.each do |fi|
 			code = fi.rxnorm_code
-			plan = fi.plan_id
-			@table_rows.has_key?(code) ? @table_rows[code][plan] = fi : @table_rows[code] = { plan => fi }
+			formulary_id = fi.plan_id
+			@table_rows.has_key?(code) ? @table_rows[code][formulary_id] = fi : @table_rows[code] = { formulary_id => fi }
 		end
 	end
-	
+
 	#-----------------------------------------------------------------------------
 
 	# Sifts through formulary drugs based on search term, returns chosen fds

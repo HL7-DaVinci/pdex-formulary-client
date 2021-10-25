@@ -5,8 +5,8 @@
 		</h1>
     <div class='card bg-transparent text-white'>
       <div class='card-body'>
-        <h2 class='card-title'>Coverages</h2>
-        <p class='card-text'>
+        <h2 class='card-title'>Formularies on this plan:</h2>
+        <p class='card-text h5'>
           <% @payerplan[:formularies_ids].each do |id| %>
             <% drug_plan = @plansbyid[id.to_sym] %>
             <%= link_to sanitize(drug_plan[:name]), "/coverageplans/#{drug_plan[:id]}" %>&nbsp;
