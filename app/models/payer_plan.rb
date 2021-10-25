@@ -33,10 +33,10 @@ class PayerPlan < Resource
       type = coding_to_string(fhir_plan.type&.coding)
 
       fhir_plan.specificCost&.each do |cost|
-        pharmacy_type = coding_to_string(cost.category&.coding)
+        pharmacy_type = coding_to_string(cost.category&.coding).downcase
 
         cost.benefit&.each do |benefit|
-          tier_name = coding_to_string(benefit.type&.coding)
+          tier_name = coding_to_string(benefit.type&.coding).downcase
           costshare = {}
           benefit.cost&.each do |share|
             share_type = coding_to_string(share.type&.coding)

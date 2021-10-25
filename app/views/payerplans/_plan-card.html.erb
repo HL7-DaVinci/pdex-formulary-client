@@ -2,7 +2,7 @@
   <h2 class='card-header'>Plan Type: <%= sanitize(plan[:type]) %></h2>
   <div class='card-body'>
     <% plan[:tiers].each do |tiername, tierdesc| %>
-      <h3 class='card-title'><%= sanitize(tiername.to_s) %></h3>
+      <h3 class='card-title'><%= sanitize(tiername.to_s.titlecase) %></h3>
       <% if tierdesc[:mailorder] %>
         <div class='drug'>
           <span class='mail-order'>Mail Order</span>

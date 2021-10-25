@@ -33,4 +33,16 @@ class Resource
   end
 
 	#-----------------------------------------------------------------------------
+
+  # Helper method: converting period to string
+  def period_to_string (period)
+    begin
+      string = "#{DateTime.parse(period.start).strftime('%m/%d/%Y')} - #{DateTime.parse(period.end).strftime('%m/%d/%Y')}"
+    rescue => exception
+      string = 'Not provided'
+    end
+    string
+  end
+
+  #-----------------------------------------------------------------------------
 end

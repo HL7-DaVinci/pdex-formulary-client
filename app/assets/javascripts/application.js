@@ -35,9 +35,9 @@
                             try {
                                 percent += (400.0 / fds);
                                 $('.compare-progress-bar')
-                                        .attr('aria-valuenow', percent.toFixed(2))
-                                        .css('width', percent.toFixed(2) + '%')
-                                        .text(percent.toFixed(2) + '%');
+                                    .attr('aria-valuenow', percent.toFixed(2))
+                                    .css('width', percent.toFixed(2) + '%')
+                                    .text(percent.toFixed(2) + '%');
                             } catch {
                                 clearInterval(update);
                             }
@@ -45,10 +45,16 @@
                     }, 25);
                 }
             })
+        },
+        initializeTooltips: function() {
+            $('[data-toggle="tooltip"]').tooltip();
         }
 
     }
 
-    $(document).on('turbolinks:load', window.progress.compareLoading);
+    $(document).on('turbolinks:load', function() {
+        window.progress.compareLoading();
+        window.progress.initializeTooltips();
+    });
 
 })(jQuery)

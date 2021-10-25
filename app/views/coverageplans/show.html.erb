@@ -36,9 +36,10 @@
 	</div>
   <section class='col-12'>
     <div class='row'>
-      <%= form_tag "/formularies?coverage=#{@plandata[:id]}", method: 'get', class: 'form-inline welcome-form' do %>
+      <%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form' do %>
+        <%= hidden_field_tag 'coverage', sanitize(@plandata[:id]) %>
         <div class='col'></div>
-          <%= button_tag 'View Formulary Drugs', class: 'btn btn-primary col-md-12', id: 'coverageplan-url' %>
+          <%= button_tag 'View Formulary Drugs', class: 'btn btn-primary col-md-12', id: 'formulary-url' %>
         <div class='col'></div>
       <% end %>
     </div>
