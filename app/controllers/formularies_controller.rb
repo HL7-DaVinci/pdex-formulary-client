@@ -22,10 +22,12 @@ class FormulariesController < ApplicationController
 		else
 			drug_tier_system = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-DrugTierCS|"
       rxnorm_code_system = "http://www.nlm.nih.gov/research/umls/rxnorm|"
+      pharmacy_type_system = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-PharmacyTypeCS|"
       code = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
 			search = { parameters: { _include: "Basic:subject", code: code } }
 			search[:parameters]["drug-tier"] = "#{drug_tier_system}#{params[:drug_tier]}" if params[:drug_tier].present?
 			search[:parameters]["formulary"] = "InsurancePlan/#{params[:coverage]}" if params[:coverage].present?
+      search[:parameters]["pharmacy-type"] = "#{pharmacy_type_system}#{params[:pharmacy_type]}" if params[:pharmacy_type].present?
 			search[:parameters]["subject:MedicationKnowledge.code"] = "#{rxnorm_code_system}#{params[:code]}" if params[:code].present?
 			search[:parameters]["subject:MedicationKnowledge.drug-name:contains"] = params[:name] if params[:name].present?
 			reply = @client.search(FHIR::Basic, search: search )
