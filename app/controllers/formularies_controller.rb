@@ -63,15 +63,17 @@ class FormulariesController < ApplicationController
 		reply = @client.search(FHIR::Basic, search: { parameters: { _id: params[:id], code: code, _include: "Basic:subject" } })
 		@@bundle = reply.resource
     fhir_formularydrugs = []
-    fhir_formularyitem = {}
+    fhir_formularyitem = nil
     @@bundle.entry.each do |entry|
       resource = entry.resource
       resource.resourceType == "Basic" ? fhir_formularyitem = resource : fhir_formularydrugs << resource
     end
-		# fhir_formularydrug = @@bundle.entry.map(&:resource).first
+
 		get_plansbyid
+    get_payers_byid
     @drugsbyid =  build_formulary_drugs(fhir_formularydrugs)
-		@formulary_drug = FormularyItem.new(fhir_formularyitem, @plansbyid, @drugsbyid)
+    redirect_to(formularies_path, flash: { error: 'Your request returned no result' }) and return  unless fhir_formularyitem.present?
+		@formulary_drug = FormularyItem.new(fhir_formularyitem, @payersbyid, @plansbyid, @drugsbyid)
 
 		# Prepare the query string for display on the page
   	@search = "<Search String in Returned Bundle is empty>"
