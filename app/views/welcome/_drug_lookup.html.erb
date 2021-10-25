@@ -1,17 +1,17 @@
-<h2 class="text-light welcome-text">Lookup Drugs by Plan, Tier, Name, and/or RxNorm</h2>
+<h2 class="text-light welcome-text">Lookup Drugs by Formulay, Tier, Name, and/or RxNorm</h2>
 <div class='row mb-1 col-md-12'>
 	<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
 		<div class='form-group col-md-3'>
-			<%= select_tag(:coverage, options_for_select(@cp_options), 
-							prompt: 'Insurance Drug Plan', class: 'custom-select coverage-select') %>
+			<%= select_tag(:coverage, options_for_select(@cp_options),
+							prompt: 'Formulary', class: 'custom-select coverage-select') %>
 		</div>
 		<div class='form-group col-md-2'>
-			<%= select_tag(:drug_tier, options_for_select([['All', ''], 
+			<%= select_tag(:drug_tier, options_for_select([['All', ''],
 											['Generic', 'generic'],
 											['Medical Benefit', 'medical-benefit'],
-											['Preferred Brand', 'preferred-brand'], 
+											['Preferred Brand', 'preferred-brand'],
 											['Non-preferred Brand', 'non-preferred-brand'],
-											['Specialty', 'specialty'], 
+											['Specialty', 'specialty'],
 											['Non-preferred Brand Specialty', 'non-preferred-brand-specialty'],
 											['Zero-cost Share Preventive', 'zero-cost-share-preventive']]),
 											prompt: 'Drug Tier',
@@ -29,6 +29,6 @@
 	<% end %>
 </div>
 <p class='text-info guidance ml-auto mr-auto mb-5'>
-	Each of the above options can be left unspecified. 
+	Each of the above options can be left unspecified.
 	Pressing "Lookup" will display the intersection of defined options.
 </p>

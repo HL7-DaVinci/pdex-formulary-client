@@ -27,7 +27,7 @@ class FormulariesController < ApplicationController
 			search[:parameters]["drug-tier"] = "#{drug_tier_system}#{params[:drug_tier]}" if params[:drug_tier].present?
 			search[:parameters]["formulary"] = "InsurancePlan/#{params[:coverage]}" if params[:coverage].present?
 			search[:parameters]["subject:MedicationKnowledge.code"] = "#{rxnorm_code_system}#{params[:code]}" if params[:code].present?
-			search[:parameters]["subject:MedicationKnowledge.drug-name"] = params[:name] if params[:name].present?
+			search[:parameters]["subject:MedicationKnowledge.drug-name:contains"] = params[:name] if params[:name].present?
 			reply = @client.search(FHIR::Basic, search: search )
 			@@bundle = reply.resource
 		end

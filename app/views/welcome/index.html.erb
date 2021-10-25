@@ -22,7 +22,7 @@
 					<td class ="col-md-auto"><%= @count %>  <%= link_to "Formulary Drugs", formularies_path%></td>
 					<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Insurance Drug Plans", coverageplans_path%> </td>
           <td class ="col-md-auto "><%=@payers_count %>  <%= link_to "Payer Insurance Plans", payerplans_path%> </td>
-					</tr>			
+					</tr>
 				</table>
 			</div>
 		<% else  %>
@@ -36,10 +36,10 @@
 			<a class="nav-link active" id="home-tab" data-toggle="tab" href="#drug-lookup" role="tab" aria-controls="home" aria-selected="true">Drug Lookup</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="profile-tab" data-toggle="tab" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Coverage Plans</a>
+			<a class="nav-link" id="profile-tab" data-toggle="tab" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Formularies</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="contact-tab" data-toggle="tab" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Plans</a>
+			<a class="nav-link" id="contact-tab" data-toggle="tab" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Formularies</a>
 		</li>
 	</ul>
 	<div class="tab-content" id="myTabContent">
@@ -52,6 +52,6 @@
 		<div class="tab-pane fade bg-dark" id="compare-plans" role="tabpanel" aria-labelledby="compare-plans-tab">
 			<%= render 'compare_plans' %>
 		</div>
-	</div>	
+	</div>
 </section>
 
