@@ -31,6 +31,35 @@
                 Mail Order
               </span>
 						<% end %>
+
+						<% if formulary_drug.prior_auth %>
+							<% title_text = "Prior Auth Required" %>
+							<% if formulary_drug.prior_auth_newstart %>
+								<% title_text = title_text + " - New Starts Only" %>
+							<% end %>
+							<span class='prior-auth' data-toggle='tooltip' data-html='true' title="<%= title_text%>">
+								Prioir Auth
+							</span>
+						<% end %>
+
+
+						<% if formulary_drug.step_therapy %>
+							<% title_text = "Step Therapy Required" %>
+							<% if formulary_drug.step_therapy_newstart %>
+								<% title_text = title_text + " - New Starts Only" %>
+							<% end %>
+							<span class='step-therapy' data-toggle='tooltip' data-html='true' title="<%= title_text%>">
+								Step Therapy
+							</span>
+			  
+						<% end %>
+						<% if formulary_drug.quantity_limit %>
+							<% title_text = "Quantity Limit" %>
+							<span class='quantity-limit' data-toggle='tooltip' data-html='true' title="<%= title_text%>">
+								Quantity Limit
+							</span>
+
+						<% end %>
 					</td>
 					<td><%= sanitize(formulary_drug.drug_tier.titlecase) %> </td>
 					<td><%= sanitize(formulary_drug.copay) %></td>
