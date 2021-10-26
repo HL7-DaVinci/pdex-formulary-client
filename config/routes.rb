@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :tiers, only: [:index, :show]
   resources :formularies, only: [:index, :show]
   resources :coverageplans, only: [:index, :show]
+  resources :payerplans, only: [:index, :show]
   resources :compare, only: [:index]
 
   get '/home', to: 'welcome#index'

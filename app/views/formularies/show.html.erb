@@ -1,66 +1,96 @@
 <section class='container'>
-  <div class='drug-head'>
-  	<h3 class='float-left text-white'>Formulary Drug </h3>
+  <div class='drug-head table-responsive'>
+    <h3 class='float-left text-white'>Formulary Drug </h3>
     <%= render 'partials/query' %>
-  	<table class='table table-dark'>
+    <table class='table table-dark'>
       <tbody>
         <tr>
           <th>Drug Name </th>
-          <td><%= @formulary_drug.drug_name%> ( <%=@formulary_drug.rxnorm_code%>)</td>
+          <td>
+            <%= sanitize(@formulary_drug.drug_name) %> (<%= link_to sanitize(@formulary_drug.rxnorm_code), sanitize(@formulary_drug.rxnorm_path) %>)
+          </td>
         </tr>
         <tr>
-          <th>Coverage Plan</th>
-  		    <td><%= link_to @formulary_drug.plan_id_name , @formulary_drug.plan_id_path %></td>
+          <th>Formulary</th>
+          <td><%= link_to sanitize(@formulary_drug.plan[:name]) , coverageplan_path(@formulary_drug.plan[:id]) %></td>
         </tr>
         <tr>
           <th>Drug Tier</th>
-          <td><%= @formulary_drug.drug_tier.split('-').map(&:capitalize).join(' ')%></td>
+          <td><%= sanitize(@formulary_drug.drug_tier.titlecase) %></td>
+        </tr>
+        <tr>
+          <th data-toggle='tooltip' title='Availability period on this formulary'>Availability Period</th>
+          <td><%= sanitize(@formulary_drug.availability_period) %></td>
         </tr>
       </tbody>
     </table>
 	</div>
   <section class='row col-12'>
     <div>
-     	<% if @formulary_drug.prior_auth %>
-		    <span class='prior-auth'>Prior Authorization</span>
+      <% if @formulary_drug.prior_auth %>
+        <span class='prior-auth'>Prior Authorization</span>
+      <% end %>
+      <% if @formulary_drug.prior_auth_newstart %>
+        <span class='prior-auth'>Prior Authorization New Starts Only</span>
       <% end %>
       <% if @formulary_drug.step_therapy %>
-		    <span class='step-therapy'>Step Therapy</span>
+        <span class='step-therapy'>Step Therapy</span>
+      <%end%>
+      <% if @formulary_drug.step_therapy_newstart %>
+        <span class='step-therapy'>Step Therapy New Starts Only</span>
       <%end%>
       <% if @formulary_drug.quantity_limit %>
-		    <span class='quantity-limit'>Quantity Limit</span>
+        <span class='quantity-limit'>Quantity Limit</span>
       <% end %>
+      <% if @formulary_drug.mailorder %>
+        <% title_text = @formulary_drug.mail_supplies&.map {|s| "<p>#{s}</p>"}&.join(' ') %>
+				<span class='mail-order' data-toggle='tooltip' data-html='true' title="<%= title_text%>">
+          Mail Order
+        </span>
+			<% end %>
     </div>
-    <% plandata = @plansbyid[@formulary_drug.plan_id.to_sym] %>
-    <% tierdesc = plandata[:tiers][@formulary_drug.drug_tier.to_sym] %>
-    <% if tierdesc %>
-		  <div class ='drug'>  
-        <% if tierdesc[:mailorder] %>
-          <span class='mail-order'>Mail Order</span>
-        <% end %>
-        <table class='table table-dark'>
-          <tr>
-            <th scope='col'>Pharmacy Type</th>
-            <th scope='col'>CoPay</th>
-            <th scope='col'>CoPay Option</th>
-            <th scope='col'>CoInsurance</th>
-            <th scope='col'>CoInsurance Option</th>
-          </tr>
-          <% tierdesc[:costshares].each do |pharmtype, costshare| %>
-		        <tr>
-		          <td> <%= pharmtype.to_s.split('-').map(&:capitalize).join(' ') %> </td>
-          		<td> $<%= costshare[:copay] %> </td>
-          		<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
-          		<td> <%= costshare[:coinsurancerate] %>% </td>
-          		<td> <%= costshare[:coinsuranceoption].split('-').map(&:capitalize).join(' ') %> </td>
-		        <tr>
+
+    <% if @formulary_drug.payer_plan.present? %>
+      <div class='col-12 card-group'>
+        <% @formulary_drug.payer_plan[:plans].each do |plan| %>
+          <% tierdesc = plan[:tiers][@formulary_drug.drug_tier.to_sym] %>
+          <% if tierdesc.present? %>
+            <div class='card bg-transparent'>
+              <div class='card-body'>
+                <table class='table table-dark text-center'>
+                  <thead>
+                    <tr>
+                      <th scope='col'>Pharmacy Type</th>
+                      <th scope='col'>Copay</th>
+                      <th scope='col'>CoPay Option</th>
+                      <th scope='col'>CoInsurance</th>
+                      <th scope='col'>CoInsurance Option</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% tierdesc.each do |pharmtype, costshare| %>
+                      <tr>
+                        <td><%= sanitize(pharmtype.to_s.titlecase) %></td>
+                        <td><%= sanitize(costshare[:copay]) %></td>
+                        <td><%= sanitize(costshare[:copay_option]) %></td>
+                        <td><%= sanitize(costshare[:coinsurance]) %></td>
+                        <td><%= sanitize(costshare[:coinsurance_option]) %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% else %>
+            <div class='card bg-transparent text-white mt-4'>
+              <h3 class='card-title'>Tier Description Missing!</h3>
+            </div>
           <% end %>
-        </table>
+        <% end %>
       </div>
     <% else %>
-      <br>
-      <div class='row col-12'>
-        <h3 class='float-left text-white'> Tier Description Missing! </h3>
+      <div class='col-12 justify-center'>
+        <h3>Tier Description Missing!</h3>
       </div>
     <% end %>
   </section>

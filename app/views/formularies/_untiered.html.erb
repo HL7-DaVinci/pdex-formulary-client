@@ -1,45 +1,42 @@
 <section class='container'>
 	<section class='row col-12'>
 		<div class='col-12'>
-			<h3 class='float-left text-white'>Formulary Drugs</h3>
+			<h3 class='float-left text-white'>
+        Formulary Drugs <%= "for #{@formulary[:name]}" if @formulary.present? %>
+      </h3>
       <%= render 'partials/query' %>
 			<div class='btn-group float-right mt-2' role='group'>
 				<%= link_to 'Previous', formularies_path(page: 'previous'), class: 'btn btn-outline-primary' %>
 				<%= link_to 'Next', 		formularies_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
 			</div>
 		</div>
-		<table class='table table-dark'>
+		<table class='table table-dark text-center'>
 			<tr>
 				<th scope='col'>Drug</th>
 				<th scope='col'>Tier</th>
-				<th scope='col'>Copay</th>
-				<th scope='col'>CoInsurance</th>
-				<th scope='col'>PlanID</th>
+				<th scope='col' data-toggle='tooltip' title='1 month in network'>Copay</th>
+				<th scope='col' data-toggle='tooltip' title='1 month in network'>CoInsurance</th>
+				<th scope='col'>Formulary</th>
 				<th scope='col'>RxNorm</th>
-				<th scope='col'>ID</th>
 			</tr>
 			<% @formularydrugs.each do |formulary_drug| %>
 				<tr>
 					<td>
 						<div class='drug'>
-							<%= link_to formulary_drug.drug_name, formulary_drug.formulary_id_path %>
+							<%= link_to sanitize(formulary_drug.drug_name), formulary_path(formulary_drug.id) %>
 						</div>
-						<% if formulary_drug.prior_auth %>
-							<span class='prior-auth'>Prior Authorization</span>
-						<% end %>
-						<% if formulary_drug.step_therapy %>
-							<span class='step-therapy'>Step Therapy</span>
-						<% end %>
-						<% if formulary_drug.quantity_limit %>
-							<span class='quantity-limit'>Quantity Limit</span>
+						<% if formulary_drug.mailorder %>
+              <% title_text = formulary_drug.mail_supplies&.map {|s| "<p>#{s}</p>"}&.join(' ') %>
+							<span class='mail-order' data-toggle='tooltip' data-html='true' title="<%= title_text%>">
+                Mail Order
+              </span>
 						<% end %>
 					</td>
-					<td><%= formulary_drug.drug_tier.split('-').map(&:capitalize).join(' ') %> </td>
-					<td>$<%=formulary_drug.copay%></td>
-					<td> <%=formulary_drug.coinsurancerate%>%</td>
-					<td><%= link_to formulary_drug.plan_id_name , formulary_drug.plan_id_path %></td>
+					<td><%= sanitize(formulary_drug.drug_tier.titlecase) %> </td>
+					<td><%= sanitize(formulary_drug.copay) %></td>
+					<td> <%= sanitize(formulary_drug.coinsurancerate) %></td>
+					<td><%= link_to formulary_drug.plan[:name] , coverageplan_path(formulary_drug.plan[:id]) %></td>
 					<td><%= link_to formulary_drug.rxnorm_code, formulary_drug.rxnorm_path %></td>
-					<td><%= formulary_drug.id %></td>
 				</tr>
 			<% end %>
 		</table>

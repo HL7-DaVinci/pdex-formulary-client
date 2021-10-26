@@ -1,0 +1,42 @@
+<div class='card'>
+  <h2 class='card-header'>Plan Type: <%= sanitize(plan[:type]) %></h2>
+  <div class='card-body'>
+    <% plan[:tiers].each do |tiername, tierdesc| %>
+      <h3 class='card-title'><%= sanitize(tiername.to_s.titlecase) %></h3>
+      <% if tierdesc[:mailorder] %>
+        <div class='drug'>
+          <span class='mail-order'>Mail Order</span>
+        </div>
+      <% end %>
+      <table class='table table-dark text-center'>
+        <colgroup>
+          <col style='width:20%'>
+          <col style='width:20%'>
+          <col style='width:20%'>
+          <col style='width:20%'>
+          <col style='width:20%'>
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope='col'>Pharmacy Type</th>
+            <th scope='col'>CoPay</th>
+            <th scope='col'>CoPay Option</th>
+            <th scope='col'>CoInsurance</th>
+            <th scope='col'>CoInsurance Option</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% tierdesc.each do |pharmtype, costshare| %>
+            <tr>
+              <td><%= sanitize(pharmtype.to_s.titlecase) %></td>
+              <td><%= sanitize(costshare[:copay]) %></td>
+              <td><%= sanitize(costshare[:copay_option]) %></td>
+              <td><%= sanitize(costshare[:coinsurance]) %></td>
+              <td><%= sanitize(costshare[:coinsurance_option]) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>
