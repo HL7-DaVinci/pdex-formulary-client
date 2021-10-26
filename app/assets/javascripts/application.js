@@ -38,7 +38,7 @@
                                     .attr('aria-valuenow', percent.toFixed(2))
                                     .css('width', percent.toFixed(2) + '%')
                                     .text(percent.toFixed(2) + '%');
-                            } catch {
+                            } catch (e) {
                                 clearInterval(update);
                             }
                         }
