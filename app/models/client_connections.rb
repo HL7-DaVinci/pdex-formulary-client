@@ -1,5 +1,4 @@
 class ClientConnections
-
   @clients = Hash.new
 
   def self.set(id, url)
@@ -7,15 +6,20 @@ class ClientConnections
       puts "ClientConnections:set  (#{id}, #{url})"
       client = FHIR::Client.new(url)
       client.use_r4
-      client.additional_headers = { 'Accept-Encoding' => 'identity' }  # 
+      client.additional_headers = { "Accept-Encoding" => "identity" }  #
       FHIR::Model.client = client
-      # profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
       search = { parameters: { _summary: "count" } }
-      count = client.search(FHIR::MedicationKnowledge, search: search ).resource.total
-      raise "No FormularyDrugs in server" unless count > 0
-    rescue
-      puts "ClientConnections:set  -- returning nil"
-      return nil
+      result = client.search(FHIR::MedicationKnowledge, search: search)
+      if result.response[:code] != 200
+        err = JSON.parse(result.response[:body])["issue"]
+        err.present? ? (raise err.first["diagnostics"]) : (raise "Invalid FHIR server: Please provide a valid FHIR server")
+      end
+      err = "Connection failed: Ensure provided url points to a valid FHIR server that holds at least one Formulary"
+      raise err unless result.resource.total > 0
+    rescue => exception
+      err = "No response from server: Timed out connecting to server. Server is either down or connection is slow."
+      return err if exception.class == Errno::ECONNRESET
+      return exception.message
     end
     @clients[id] = Hash.new
     prune(id)
@@ -41,15 +45,13 @@ class ClientConnections
 
   def self.prune(protectID = nil)
     puts "ClientConnect:prune (protectID = #{protectID} clients = #{@clients.keys}"
-    @clients.each {|key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}"} 
+    @clients.each { |key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}" }
     @clients[protectID][:lastUsed] = Time.now if protectID && @clients[protectID]
     safeHours = 5
     @clients.delete_if { |id, connection| (Time.now - connection[:lastUsed]) > (safeHours * 60 * 60) }
-    puts "After #{@clients.keys}" 
-    @clients.each {|key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}"} 
-    rescue => exception
-      puts "failure in Client:Connection.prune"
-
+    puts "After #{@clients.keys}"
+    @clients.each { |key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}" }
+  rescue => exception
+    puts "failure in Client:Connection.prune"
   end
-
 end
