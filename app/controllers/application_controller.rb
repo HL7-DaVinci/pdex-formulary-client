@@ -7,6 +7,8 @@
 ################################################################################
 
 class ApplicationController < ActionController::Base
+  rescue_from Rack::Timeout::RequestTimeoutException, with: :handle_timeout
+
   @@plansbyid = {}
 
   def self.plansbyid
@@ -151,6 +153,13 @@ class ApplicationController < ActionController::Base
 
   #-----------------------------------------------------------------------------
 
+  # Handle time out request:
+  def handle_timeout
+    err = "No response from server: Timed out connecting to server. Server is either down or connection is slow."
+    redirect_to root_path, flash: { error: err }
+  end
+
+  #-----------------------------------------------------------------------------
   # Check that this session has an established FHIR client connection.
   # Specifically, sets @client and redirects home if nil.
 
@@ -158,7 +167,7 @@ class ApplicationController < ActionController::Base
     session[:foo] = "bar" unless session.id
     raise "session.id is nil" unless session.id
     unless @client = ClientConnections.get(session.id.public_id)
-      session.clear
+      reset_session
       redirect_to root_path, flash: { error: "Please connect to a formulary server" }
     end
   end

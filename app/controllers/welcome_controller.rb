@@ -34,8 +34,8 @@ class WelcomeController < ApplicationController
   def connect_to_formulary_server
     session[:foo] = "bar" unless session.id
     raise "session.id is nil" unless session.id
-    # Clear sessions if new server_url provided
-    session.clear if params[:server_url].present?
+    # Establish a new session if new server_url provided
+    reset_session if params[:server_url].present?
     client_connection = ClientConnections.set(session.id.public_id, params[:server_url])
     if params[:server_url].present? && client_connection.class != FHIR::Client
       session[:error] = client_connection

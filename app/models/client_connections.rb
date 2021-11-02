@@ -17,8 +17,6 @@ class ClientConnections
       err = "Connection failed: Ensure provided url points to a valid FHIR server that holds at least one Formulary"
       raise err unless result.resource.total > 0
     rescue => exception
-      err = "No response from server: Timed out connecting to server. Server is either down or connection is slow."
-      return err if exception.class == Errno::ECONNRESET
       return exception.message
     end
     @clients[id] = Hash.new
