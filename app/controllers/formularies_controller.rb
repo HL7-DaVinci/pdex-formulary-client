@@ -39,7 +39,7 @@ class FormulariesController < ApplicationController
     fhir_formularyitems = []
     fhir_formularydrugs = []
 
-    @@bundle&.entry.each do |entry|
+    @@bundle&.entry&.each do |entry|
       resource = entry.resource
       resource.resourceType == "Basic" ? fhir_formularyitems << resource : fhir_formularydrugs << resource
     end
