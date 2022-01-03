@@ -7,11 +7,12 @@ Rails.application.routes.draw do
   resources :coverageplans, only: [:index, :show]
   resources :payerplans, only: [:index, :show]
   resources :compare, only: [:index]
+  resources :register, only: [:new, :create]
 
-  get '/home', to: 'welcome#index'
-  get '/dashboard', to: 'dashboard#index'
-  get '/login', to: 'dashboard#login'
-  get '/launch', to: 'dashboard#launch'
+  get "/home", to: "welcome#index"
+  get "/dashboard", to: "dashboard#index"
+  get "/login", to: "dashboard#login"
+  get "/launch", to: "dashboard#launch"
 
-  root 'welcome#index'
+  root "welcome#index"
 end

@@ -121,7 +121,7 @@ class DashboardController < ApplicationController
           }
         )
       rescue StandardError => exception
-        byebug
+        # byebug
         # reset_session
         redirect_to patients_path, alert: "Failed to connect: " + exception.message  and return
       end
