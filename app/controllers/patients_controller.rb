@@ -7,10 +7,9 @@
 ################################################################################
 
 class PatientsController < ApplicationController
-
   def index
     puts "==>PatientsController.index"
+    @patient_client = session[:patient_client]
     #redirect_to '/dashboard'
   end
-
 end

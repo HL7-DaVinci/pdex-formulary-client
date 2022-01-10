@@ -1,6 +1,58 @@
+<section class="container vh-100 ">
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-10 col-md-10 col-lg-12 col-xl-12">
+          <div class="card" style="border-radius: 15px;">
+            <div class="card-body p-5">
+              <h4 class="text-uppercase card-title text-center mb-5">Connect to a Patient FHIR server</h4>
+              <% if @patient_client %>
+                <p class="card-subtitle text-success m-auto client-connected text-center">
+                  Connected to <%= session[:iss_url] -%>
+                </p>
+                <p class="card-subtitle text-success m-auto client-connected text-center">
+                  Patient <%= session[:patient_id] -%>
+                </p>
+              <% else %>
+                <p class="card-subtitle text-danger m-auto" style='text-align: center'>No Connection Established</p>
+              <% end %>
+              <%= form_tag server_metadata_path, method: "get", id: "server-form" do %>
+
+                <div class="form-outline mb-4">
+                  <%= text_field_tag :iss_url, cookies[:iss_url], class: "form-control form-control-lg",
+                                                                  placeholder: "http://cpcds-ri.org/cpcds-server/fhir" %>
+                  <label class="form-label">FHIR Server with Patients</label>
+                </div>
+                <div class="form-outline mb-4">
+                  <%= text_field_tag :client_id, cookies[:client_id], class: "form-control form-control-lg",
+                                                                      placeholder: "Client ID" %>
+                  <label class="form-label">Client ID</label>
+                </div>
+                <div class="form-outline mb-4">
+                  <%= text_field_tag :client_secret, cookies[:client_secret], class: "form-control form-control-lg",
+                                                                              placeholder: "Client secret" %>
+                  <label class="form-label">Client Secret</label>
+                </div>
+                <div class="d-flex justify-content-center">
+                  <%= button_tag "Connect", class: "btn btn-primary btn-block btn-md gradient-custom-4 text-body", id: "server-url" %>
+                </div>
+
+                <p class="text-center text-muted mt-5 mb-0">
+                  For unauthenticated severs, please provide the FHIR server url and patient ID in the client secret field.
+                </p>
+
+              <% end %>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END -->
 <section class='container'>
 <h2 class="text-light welcome-text">Connect to a Patient FHIR server</h2>
-<p class="text-center text-muted mb-4">Dont't have credentials? <%= link_to "Register client here", new_register_path, class: "fw-bold text-primary" %></p>
 	<% if @client %>
 		<p class="text-success m-auto client-connected" style='text-align: center'>
 			Connected to <%= server_url -%>
@@ -14,7 +66,7 @@
 
 	<section class='row col-12'>
 		<div class='row'>
-			<%= form_tag launch_path, method: "get", class: "form-inline welcome-form", id: "server-form" do %>
+			<%= form_tag server_metadata_path, method: "get", class: "form-inline welcome-form", id: "server-form" do %>
 				<div class='col'></div>
 				<div class='form-group col-md-7 last'>
 					<label class="float-left text-light"> FHIR Server with Patients</label>

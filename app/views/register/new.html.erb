@@ -10,13 +10,13 @@
               <%= form_tag register_index_path, method: "post", id: "server-form" do %>
 
                 <div class="form-outline mb-4">
-                  <%= text_field_tag :server_url, nil, class: "form-control form-control-lg",
-                                                       placeholder: "https://davinci-drug-formulary-ri.logicahealth.org/fhir" %>
+                  <%= text_field_tag :iss_url, nil, class: "form-control form-control-lg",
+                                                    placeholder: "https://davinci-drug-formulary-ri.logicahealth.org/fhir" %>
                   <label class="form-label" for="form3Example3cg">Server URL</label>
                 </div>
 
                 <div class="d-flex justify-content-center">
-                  <button type="button" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
+                  <%= button_tag "Register", class: "btn btn-success btn-block btn-lg gradient-custom-4 text-body", id: "server-url" %>
                 </div>
 
                 <p class="text-center text-muted mt-5 mb-0">Already have credentials? <%= link_to "Connect to a server here", patients_path, class: "fw-bold text-primary" %></p>

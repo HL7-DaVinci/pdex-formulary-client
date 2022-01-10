@@ -16,7 +16,7 @@ gem "coffee-rails", "~> 4.2"    # Use CoffeeScript for .coffee assets and views
 gem "turbolinks", "~> 5"        # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem "jbuilder", "~> 2.5"        # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem "dalli"                     # Memcache client
-
+gem "jwt"
 # gem 'redis', '~> 4.0'         # Use Redis adapter to run Action Cable in production
 # gem 'bcrypt', '~> 3.1.7'      # Use ActiveModel has_secure_password
 # gem 'mini_magick', '~> 4.8'   # Use ActiveStorage variant
@@ -27,7 +27,7 @@ gem "bootsnap", ">= 1.1.0", require: false  # Reduces boot times through caching
 gem "fhir_client"               # Handles FHIR client requests
 gem "jquery-rails"              # Automate using jQuery with Rails
 gem "bootstrap", "~> 4.3.1"     # Integrates Bootstrap HTML, CSS, and JavaScript framework
-gem "rack-timeout"              # Abort requests that are taking too long.
+# gem "rack-timeout"              # Abort requests that are taking too long.
 
 group :development, :test do
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]     # Call 'byebug' anywhere in the code to stop execution and get a debugger console

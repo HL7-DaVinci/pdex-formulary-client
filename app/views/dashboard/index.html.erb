@@ -1,10 +1,15 @@
 <section class='container'>
-  <section class='row'>
-    <div class='col-5 card-container'>
-      <%= render 'patient-card' %>
-    </div>
-    <div class='col-7 card-container'>
-      <%= render 'plan-card' %>
-    </div>
-  </section>
+
+  <% if @patient %>
+    <section class='row'>
+      <div class='col-5 card-container'>
+        <%= render "patient-card" %>
+      </div>
+      <div class='col-7 card-container'>
+        <%= render "plan-card" %>
+      </div>
+    </section>
+  <% else %>
+    <h2 class='text-center mt-5'>No data available for Patient with ID: <%= session[:patient_id] %></h2>
+  <% end %>
 </section>
