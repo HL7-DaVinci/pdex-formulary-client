@@ -94,6 +94,7 @@ class DashboardController < ApplicationController
       })
       # byebug
     rescue StandardError => exception
+      reset_session
       err = JSON.parse(exception.response)
       redirect_to patients_path, alert: "Registration failed - #{exception.message}: #{err["error_description"]} " and return
     end
