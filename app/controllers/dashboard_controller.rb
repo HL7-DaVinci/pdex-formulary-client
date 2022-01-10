@@ -37,7 +37,6 @@ class DashboardController < ApplicationController
   end
 
   #-----------------------------------------------------------------------------
-  ##  TODO: my change
   def server_metadata
     # reset_session    # Get a completely fresh session for each launch.  This is a rails method.
     session[:iss_url] = cookies[:iss_url] = params[:iss_url].strip.delete_suffix("/")
@@ -104,8 +103,6 @@ class DashboardController < ApplicationController
     redirect_to launch_path
   end
 
-  #-----------------------------------------------------------------------------
-  ## TODO: END
   #-----------------------------------------------------------------------------
 
   # launch:  Pass either params or hardcoded server and client data to the

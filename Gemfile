@@ -27,7 +27,7 @@ gem "bootsnap", ">= 1.1.0", require: false  # Reduces boot times through caching
 gem "fhir_client"               # Handles FHIR client requests
 gem "jquery-rails"              # Automate using jQuery with Rails
 gem "bootstrap", "~> 4.3.1"     # Integrates Bootstrap HTML, CSS, and JavaScript framework
-# gem "rack-timeout"              # Abort requests that are taking too long.
+gem "rack-timeout"              # Abort requests that are taking too long.
 
 group :development, :test do
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]     # Call 'byebug' anywhere in the code to stop execution and get a debugger console

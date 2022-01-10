@@ -7,7 +7,7 @@
 ################################################################################
 
 class ApplicationController < ActionController::Base
-  # rescue_from Rack::Timeout::RequestTimeoutException, with: :handle_timeout
+  rescue_from Rack::Timeout::RequestTimeoutException, with: :handle_timeout
   include AuthHelper
 
   @@plansbyid = {}
