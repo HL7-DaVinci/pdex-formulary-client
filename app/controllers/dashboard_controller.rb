@@ -12,7 +12,7 @@ class DashboardController < ApplicationController
   require "base64"
 
   before_action :check_formulary_server_connection, only: [:index]
-  @@rsa_key = OpenSSL::PKey::RSA.new(2048) # public/private key to sign cert|jwt
+  @@rsa_key =  OpenSSL::PKCS12.new(KEY, KEY_PASSWORD).key # private key to sign jwt
   #-----------------------------------------------------------------------------
 
   def index
@@ -87,7 +87,7 @@ class DashboardController < ApplicationController
       result = RestClient.post(session[:registration_url],
                                {
                                  software_statement: client_credentials,
-                                 certifications: [generate_cert(@@rsa_key)],
+                                 certifications: [],
                                  udap: "1",
                                }.to_json, {
         content_type: :json,
@@ -96,7 +96,7 @@ class DashboardController < ApplicationController
     rescue StandardError => exception
       reset_session
       err = JSON.parse(exception.response)
-      redirect_to patients_path, alert: "Registration failed - #{exception.message}: #{err["error_description"]} " and return
+      redirect_to patients_path, alert: "Registration failed - #{err["error"]}: #{err["error_description"]} " and return
     end
     rcResult = JSON.parse(result)
     # byebug
@@ -111,7 +111,8 @@ class DashboardController < ApplicationController
 
   def launch
     # For authenticated access: UDAP or smart auth server
-    if (session[:is_auth_server?] == true || nil)
+    # byebug
+    if (session[:is_auth_server?].nil? || session[:is_auth_server?] == true)
       err = "This is a secured server: Please provide a client ID and Secret to authenticate"
       redirect_to patients_path, alert: err and return if (session[:client_id].blank? || session[:auth_url].blank?)
       server_auth_url = set_server_auth_url()
@@ -147,10 +148,11 @@ class DashboardController < ApplicationController
                                    {
             grant_type: "authorization_code",
             code: code,
-            redirect_uri: CLIENT_URL + "/login",
-          },
+            redirect_uri: login_url,
+            client_id: session[:client_id],
+                                   },
                                    {
-            :Authorization => auth,
+            Authorization: auth,
           })
         rescue StandardError => exception
           reset_session
@@ -167,11 +169,13 @@ class DashboardController < ApplicationController
                                      redirect_uri: login_url,
                                      client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                                      client_assertion: get_authentication_claims(@@rsa_key),
+                                     client_id: session[:client_id],
                                      udap: "1",
-                                   })
+                                   },
+                                  )
           # byebug
         rescue StandardError => exception
-          reset_session
+          # reset_session
           err = JSON.parse(exception.response)
           err = "Authentication failed - #{err["error"]}: #{err["error_description"]} "
           redirect_to patients_path, alert: err and return
