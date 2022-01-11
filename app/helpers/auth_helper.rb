@@ -73,7 +73,7 @@ module AuthHelper
       "aud" => session[:token_url],
       "exp" => time + 300,
       "iat" => time,
-      "jti" => SecureRandom.hex,
+      "jti" => SecureRandom.hex
     }
     header = {
       "alg" => "RS256",

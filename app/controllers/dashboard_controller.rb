@@ -17,21 +17,21 @@ class DashboardController < ApplicationController
 
   def index
     connect_to_patient_server if @patient_client.nil?
-
-    @patient = @patient_client.read(FHIR::Patient, "PDexPatient1").resource
+    # patient_id = "PDexPatient1"
+    @patient = @patient_client.read(FHIR::Patient, session[:patient_id]).resource
     if @patient
       pdex_coverage_bundle = @patient_client.search(FHIR::Coverage,
                                                     search: {
                                                       parameters: { patient: @patient.id },
                                                     }).resource
-      pdex_coverage = pdex_coverage_bundle.entry.first.resource
+      pdex_coverage = pdex_coverage_bundle&.entry&.first&.resource
 
-      coverage_plan_id = CoveragePlan.find_formulary_coverage_plan(pdex_coverage)
+      coverage_plan_id = CoveragePlan.find_formulary_coverage_plan(pdex_coverage) if pdex_coverage
       coverage_plan_bundle = @client.search(FHIR::List,
                                             search: {
                                               parameters: { identifier: coverage_plan_id },
                                             }).resource
-      @coverage_plan = coverage_plan_bundle.entry.first.resource
+      @coverage_plan = coverage_plan_bundle&.entry&.first&.resource
     end
     puts "==>DashboardController.index"
   end
@@ -81,17 +81,14 @@ class DashboardController < ApplicationController
   def registration
     redirect_to patients_path, alert: "Please provide a valid server url." and return if session[:registration_url].blank?
     # @@rsa_key = OpenSSL::PKey::RSA.new(2048) # public/private key
-    client_credentials = get_registration_claims(@@rsa_key)
+    # client_credentials = get_registration_claims(@@rsa_key)
     # byebug
     begin
-      result = RestClient.post(session[:registration_url],
-                               {
-                                 software_statement: client_credentials,
-                                 certifications: [],
-                                 udap: "1",
-                               }.to_json, {
-        content_type: :json,
-      })
+      payload = {
+        "software_statement" => get_registration_claims(@@rsa_key),
+        "udap" => "1",
+      }
+      result = RestClient.post(session[:registration_url], payload.to_json, content_type: :json)
       # byebug
     rescue StandardError => exception
       reset_session
@@ -101,6 +98,7 @@ class DashboardController < ApplicationController
     rcResult = JSON.parse(result)
     # byebug
     session[:client_id] = rcResult["client_id"]
+    puts "Successfully registered client to the server. Generated client_id: #{session[:client_id]}"
     redirect_to launch_path
   end
 
@@ -143,17 +141,14 @@ class DashboardController < ApplicationController
       code = params[:code]
       if session[:client_secret].present?
         auth = "Basic " + Base64.strict_encode64(session[:client_id] + ":" + session[:client_secret])
+        payload = {
+          "grant_type" => "authorization_code",
+          "code" => code,
+          "redirect_uri" => login_url,
+          "client_id" => session[:client_id],
+        }
         begin
-          result = RestClient.post(session[:token_url],
-                                   {
-            grant_type: "authorization_code",
-            code: code,
-            redirect_uri: login_url,
-            client_id: session[:client_id],
-                                   },
-                                   {
-            Authorization: auth,
-          })
+          result = RestClient.post(session[:token_url], payload,{Authorization: auth})
         rescue StandardError => exception
           reset_session
           err = JSON.parse(exception.response)
@@ -162,20 +157,20 @@ class DashboardController < ApplicationController
         end
       else
         begin
-          result = RestClient.post(session[:token_url],
-                                   {
-                                     grant_type: "authorization_code",
-                                     code: code,
-                                     redirect_uri: login_url,
-                                     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                                     client_assertion: get_authentication_claims(@@rsa_key),
-                                     client_id: session[:client_id],
-                                     udap: "1",
-                                   },
-                                  )
+          payload = {
+            "grant_type" => "authorization_code",
+            "code" => code,
+            "redirect_uri" => login_url,
+            "client_assertion_type" => "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            "client_assertion" => get_authentication_claims(@@rsa_key),
+            "client_id" => session[:client_id],
+            "udap" => "1"
+          },
+          result = RestClient.post(session[:token_url], payload)
           # byebug
         rescue StandardError => exception
           # reset_session
+          session[:client_id] = session[:iss_url] = session[:client_secret] = nil
           err = JSON.parse(exception.response)
           err = "Authentication failed - #{err["error"]}: #{err["error_description"]} "
           redirect_to patients_path, alert: err and return
@@ -189,7 +184,7 @@ class DashboardController < ApplicationController
       session[:token_expiration] = Time.now.to_i + rcResult["expires_in"].to_i
       @patient = session[:patient_id] = rcResult["patient"]
 
-      redirect_to dashboard_url, notice: "Signed in with patient ID: #{session[:patient_id]}"
+      redirect_to dashboard_url, notice: "Successfully signed in with patient ID: #{session[:patient_id]}"
     end
   end
 

@@ -1,6 +1,6 @@
 <section class='container'>
 
-  <% if @patient %>
+  <% if (@patient && @coverage_plan) %>
     <section class='row'>
       <div class='col-5 card-container'>
         <%= render "patient-card" %>
