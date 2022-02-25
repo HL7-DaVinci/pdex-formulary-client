@@ -165,7 +165,7 @@ class DashboardController < ApplicationController
             "client_assertion" => get_authentication_claims(@@rsa_key),
             "client_id" => session[:client_id],
             "udap" => "1"
-          },
+          }
           result = RestClient.post(session[:token_url], payload)
           # byebug
         rescue StandardError => exception
