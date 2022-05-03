@@ -6,6 +6,8 @@
 #
 ################################################################################
 
+# PayerInsurancePlan Profile of the FHIR R4 InsurancePlan
+# @See https://build.fhir.org/ig/HL7/davinci-pdex-formulary/StructureDefinition-usdf-PayerInsurancePlan.html
 class PayerPlan < Resource
   include ActiveModel::Model
 
