@@ -2,7 +2,7 @@
 #
 # Dashboard Controller
 #
-# Copyright (c) 2020 The MITRE Corporation.  All rights reserved.
+# Copyright (c) 2022 The MITRE Corporation.  All rights reserved.
 #
 ################################################################################
 
@@ -11,27 +11,23 @@ class DashboardController < ApplicationController
   require 'json'
   require 'base64'
 
-  before_action :check_formulary_server_connection, only: [:index]
+  before_action :connect_to_auth_server, only: [:index]
   @@rsa_key = OpenSSL::PKCS12.new(KEY, KEY_PASSWORD).key # private key to sign jwt
   #-----------------------------------------------------------------------------
 
   def index
-    connect_to_patient_server if @patient_client.nil?
-    # patient_id = "PDexPatient1"
-    @patient = @patient_client.read(FHIR::Patient, session[:patient_id]).resource
-    if @patient
-      pdex_coverage_bundle = @patient_client.search(FHIR::Coverage,
-                                                    search: {
-                                                      parameters: { patient: @patient.id }
-                                                    }).resource
-      pdex_coverage = pdex_coverage_bundle&.entry&.first&.resource
+    search_params = { patient: session[:patient_id], type: 'http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL',
+                      _include: 'Coverage:patient' }
+    # TODO: first check the status of the response and handle operation outcome accordingly
+    bundle_entry = @client.search(FHIR::Coverage, search: { parameters: search_params })&.resource&.entry
+    if bundle_entry
+      @patient = bundle_entry.find { |entry| entry.resource.resourceType == 'Patient' }&.resource
+      pdex_coverage = bundle_entry.find { |entry| entry.resource.resourceType == 'Coverage' }
+      drug_plan_class = pdex_coverage&.resource&.local_class&.find { |c| read_code_from_codeableconcept(c.type) == 'plan' }
+      insurance_drug_plan_id = drug_plan_class&.value
+      get_plansbyid
+      @coverage_plan = @plansbyid.select { |_, v| v[:planid] == insurance_drug_plan_id }.values.first
 
-      coverage_plan_id = CoveragePlan.find_formulary_coverage_plan(pdex_coverage) if pdex_coverage
-      coverage_plan_bundle = @client.search(FHIR::List,
-                                            search: {
-                                              parameters: { identifier: coverage_plan_id }
-                                            }).resource
-      @coverage_plan = coverage_plan_bundle&.entry&.first&.resource
     end
     puts '==>DashboardController.index'
   end
@@ -49,14 +45,14 @@ class DashboardController < ApplicationController
     session[:client_secret] = params[:client_secret].strip
     begin
       # For udap server
-      rcRequest = RestClient::Request.new(
+      rc_request = RestClient::Request.new(
         method: :get,
-        url: session[:iss_url] + '/.well-known/udap'
+        url: "#{session[:iss_url]}/.well-known/udap"
       ).execute
-      rcResult = JSON.parse(eval(rcRequest).to_json)
-      session[:registration_url] = rcResult['registration_endpoint']
-      session[:auth_url] = rcResult['authorization_endpoint']
-      session[:token_url] = rcResult['token_endpoint']
+      rc_result = JSON.parse(eval(rc_request).to_json)
+      session[:registration_url] = rc_result['registration_endpoint']
+      session[:auth_url] = rc_result['authorization_endpoint']
+      session[:token_url] = rc_result['token_endpoint']
       if session[:client_id].present?
         redirect_to launch_path
       else
@@ -64,12 +60,12 @@ class DashboardController < ApplicationController
       end
     rescue StandardError
       begin
-        rcRequest = RestClient::Request.new(
+        rc_request = RestClient::Request.new(
           method: :get,
-          url: session[:iss_url] + '/metadata'
+          url: "#{session[:iss_url]}/metadata"
         ).execute
-        rcResult = JSON.parse(eval(rcRequest).to_json) if rcRequest
-        is_auth_server?(rcResult)
+        rc_result = JSON.parse(eval(rc_request).to_json) if rc_request
+        is_auth_server?(rc_result)
         redirect_to launch_path
       rescue StandardError => exception
         reset_session
@@ -103,9 +99,9 @@ class DashboardController < ApplicationController
       err = JSON.parse(e.response)
       redirect_to patients_path, alert: "Registration failed - #{err['error']}: #{err['error_description']} " and return
     end
-    rcResult = JSON.parse(result)
+    rc_result = JSON.parse(result)
     # byebug
-    session[:client_id] = rcResult['client_id']
+    session[:client_id] = rc_result['client_id']
     puts "Successfully registered client to the server. Generated client_id: #{session[:client_id]}"
     redirect_to launch_path
   end
@@ -142,7 +138,7 @@ class DashboardController < ApplicationController
 
   def login
     if params[:error].present? # Authentication Failure
-      err = 'Authentication Failure: ' + params[:error] + ' - ' + params[:error_description]
+      err = "Authentication Failure:  #{params[:error]} - #{params[:error_description]}"
       redirect_to patients_path, alert: err
     else
       session[:wakeupsession] = 'ok' # using session hash prompts rails session to load
@@ -150,7 +146,7 @@ class DashboardController < ApplicationController
       session[:client_secret] = params[:client_secret] || session[:client_secret] # ).gsub! /\t/, ''
       code = params[:code]
       if session[:client_secret].present?
-        auth = 'Basic ' + Base64.strict_encode64(session[:client_id] + ':' + session[:client_secret])
+        auth = "Basic #{Base64.strict_encode64("#{session[:client_id]}:#{session[:client_secret]}")}"
         payload = {
           'grant_type' => 'authorization_code',
           'code' => code,
@@ -187,12 +183,12 @@ class DashboardController < ApplicationController
         end
       end
 
-      rcResult = JSON.parse(result)
-      scope = rcResult['scope']
-      session[:access_token] = rcResult['access_token']
-      session[:refresh_token] = rcResult['refresh_token']
-      session[:token_expiration] = Time.now.to_i + rcResult['expires_in'].to_i
-      @patient = session[:patient_id] = rcResult['patient']
+      rc_result = JSON.parse(result)
+      # scope = rc_result['scope']
+      session[:access_token] = rc_result['access_token']
+      session[:refresh_token] = rc_result['refresh_token']
+      session[:token_expiration] = Time.now.to_i + rc_result['expires_in'].to_i
+      @patient = session[:patient_id] = rc_result['patient']
 
       redirect_to dashboard_url, notice: "Successfully signed in with patient ID: #{session[:patient_id]}"
     end
@@ -206,15 +202,16 @@ class DashboardController < ApplicationController
   # Connect the FHIR client with the specified patient server and save the connection
   # for future requests.
 
-  def connect_to_patient_server
-    puts '==>connect_to_patient_server'
+  def connect_to_auth_server
+    # check_formulary_server_connection
+    puts '==>connect_to_auth_server'
     if session.empty? || session[:iss_url].nil?
       redirect_to patients_path,
                   alert: 'Your session has expired. Please reconnect!' and return
     end
 
-    @patient_client = session[:patient_client]
-    if @patient_client.present?
+    @client = session[:auth_client]
+    if @client.present? && ClientConnections.get(session.id.public_id).present?
       if session[:is_auth_server?].nil? || true
         token_expires_in = session[:token_expiration] - Time.now.to_i
         if token_expires_in.to_i < 10 # if we are less than 10s from an expiration, refresh
@@ -224,28 +221,46 @@ class DashboardController < ApplicationController
           token = refresh_token
           return if token.nil?
         end
-        @patient_client.set_bearer_token(session[:access_token])
+        @client.set_bearer_token(session[:access_token])
       end
     else
-      @patient_client = FHIR::Client.new(session[:iss_url])
-      @patient_client.use_r4
-      if !!session[:is_auth_server?]
-        @patient_client.set_bearer_token(session[:access_token]) if session[:access_token].present?
-        @patient_client.default_json
+      @client = connect_to_formulary_server(session[:iss_url])
+
+      # @client = FHIR::Client.new(session[:iss_url])
+      # @client.use_r4
+      if session[:is_auth_server?]
+        @client.set_bearer_token(session[:access_token]) if session[:access_token].present?
+        @client.default_json
       end
     end
-    session[:patient_client] = @patient_client
+    session[:auth_client] = @client
   rescue StandardError => e
     reset_session
-    err = 'Failed to connect: ' + e.message
+    err = "Failed to connect: #{e.message}"
     redirect_to patients_path, alert: err
+  end
+
+  #-----------------------------------------------------------------------------
+
+  # Connect the FHIR client with the specified server and save the connection
+  # for future requests.
+  def connect_to_formulary_server(server_url)
+    session[:foo] = 'bar' unless session.id
+    raise 'session.id is nil' unless session.id
+
+    client_connection = ClientConnections.set(session.id.public_id, server_url)
+    error = client_connection if client_connection.class != FHIR::Client
+    cookies[:server_url] = server_url
+    redirect_to patients_path, alert: session.delete(:error) and return if error
+
+    client_connection
   end
 
   # ------------------------------------------------------------
   # Refresh token from the authorization server
   def refresh_token
-    auth = 'Basic ' + Base64.strict_encode64(session[:client_id] + ':' + session[:client_secret]).chomp
-    rcResultJson = RestClient.post(
+    auth = "Basic #{Base64.strict_encode64("#{session[:client_id]}:#{session[:client_secret]}").chomp}"
+    rc_result_json = RestClient.post(
       session[:token_url],
       {
         grant_type: 'refresh_token',
@@ -255,14 +270,20 @@ class DashboardController < ApplicationController
         Authorization: auth
       }
     )
-    rcResult = JSON.parse(rcResultJson)
+    rc_result = JSON.parse(rc_result_json)
 
-    session[:patient_id] = rcResult['patient']
-    session[:access_token] = rcResult['access_token']
-    session[:refresh_token] = rcResult['refresh_token']
-    session[:token_expiration] = (Time.now.to_i + rcResult['expires_in'].to_i)
+    session[:patient_id] = rc_result['patient']
+    session[:access_token] = rc_result['access_token']
+    session[:refresh_token] = rc_result['refresh_token']
+    session[:token_expiration] = (Time.now.to_i + rc_result['expires_in'].to_i)
   rescue StandardError => e
-    err = 'Failed to refresh token: ' + e.message
+    err = "Failed to refresh token: #{e.message}"
     redirect_to patients_path, alert: err and return
+  end
+
+  # ------------------------------------------------------------
+  # Read Codeable concept code
+  def read_code_from_codeableconcept(codeable_concept)
+    codeable_concept&.coding&.first&.code
   end
 end

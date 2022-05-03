@@ -6,13 +6,19 @@
           <div class="card" style="border-radius: 15px;">
             <div class="card-body p-5">
               <h4 class="text-uppercase card-title text-center mb-5">Connect to a Patient FHIR server</h4>
-              <% if @patient_client %>
+              <% if @client %>
                 <p class="card-subtitle text-success m-auto client-connected text-center">
                   Connected to <%= session[:iss_url] -%>
                 </p>
                 <p class="card-subtitle text-success m-auto client-connected text-center">
                   Patient <%= session[:patient_id] -%>
                 </p>
+                <br />
+                <%= form_tag dashboard_path, method: "get", id: "server-form" do %>
+                  <div class="d-flex justify-content-center">
+                    <%= button_tag "My Formulary", class: "btn btn-success btn-block btn-md gradient-custom-4 text-body", id: "server-url" %>
+                  </div>
+                <% end %>
               <% else %>
                 <p class="card-subtitle text-danger m-auto" style='text-align: center'>No Connection Established</p>
               <% end %>
@@ -20,7 +26,7 @@
 
                 <div class="form-outline mb-4">
                   <%= text_field_tag :iss_url, cookies[:iss_url], class: "form-control form-control-lg",
-                                                                  placeholder: "http://cpcds-ri.org/cpcds-server/fhir" %>
+                                                                  placeholder: "https://davinci-drug-formulary-ri.logicahealth.org/fhir" %>
                   <label class="form-label">FHIR Server with Patients</label>
                 </div>
                 <div class="form-outline mb-4">
@@ -38,7 +44,6 @@
                 </div>
 
                 <p class="text-center text-muted mt-5 mb-0">
-                  For unauthenticated severs, please provide the FHIR server url and patient ID in the client secret field.<br/>
                   This app also supports UDAP dynamic registration and JWT-based authentication.
                 </p>
 
