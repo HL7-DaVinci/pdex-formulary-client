@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
   # Read all of the insurance drug plans (Formularies) from the server
   def coverage_plans
-    cp_type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    cp_type = 'http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL'
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: cp_type } }).resource
     @plansbyid = build_coverage_plans(reply)
     @locationsbyid = locations
@@ -38,13 +38,13 @@ class ApplicationController < ActionController::Base
     session[:cp_options] = compress_hash(@cp_options)
 
     # Prepare the query string for display on the page
-    @search = URI.decode(reply.link.select { |l| l.relation === "self" }.first.url) if reply.link.first
+    @search = URI.decode(reply.link.select { |l| l.relation === 'self' }.first.url) if reply.link.first
     session[:query] = @search
 
     @cp_options
-  rescue => exception
-    puts "coverage_plans fails:  not connected"
-    @cp_options = [["N/A (Must connect first)", "-"]]
+  rescue StandardError => e
+    puts 'coverage_plans fails:  not connected'
+    @cp_options = [['N/A (Must connect first)', '-']]
     @locationsbyid ||= {}
     @plansbyid ||= {}
   end
@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
   # Read all Locations from the server
   def locations
-    profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-InsurancePlanLocation"
+    profile = 'http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-InsurancePlanLocation'
     bundle = @client.search(FHIR::Location, search: { parameters: { _profile: profile } }).resource&.entry || []
     areas = bundle.each_with_object({}) do |entry, areahashbyid|
       areahashbyid[entry.resource.id] = Location.new(entry.resource)
@@ -78,16 +78,16 @@ class ApplicationController < ActionController::Base
   #-----------------------------------------------------------------------------
   # Read all payer insurance plans from the server
   def payer_plans
-    payerplan_type = "http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|"
+    payerplan_type = 'http://hl7.org/fhir/us/davinci-pdex-plan-net/CodeSystem/InsuranceProductTypeCS|'
     reply = @client.search(FHIR::InsurancePlan, search: { parameters: { type: payerplan_type } }).resource
     @payersbyid = build_payer_plans(reply)
     session[:payersbyid] = compress_hash(@payersbyid.to_json)
 
     # Prepare the query string for display on the page
-    @search = URI.decode(reply.link.select { |l| l.relation === "self" }.first.url) if reply.link.first
+    @search = URI.decode(reply.link.select { |l| l.relation === 'self' }.first.url) if reply.link.first
     session[:payersplan_query] = @search
-  rescue => exception
-    puts "payer plans fails: #{exception}"
+  rescue StandardError => e
+    puts "payer plans fails: #{e}"
     @payersbyid ||= {}
   end
 
@@ -121,7 +121,7 @@ class ApplicationController < ActionController::Base
     @cp_options = fhir_list_reply.entry.collect do |entry|
       [entry.resource.name, entry.resource.id]
     end
-    @cp_options.unshift(["All", ""])
+    @cp_options.unshift(['All', ''])
   end
 
   #-----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ class ApplicationController < ActionController::Base
 
   # Handle time out request:
   def handle_timeout
-    err = "No response from server: Timed out connecting to server. Server is either down or connection is slow."
+    err = 'No response from server: Timed out connecting to server. Server is either down or connection is slow.'
     redirect_to root_path, flash: { error: err }
   end
 
@@ -165,11 +165,12 @@ class ApplicationController < ActionController::Base
   # Specifically, sets @client and redirects home if nil.
 
   def check_formulary_server_connection
-    session[:foo] = "bar" unless session.id
-    raise "session.id is nil" unless session.id
+    session[:foo] = 'bar' unless session.id
+    raise 'session.id is nil' unless session.id
+
     unless @client = ClientConnections.get(session.id.public_id)
       reset_session
-      redirect_to root_path, flash: { error: "Please connect to a formulary server" }
+      redirect_to root_path, flash: { error: 'Please connect to a formulary server' }
     end
   end
 end
