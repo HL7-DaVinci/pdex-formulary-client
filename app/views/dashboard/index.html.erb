@@ -1,10 +1,14 @@
 <section class='container'>
-  <section class='row'>
-    <div class='col-5 card-container'>
-      <%= render 'patient-card' %>
-    </div>
-    <div class='col-7 card-container'>
-      <%= render 'plan-card' %>
-    </div>
-  </section>
+  <% if @coverage_plan %>
+    <section class='row'>
+      <div class='col-5 card-container'>
+        <%= render 'patient-card' %>
+      </div>
+      <div class='col-7 card-container'>
+        <%= render 'plan-card' %>
+      </div>
+    </section>
+  <% else %>
+    <%= render 'query-error' %>
+  <% end %>
 </section>

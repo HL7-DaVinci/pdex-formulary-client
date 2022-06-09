@@ -16,6 +16,7 @@ gem 'coffee-rails', '~> 4.2'    # Use CoffeeScript for .coffee assets and views
 gem 'turbolinks', '~> 5'        # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'jbuilder', '~> 2.5'        # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'dalli'                     # Memcache client
+gem 'hash_dot'                  # Allows using dot notation on hashes
 
 # gem 'redis', '~> 4.0'         # Use Redis adapter to run Action Cable in production
 # gem 'bcrypt', '~> 3.1.7'      # Use ActiveModel has_secure_password
@@ -24,7 +25,7 @@ gem 'dalli'                     # Memcache client
 gem 'zlib' , '>= 1.0.0'
 gem 'bootsnap', '>= 1.1.0', require: false  # Reduces boot times through caching; required in config/boot.rb
 
-gem 'fhir_client'               # Handles FHIR client requests 
+gem 'fhir_client'               # Handles FHIR client requests
 gem 'jquery-rails'              # Automate using jQuery with Rails
 gem 'bootstrap', '~> 4.3.1'     # Integrates Bootstrap HTML, CSS, and JavaScript framework
 

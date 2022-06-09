@@ -1,4 +1,4 @@
-CLIENT_URL = "http://localhost:4000"
+CLIENT_URL = "http://localhost:3000"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.

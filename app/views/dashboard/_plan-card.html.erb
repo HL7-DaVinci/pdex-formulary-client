@@ -1,16 +1,16 @@
 <div class='card bg-dark text-white'>
   <div class='card-body'>
-    <h2 class="text-light"><%= @coverage_plan.title %></h2>
+    <h2 class="text-light"><%= @coverage_plan.name %></h2>
     <div class='row mb-1 col-md-12'>
       <%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
-        <%= hidden_field_tag :coverage, @coverage_plan.identifier.first.value %>
+        <%= hidden_field_tag :coverage, @coverage_plan.planid %>
         <div class='form-group col-md-3'>
-          <%= select_tag(:drug_tier, options_for_select([['All', ''], 
+          <%= select_tag(:drug_tier, options_for_select([['All', ''],
                           ['Generic', 'generic'],
                           ['Medical Benefit', 'medical-benefit'],
-                          ['Preferred Brand', 'preferred-brand'], 
+                          ['Preferred Brand', 'preferred-brand'],
                           ['Non-preferred Brand', 'non-preferred-brand'],
-                          ['Specialty', 'specialty'], 
+                          ['Specialty', 'specialty'],
                           ['Non-preferred Brand Specialty', 'non-preferred-brand-specialty'],
                           ['Zero-cost Share Preventive', 'zero-cost-share-preventive']]),
                           prompt: 'Drug Tier',
@@ -19,7 +19,6 @@
         <div class='form-group col-md-3'>
           <%= text_field_tag :name, nil, class: 'form-control code-input', placeholder: 'Drug Name'%>
         </div>
-
         <div class='form-group col-md-4 last'>
           <%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
         </div>
@@ -28,8 +27,8 @@
       <% end %>
     </div>
     <p class='text-info guidance ml-auto mr-auto mb-5'>
-      Each of the above options can be left unspecified. 
+      Each of the above options can be left unspecified.
       Pressing "Lookup" will display the intersection of defined options.
-    </p>  
+    </p>
   </div>
 </div>

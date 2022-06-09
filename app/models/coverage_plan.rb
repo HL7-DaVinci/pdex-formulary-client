@@ -11,28 +11,28 @@ class CoveragePlan
 
   include ActiveModel::Model
 
-	attr_accessor :name, :id, :summaryurl, :network, :formularyurl, :email, 
+	attr_accessor :name, :id, :summaryurl, :network, :formularyurl, :email,
 									:marketingurl, :planidtype, :planid, :drugs, :tiers
 
 	def initialize(fhir_coverageplan)
 		@name 	= fhir_coverageplan.title
-		@id 		= fhir_coverageplan.id 
-		@planid = fhir_coverageplan.identifier.first.value 
+		@id 		= fhir_coverageplan.id
+		@planid = fhir_coverageplan.identifier.first.value
 
 		parse_extensions(fhir_coverageplan)
 
-		@tiers = parse_tiers(fhir_coverageplan) 
+		@tiers = parse_tiers(fhir_coverageplan)
 
 		#--- Collect the pharmacy types present in this coverage plan -- we don't use this
 		# @pharmacytypes = {}
-		# @tiers.each do |tiername, tierdesc| 
-		#	  tierdesc[:costshares].each do |pharmtype, costshare|  
+		# @tiers.each do |tiername, tierdesc|
+		#	  tierdesc[:costshares].each do |pharmtype, costshare|
     #     @pharmacytypes[pharmtype] = true
-    #   end  
-		# end  
-		
+    #   end
+		# end
+
 		# We don't currently use the drug list that is part of the coverage plan.
-		# Since we want to save this in the session object and keep it small, we 
+		# Since we want to save this in the session object and keep it small, we
 		# will not build this array.
 		#
 		# @drugs = parse_drugs(fhir_coverageplan)
@@ -41,7 +41,7 @@ class CoveragePlan
 
 	#-----------------------------------------------------------------------------
 
- 	#--- Parses the values within the extensions defined by the formulary drug 
+ 	#--- Parses the values within the extensions defined by the formulary drug
 	#--- resource.
 	 def parse_extensions(fhir_coverageplan)
 		extensions = fhir_coverageplan.extension
@@ -65,7 +65,7 @@ class CoveragePlan
 			@planid = "Required extensions not specified"
 		end
 	end
-	 
+
 	#-----------------------------------------------------------------------------
 
 	def parse_drugs(fhir_coverageplan)
@@ -109,7 +109,7 @@ class CoveragePlan
                 else
 									puts "Weird stuff in coverage_plan.rb"
                 end
-							end 
+							end
 
               costshare = {
               	:pharmacytype 			=> pharmacytype,
@@ -120,12 +120,12 @@ class CoveragePlan
               }
 
 							costshares[pharmacytype] = costshare
-            end 
-					end 
+            end
+					end
           tiers[tiername] = {:mailorder => mailorder, :costshares => costshares}
 				end
 			end
-			return tiers 
+			return tiers
 		end
 	end
 
@@ -137,9 +137,12 @@ class CoveragePlan
 
 	#-----------------------------------------------------------------------------
 
-	def self.find_formulary_coverage_plan(pdex_coverage)
-		pdex_coverage_identifier = pdex_coverage.identifier.first.value
-		COVERAGE_PLAN_MAPPING[pdex_coverage_identifier]
+	def self.find_formulary_coverage_plan_id(pdex_coverage)
+		# pdex_coverage_identifier = pdex_coverage.identifier.first.value
+		# COVERAGE_PLAN_MAPPING[pdex_coverage_identifier]
+		if !pdex_coverage.nil?
+			return pdex_coverage.local_class&.find {|c| c&.type&.coding&.first&.code == 'plan'}&.value
+		end
 	end
 
 	#-----------------------------------------------------------------------------
