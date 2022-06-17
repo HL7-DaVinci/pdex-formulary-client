@@ -1,55 +1,55 @@
 <section class='container'>
-	<section class='row col-12'>
-		<div class='col-12'>
-			<h3 class='float-left text-white'>CoveragePlans - Index</h3>
-      <%= render 'partials/query' %>
-			<div class='btn-group float-right mt-2' role='group'>
-				<%= link_to 'Previous', coverageplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
-				<%= link_to 'Next', 		coverageplans_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
-			</div>
-		</div>
-		<table class='table table-dark'>
-			<tr>
-				<th scope='col'>Name</th>
-				<th scope='col'>Links</th>
-				<th scope='col'>Network</th>
-        <th scope='col'>ID</th>
-				<th scope='col'>Type</th>
-        <th scope='col'>Drugs</th>
-			</tr>
-			<% @coverageplans.each do |coverageplan| %>
-				<tr>
-					<td>  <%= link_to sanitize(coverageplan[:name]), "/coverageplans/#{coverageplan[:planid]}" %> </td>
-          <td>
-            <% if coverageplan[:email] %>
-              <a href=mailto:<%=coverageplan[:email] %> >e-mail </a>,
-            <% end %>
-            <% if coverageplan[:marketingurl]%>
-              <a href=<%=coverageplan[:marketingurl] %> >marketing </a>,
-            <% end %>
-            <% if coverageplan[:formularyurl] %>
-              <a href=<%=coverageplan[:formularyurl] %> >formulary </a>,
-            <% end %>
-            <% if coverageplan[:summaryurl] %>
-              <a href=<%=coverageplan[:summaryurl] %> >summary </a> 
-            <% end %>     
-          </td>
-					<td> <%= coverageplan[:network] %></td>
-					<td> <%= coverageplan[:planid] %></td>
-          <td> <%= coverageplan[:planidtype] %></td>
-          <td> <a href=/formularies?coverage=<%=coverageplan[:planid]%>>drugs </a> </td>
-				</tr>
-			<% end %>
-		</table>
-		<div class='col-12'>
-			<div class='btn-group float-right mt-2' role='group'>
-				<%= link_to 'Previous', coverageplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
-				<%= link_to 'Next', 		coverageplans_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
-			</div>
-		</div>
-	</section>
+  <section class='row col-12'>
+    <div class='col-12'>
+      <h3 class='float-left text-white'>CoveragePlans - Index</h3>
+      <%= render "partials/query" %>
+      <div class='btn-group float-right mt-2' role='group'>
+        <%= link_to "Previous", coverageplans_path(page: "previous"), class: "btn btn-outline-primary" %>
+        <%= link_to "Next", coverageplans_path(page: "next"), class: "btn btn-outline-primary" %>
+      </div>
+    </div>
+    <% if @coverageplans.present? %>
+      <table class='table table-dark'>
+        <tr>
+          <th scope='col'>Name</th>
+          <th scope='col'>Links</th>
+          <th scope='col'>Network</th>
+          <th scope='col'>ID</th>
+          <th scope='col'>Type</th>
+          <th scope='col'>Drugs</th>
+        </tr>
+        <% @coverageplans.each do |coverageplan| %>
+          <tr>
+            <td>  <%= link_to sanitize(coverageplan[:name]), "/coverageplans/#{coverageplan[:planid]}" %> </td>
+            <td>
+              <% if coverageplan[:email] %>
+                <a href=mailto:<%= coverageplan[:email] %> >e-mail </a>,
+              <% end %>
+              <% if coverageplan[:marketingurl] %>
+                <a href=<%= coverageplan[:marketingurl] %> >marketing </a>,
+              <% end %>
+              <% if coverageplan[:formularyurl] %>
+                <a href=<%= coverageplan[:formularyurl] %> >formulary </a>,
+              <% end %>
+              <% if coverageplan[:summaryurl] %>
+                <a href=<%= coverageplan[:summaryurl] %> >summary </a>
+              <% end %>
+            </td>
+            <td> <%= coverageplan[:network] %></td>
+            <td> <%= coverageplan[:planid] %></td>
+            <td> <%= coverageplan[:planidtype] %></td>
+            <td> <a href=/formularies?coverage=<%= coverageplan[:planid] %>>drugs </a> </td>
+					</tr>
+				<% end %>
+			</table>
+    <% else %>
+			<%= render 'dashboard/query-error', resource_type: 'Coverage Plans', not_found_message: 'No Coverage plan available on the server' %>
+    <% end %>
+    <div class='col-12'>
+      <div class='btn-group float-right mt-2' role='group'>
+        <%= link_to "Previous", coverageplans_path(page: "previous"), class: "btn btn-outline-primary" %>
+        <%= link_to "Next", coverageplans_path(page: "next"), class: "btn btn-outline-primary" %>
+      </div>
+    </div>
+  </section>
 </section>
-
-
-
-

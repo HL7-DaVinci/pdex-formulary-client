@@ -7,6 +7,7 @@
 ################################################################################
 
 class ApplicationController < ActionController::Base
+  require "hash_dot"
 
   @@plansbyid = {}
 
@@ -16,34 +17,44 @@ class ApplicationController < ActionController::Base
 
   #-----------------------------------------------------------------------------
   private
+
   #-----------------------------------------------------------------------------
 
   def get_patient
-    Patient.init 
-  end
-  
-  def coverage_plans
-    # Read all of the coverage plans from the server
-    cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-    # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code}}).resource
-    @plansbyid  = build_coverage_plans(reply)
-    options = build_coverage_plan_options(reply)
-    session[:plansbyid] = compress_hash(@plansbyid.to_json)
-    session[:cp_options] = compress_hash(options)
-
-    # Prepare the query string for display on the page
-  	@search = URI.decode(reply.link.select { |l| l.relation === "self"}.first.url) if reply.link.first
-    session[:query] = @search
-
-    options
-    rescue => exception
-      puts "coverage_plans fails:  not connected"
-      options = [["N/A (Must connect first)", "-"]]
+    Patient.init
   end
 
   #-----------------------------------------------------------------------------
+  # Query all coverage plans from the server and save them in the session object for later use.
+  def coverage_plans
+    # Initialize @plansbyid and @@cp_options
+    @plansbyid = {}
+    @cp_options = [["N/A (Must connect first)", "-"]]
+    return if @client.nil?
 
+    # Read all of the coverage plans from the server (searching by plan code)
+    cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
+    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code } })
+
+    if reply.code == 200
+      fhir_list_entries = reply.resource.entry
+      @plansbyid = build_coverage_plans(fhir_list_entries)
+      @cp_options = build_coverage_plan_options(fhir_list_entries)
+      session[:plansbyid] = compress_hash(@plansbyid.to_json)
+      session[:cp_options] = compress_hash(@cp_options)
+    else
+      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+    end
+
+    # Prepare the query string for display on the page
+    request = reply.request.to_dot(use_default: true)
+    @search = "#{request[:method].to_s.capitalize} #{request.url}"
+    session[:query] = @search
+  end
+
+  #-----------------------------------------------------------------------------
+  # Retrieves the cached coverage plan info and search query.
   def get_plansbyid
     if session[:plansbyid]
       @plansbyid = JSON.parse(decompress_hash(session[:plansbyid])).deep_symbolize_keys
@@ -51,9 +62,7 @@ class ApplicationController < ActionController::Base
       @search = session[:query]
     else
       puts "get_plansbyid:  session[:plansbyid] is nil, calling coverage_plans "
-      @plansbyid = nil
-      @cp_options = [["N/A (Must connect first)", "-"]]
-      coverage_plans 
+      coverage_plans
     end
   end
 
@@ -70,18 +79,20 @@ class ApplicationController < ActionController::Base
   end
 
   #-----------------------------------------------------------------------------
-
-  def build_coverage_plan_options(fhir_list_reply)
-    options = fhir_list_reply.entry.collect do |entry| 
+  # Read an array of List instances and return an [[plan_name, plan_identifier]] or []
+  def build_coverage_plan_options(fhir_list_entries)
+    fhir_list_entries = [] if fhir_list_entries.nil?
+    options = fhir_list_entries.collect do |entry|
       [entry.resource.title, entry.resource.identifier.first.value]
     end
     options.unshift(["All", ""])
   end
 
   #-----------------------------------------------------------------------------
-
-  def build_coverage_plans (fhir_list_reply)
-    coverageplans = fhir_list_reply.entry.each_with_object({}) do | entry, planhashbyid |
+  # Read an array of List instances and return {:plan_id => CoveragePlan_instance} or {}
+  def build_coverage_plans(fhir_list_entries)
+    fhir_list_entries = [] if fhir_list_entries.nil?
+    coverageplans = fhir_list_entries.each_with_object({}) do |entry, planhashbyid|
       planhashbyid[entry.resource.identifier.first.value] = CoveragePlan.new(entry.resource)
     end
     coverageplans.deep_symbolize_keys
@@ -93,11 +104,10 @@ class ApplicationController < ActionController::Base
   # Specifically, sets @client and redirects home if nil.
 
   def check_formulary_server_connection
-    session[:foo] = "bar" unless session.id   
-    raise "session.id is nil"  unless session.id
+    session[:foo] = "bar" unless session.id
+    raise "session.id is nil" unless session.id
     unless @client = ClientConnections.get(session.id.public_id)
       redirect_to root_path, flash: { error: "Please connect to a formulary server" }
     end
   end
-
 end

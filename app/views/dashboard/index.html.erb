@@ -9,6 +9,6 @@
       </div>
     </section>
   <% else %>
-    <%= render 'query-error' %>
+    <%= render 'query-error', resource_type: 'Drug Coverage', not_found_message: 'You do not have an active drug coverage.' %>
   <% end %>
 </section>

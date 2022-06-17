@@ -1,12 +1,12 @@
-<div class="d-flex align-items-center justify-content-center vh-100">
-  <div class="text-center">
-    <h1 class="display-1 fw-bold"><%= @request_faillure ? "Something went wrong " : "Drug Coverage Not Found" %></h1>
-    <p class="fs-3"> <span class="text-danger">Opps!</span> <%= @request_faillure ? "Unable to retrieve your coverage plan from the server." : "You do not have any active coverage." %></p>
+<div class="d-flex align-items-center justify-content-center mt-0 ">
+  <div class="text-center text-white mt-0">
+    <h1 class="display-1 fw-bold"><%= @request_faillure ? "Something went wrong " : "#{local_assigns[:resource_type]} Not Found" %></h1>
+    <p class="fs-3"> <span class="text-danger">Opps!</span> <%= @request_faillure ? "Server was unable to process your request." : "#{local_assigns[:not_found_message]}." %></p>
     <% if @request_faillure %>
       <p class="lead">
         Error message from the server:
       </p>
-      <%= @request_faillure %>
+      <p class="fs-2 fw-bolder text-danger"><%= @request_faillure %></p>
       <%= link_to 'Go Home', root_path, class: 'btn btn-primary' %>
     <% else %>
       <%= link_to 'Browse Coverage Plans', coverageplans_path, class: 'btn btn-primary' %>

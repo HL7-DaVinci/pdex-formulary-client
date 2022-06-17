@@ -9,7 +9,6 @@
 class DashboardController < ApplicationController
   require "rest-client"
   require "json"
-  require "hash_dot"
   require "base64"
 
   before_action :check_formulary_server_connection, only: [:index]
@@ -32,9 +31,9 @@ class DashboardController < ApplicationController
         @coverage_plan = @plansbyid[coverage_plan_id.to_sym]&.to_dot(use_default: true) if @plansbyid.present?
       end
     else
-      request = reply.request
-      @search = "#{request.method.capitalize} #{request.url}"
-      @request_faillure = JSON.parse(request.body).to_dot(use_default: true).text&.div
+      request = reply.request.to_dot(use_default: true)
+      @search = "#{request[:method].to_s.capitalize} #{request.url}"
+      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
     end
     puts "==>DashboardController.index"
   end

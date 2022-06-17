@@ -7,17 +7,17 @@
 ################################################################################
 
 require 'json'
-	
+
 class CoverageplansController < ApplicationController
 
-	before_action :check_formulary_server_connection, only: [ :index, :show ]
+	before_action :check_formulary_server_connection, :get_plansbyid, only: [ :index, :show ]
 
 	#-----------------------------------------------------------------------------
 
 	# GET /coverageplans
 
 	def index
-		get_plansbyid
+		# get_plansbyid
 		@coverageplans = @plansbyid.values
 	end
 
@@ -26,7 +26,7 @@ class CoverageplansController < ApplicationController
 	# GET /coverageplans/[id]
 
 	def show
-		get_plansbyid
+		# get_plansbyid
 		@plandata = @plansbyid[params[:id].to_sym]
 	end
 

@@ -141,7 +141,7 @@ class CoveragePlan
 		# pdex_coverage_identifier = pdex_coverage.identifier.first.value
 		# COVERAGE_PLAN_MAPPING[pdex_coverage_identifier]
 		if !pdex_coverage.nil?
-			return pdex_coverage.local_class&.find {|c| c&.type&.coding&.first&.code == 'plan'}&.value
+			return pdex_coverage.local_class&.find { |c| c&.type&.coding&.first&.code == 'plan'}&.value
 		end
 	end
 
