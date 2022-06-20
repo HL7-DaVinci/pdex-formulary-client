@@ -30,27 +30,31 @@
 			</div>
 		<% end %>
 	</div>
-	<ul class="nav nav-tabs bg-dark" id="myTab" role="tablist">
-		<li class="nav-item">
-			<a class="nav-link active" id="home-tab" data-toggle="tab" href="#drug-lookup" role="tab" aria-controls="home" aria-selected="true">Drug Lookup</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="profile-tab" data-toggle="tab" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Coverage Plans</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="contact-tab" data-toggle="tab" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Plans</a>
-		</li>
-	</ul>
-	<div class="tab-content" id="myTabContent">
-		<div class="tab-pane fade show active bg-dark" id="drug-lookup" role="tabpanel" aria-labelledby="drug-lookup-tab">
-			<%= render 'drug_lookup' %>
+	<% if @request_faillure %>
+		<%= render 'dashboard/query-error', resource_type: 'Coverage Plans', not_found_message: 'No Coverage plan available on the server' %>
+	<% else %>
+		<ul class="nav nav-tabs bg-dark" id="myTab" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active" id="home-tab" data-toggle="tab" href="#drug-lookup" role="tab" aria-controls="home" aria-selected="true">Drug Lookup</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="profile-tab" data-toggle="tab" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Coverage Plans</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="contact-tab" data-toggle="tab" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Plans</a>
+			</li>
+		</ul>
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade show active bg-dark" id="drug-lookup" role="tabpanel" aria-labelledby="drug-lookup-tab">
+				<%= render 'drug_lookup' %>
+			</div>
+			<div class="tab-pane fade bg-dark" id="coverage-plans" role="tabpanel" aria-labelledby="coverage-plans-tab">
+				<%= render 'coverage_plans' %>
+			</div>
+			<div class="tab-pane fade bg-dark" id="compare-plans" role="tabpanel" aria-labelledby="compare-plans-tab">
+				<%= render 'compare_plans' %>
+			</div>
 		</div>
-		<div class="tab-pane fade bg-dark" id="coverage-plans" role="tabpanel" aria-labelledby="coverage-plans-tab">
-			<%= render 'coverage_plans' %>
-		</div>
-		<div class="tab-pane fade bg-dark" id="compare-plans" role="tabpanel" aria-labelledby="compare-plans-tab">
-			<%= render 'compare_plans' %>
-		</div>
-	</div>
+	<% end %>
 </section>
 
