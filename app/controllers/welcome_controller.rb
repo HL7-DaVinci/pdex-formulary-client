@@ -9,7 +9,7 @@
 class WelcomeController < ApplicationController
   before_action :connect_to_formulary_server, only: [:index]
 
-  # Welcome#index: Connects to the server & retrieves the total count of coverage plans and formulary drugs.
+  # GET / : Connects to the server & retrieves the total count of coverage plans and formulary drugs.
   def index
     # solution from https://stackoverflow.com/questions/30772737/rails-4-session-id-occasionally-nil
     session[:foo] = "bar" unless session.id

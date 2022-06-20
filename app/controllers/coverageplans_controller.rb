@@ -2,7 +2,7 @@
 #
 # CoveragePlans Controller
 #
-# Copyright (c) 2019 The MITRE Corporation.  All rights reserved.
+# Copyright (c) 2022 The MITRE Corporation.  All rights reserved.
 #
 ################################################################################
 
@@ -10,14 +10,13 @@ require 'json'
 
 class CoverageplansController < ApplicationController
 
-	before_action :check_formulary_server_connection, :get_plansbyid, only: [ :index, :show ]
+	before_action :check_formulary_server_connection, :get_plansbyid
 
 	#-----------------------------------------------------------------------------
 
 	# GET /coverageplans
 
 	def index
-		# get_plansbyid
 		@coverageplans = @plansbyid.values
 	end
 
@@ -26,7 +25,6 @@ class CoverageplansController < ApplicationController
 	# GET /coverageplans/[id]
 
 	def show
-		# get_plansbyid
 		@plandata = @plansbyid[params[:id].to_sym]
 	end
 
