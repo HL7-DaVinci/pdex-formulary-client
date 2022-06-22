@@ -2,14 +2,16 @@
 <html>
   <%= render 'partials/head' %>
   <body>
-    <%= render 'partials/header' %>
-    <div id='content'>
-      <main role='main'>
-        <%= render 'partials/messages' %>
-        <%= yield %>
-      </main>
-      <%= render 'partials/footer' %>
+    <div class='container'>
+      <%= render 'partials/header' %>
+      <div id='content'>
+        <main role='main'>
+          <%= render 'partials/messages' %>
+          <%= yield %>
+        </main>
+      </div>
     </div>
+    <%= render 'partials/footer' %>
     <%= yield :scripts %>
   </body>
 </html>

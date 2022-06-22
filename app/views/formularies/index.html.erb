@@ -1,5 +1,8 @@
-<% if @formularydrugs.empty? %>  
-    <%= render "no_formularies" %>
+<% if @search %>
+    <div style='margin-top: 8%;'> <%= render "partials/query" %> </div>
+<% end %>
+<% if @formularydrugs.empty? %>
+    <%= render 'dashboard/query-error', resource_type: 'Formulary Drugs', not_found_message: 'No Formularies match your search.' %>
 <% else %>
     <%= render "untiered" %>
 <% end %>
