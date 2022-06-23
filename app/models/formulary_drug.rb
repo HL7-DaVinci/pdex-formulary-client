@@ -11,7 +11,7 @@ class FormularyDrug < Resource
 
   attr_accessor(:drug_name, :drug_tier, :rxnorm_code, :id, :plan_id,
                 :plan, :plan_name, :plan_path, :plan_tierdesc, :rxnorm_path,
-                :coverage_restrictions, :formulary_id_path, :plansbyid)
+                :coverage_restrictions, :formulary_id_path)
 
   # Validations for required fields
   validates_presence_of :drug_name, :rxnorm_code, :plan_id, :drug_tier, message: "must be provided"
@@ -21,7 +21,6 @@ class FormularyDrug < Resource
     @id = fhir_formulary.id
     @drug_name = parse_drug_name(fhir_formulary)
     @rxnorm_code = parse_rxnorm_code(fhir_formulary)
-    @plansbyid = plansbyid
     @rxnorm_path = "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=#{@rxnorm_code}"
     @formulary_id_path = "/formularies/#{@id}"
     parse_extensions(fhir_formulary)
