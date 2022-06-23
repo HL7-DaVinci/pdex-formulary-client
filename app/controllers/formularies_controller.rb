@@ -18,6 +18,7 @@ class FormulariesController < ApplicationController
   def index
     if params[:page].present?
       @@bundle = update_page(params[:page], @@bundle)
+      @search = session[:formulary_search]
     else
       @@bundle = nil
       search = formularies_search_params
@@ -29,13 +30,14 @@ class FormulariesController < ApplicationController
       end
       # Prepare the query string for display on the page
       request = reply.request.to_dot(use_default: true)
-      @search = "#{request[:method].to_s.capitalize} #{request.url}"
+      @search = session[:formulary_search] = "#{request[:method].to_s.capitalize} #{request.url}"
     end
 
     fhir_formularydrugs = @@bundle ? @@bundle.entry.map(&:resource) : []
     @formularydrugs = []
     fhir_formularydrugs.each do |fhir_formularydrug|
-      @formularydrugs << FormularyDrug.new(fhir_formularydrug, @plansbyid)
+      formulary_drug = FormularyDrug.new(fhir_formularydrug, @plansbyid)
+      @formularydrugs << formulary_drug if formulary_drug.valid?
     end
   end
 
@@ -45,16 +47,16 @@ class FormulariesController < ApplicationController
 
   def show
     reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { _id: params[:id] } })
-    if reply.code == 200
-      fhir_formularydrug = reply.resource.entry.map(&:resource).first
-      @formulary_drug = FormularyDrug.new(fhir_formularydrug, @plansbyid) if fhir_formularydrug
-    else
-      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
-    end
-
     # Prepare the query string for display on the page
     request = reply.request.to_dot(use_default: true)
     @search = "#{request[:method].to_s.capitalize} #{request.url}"
+    if reply.code == 200
+      fhir_formularydrug = reply.resource.entry.map(&:resource).first
+      @formulary_drug = FormularyDrug.new(fhir_formularydrug, @plansbyid) if fhir_formularydrug
+      redirect_to formularies_path, flash: { error: "No Formulary drug matched your search." } if @formulary_drug.nil?
+    else
+      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+    end
   end
 
   #-----------------------------------------------------------------------------

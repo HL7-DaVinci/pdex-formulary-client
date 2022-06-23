@@ -1,7 +1,7 @@
 <div class="d-flex align-items-center justify-content-center mt-0 ">
   <div class="text-center text-white mt-0">
-    <h1 class="display-1 fw-bold"><%= @request_faillure ? "Something went wrong " : "#{local_assigns[:resource_type]} Not Found" %></h1>
-    <p class="fs-3"> <span class="text-danger">Opps!</span> <%= @request_faillure ? "Server was unable to process your request." : "#{local_assigns[:not_found_message]}." %></p>
+    <h1 class="display-3 fw-bold"><%= @request_faillure ? "Something went wrong " : "#{resource_type} Not Found or Invalid" %></h1>
+    <p class="fs-3"> <span class="text-danger">Opps!</span> <%= @request_faillure ? "Server was unable to process your request." : "#{not_found_message}" %></p>
     <% if @request_faillure %>
       <p class="lead">
         Error message from the server:

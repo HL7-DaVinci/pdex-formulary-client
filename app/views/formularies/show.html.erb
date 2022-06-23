@@ -1,12 +1,15 @@
 <section class='container'>
-  <% if @request_faillure || @formulary_drug.nil? %>
+  <% if (@request_faillure || @formulary_drug.invalid?) %>
     <%= render "partials/query" %>
-    <%= render 'dashboard/query-error', resource_type: 'Formulary Drug', not_found_message: 'No Formulary drug matches your search.' %>
+    <% error_msg = "The data received from the server is not valid: " %>
+    <% error_msg += "[ #{@formulary_drug&.errors&.full_messages&.join(', ')} ]" %>
+    <%= render 'dashboard/query-error', resource_type: 'Formulary Drug', not_found_message: raw(error_msg) %>
   <% else %>
     <div class='drug-head'>
       <h3 class='float-left text-white'>Formulary Drug </h3>
       <%= render 'partials/query' %>
       <table class='table table-dark'>
+        <caption></caption>
         <tbody>
           <tr>
             <th>Drug Name </th>
@@ -14,35 +17,28 @@
           </tr>
           <tr>
             <th>Coverage Plan</th>
-            <td><%= link_to @formulary_drug.plan_id_name , @formulary_drug.plan_id_path %></td>
+            <td><%= link_to @formulary_drug.plan_name , @formulary_drug.plan_path %></td>
           </tr>
           <tr>
             <th>Drug Tier</th>
-            <td><%= @formulary_drug.drug_tier.split('-').map(&:capitalize).join(' ')%></td>
+            <td><%= @formulary_drug.formatted_drug_tier %></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <section class='row col-12'>
-      <div>
-        <% if @formulary_drug.prior_auth %>
-          <span class='prior-auth'>Prior Authorization</span>
-        <% end %>
-        <% if @formulary_drug.step_therapy %>
-          <span class='step-therapy'>Step Therapy</span>
-        <%end%>
-        <% if @formulary_drug.quantity_limit %>
-          <span class='quantity-limit'>Quantity Limit</span>
+    <section class=''>
+      <div class='my-auto'>
+        <% @formulary_drug.coverage_restrictions.each do |key, value| %>
+          <span class="<%= key %>"><%= value %></span>
         <% end %>
       </div>
-      <% plandata = @plansbyid[@formulary_drug.plan_id.to_sym] %>
-      <% tierdesc = plandata[:tiers][@formulary_drug.drug_tier.to_sym] %>
-      <% if tierdesc %>
-        <div class ='drug'>
+      <% if (tierdesc = @formulary_drug.plan_tierdesc).present? %>
+        <div class ='drug w-100'>
           <% if tierdesc[:mailorder] %>
             <span class='mail-order'>Mail Order</span>
           <% end %>
           <table class='table table-dark'>
+            <caption>Tier info</caption>
             <tr>
               <th scope='col'>Pharmacy Type</th>
               <th scope='col'>CoPay</th>
