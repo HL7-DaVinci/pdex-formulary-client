@@ -25,7 +25,7 @@ class FormularyDrug < Resource
     @formulary_id_path = "/formularies/#{@id}"
     parse_extensions(fhir_formulary)
     @plan = plansbyid[@plan_id&.to_sym]
-    @plan_name = plan ? plan[:name] : "No associated plan"
+    @plan_name = plan ? plan[:name] : "No associated plan record found"
     @plan_tierdesc = @plan[:tiers][@drug_tier&.to_sym] if @plan
   end
 

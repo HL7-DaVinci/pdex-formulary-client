@@ -2,14 +2,14 @@
 #
 # Formularies Controller
 #
-# Copyright (c) 2019 The MITRE Corporation.  All rights reserved.
+# Copyright (c) 2022 The MITRE Corporation.  All rights reserved.
 #
 ################################################################################
 
 require "json"
 
 class FormulariesController < ApplicationController
-  before_action :check_formulary_server_connection, :get_plansbyid
+  before_action :check_formulary_server_connection, :get_plansbyid, :redirect_to_home
 
   #-----------------------------------------------------------------------------
 
@@ -101,5 +101,11 @@ class FormulariesController < ApplicationController
     search[:parameters]["DrugName:contains"] = params[:name] if params[:name].present?
 
     search
+  end
+
+  #-----------------------------------------------------------------------------
+  # Redirect to home page if Unable to query coverage plans
+  def redirect_to_home
+    redirect_to root_path, flash: { error: "Unable to retrieve coverage plans from the server." } if @request_faillure
   end
 end
