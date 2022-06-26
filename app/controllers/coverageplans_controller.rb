@@ -6,26 +6,25 @@
 #
 ################################################################################
 
-require 'json'
+require "json"
 
 class CoverageplansController < ApplicationController
+  before_action :check_formulary_server_connection, :get_plansbyid
 
-	before_action :check_formulary_server_connection, :get_plansbyid
+  #-----------------------------------------------------------------------------
 
-	#-----------------------------------------------------------------------------
+  # GET /coverageplans
 
-	# GET /coverageplans
+  def index
+    @coverageplans = @plansbyid.values
+  end
 
-	def index
-		@coverageplans = @plansbyid.values
-	end
+  #-----------------------------------------------------------------------------
 
-	#-----------------------------------------------------------------------------
+  # GET /coverageplans/[id]
 
-	# GET /coverageplans/[id]
-
-	def show
-		@plandata = @plansbyid[params[:id].to_sym]
-	end
-
+  def show
+    @plandata = @plansbyid[params[:id].to_sym]
+    redirect_to coverageplans_path, flash: { error: "Coverage plan record not found" } unless @plandata
+  end
 end
