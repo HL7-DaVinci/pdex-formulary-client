@@ -1,40 +1,35 @@
-
- <section class='container'>
-	<div class='plan'>
-			<h3 class='float-left text-white'>CoveragePlan: 
-			<%= @plandata[:name]%>
-			</h3>
-	</div>
+<section class='container'>
+  <div class='plan'>
+    <h3 class='float-left text-white'>CoveragePlan:
+      <%= @plandata[:name] %>
+    </h3>
+  </div>
   <section class='row col-12'>
-    <% unless @plandata.nil? %>
-	<% @plandata[:tiers].each do | tiername, tierdesc| %>
-	<h2 class='float-left text-white'><%= tiername.to_s.split('-').map(&:capitalize).join(' ') %>	</h2>
-	<% if tierdesc[:mailorder] %>
-	<div class ='drug'>
-		<span class='mail-order'>Mail Order</span>
-	</div>
-	<% end %>
-    <table class='table table-dark'>
-      	<tr>
-		<th scope='col'>Pharmacy Type</th>
-		<th scope='col'>CoPay</th>
-        <th scope='col'>CoPay Option</th>
-		<th scope='col'>CoInsurance</th>
-        <th scope='col'>CoInsurance Option</th>
-	    </tr>
-	<% tierdesc[:costshares].each do |pharmtype, costshare| %>
-	<tr>
-	<td> <%= pharmtype.to_s.split('-').map(&:capitalize).join(' ') %> </td>
-	<td> $<%= costshare[:copay] %> </td>
-	<td> <%= costshare[:copayoption].split('-').map(&:capitalize).join(' ') %> </td>
-	<td> <%= costshare[:coinsurancerate] %>% </td>
-	<td> <%= costshare[:coinsuranceoption].split('-').map(&:capitalize).join(' ') %> </td>
-	<tr>
-    <%  end %>
- 	</table>
-	<%  end %>
-    <% else %>
-      Not available
+    <% @plandata[:tiers].each do |tiername, tierdesc| %>
+      <h2 class='float-left text-white'><%= format_hyphenated_word(tiername) %>	</h2>
+      <% if tierdesc[:mailorder] %>
+        <div class ='drug'>
+          <span class='mail-order'>Mail Order</span>
+        </div>
+      <% end %>
+      <table class='table table-dark'>
+        <tr>
+          <th scope='col'>Pharmacy Type</th>
+          <th scope='col'>CoPay</th>
+          <th scope='col'>CoPay Option</th>
+          <th scope='col'>CoInsurance</th>
+          <th scope='col'>CoInsurance Option</th>
+        </tr>
+        <% tierdesc[:costshares].each do |costshare| %>
+          <tr>
+            <td> <%= format_hyphenated_word(costshare[:pharmacytype]) %> </td>
+            <td> $<%= costshare[:copay] %> </td>
+            <td> <%= format_hyphenated_word(costshare[:copayoption]) %> </td>
+            <td> <%= costshare[:coinsurancerate] %>% </td>
+            <td> <%= format_hyphenated_word(costshare[:coinsuranceoption]) %> </td>
+          <tr>
+        <% end %>
+      </table>
     <% end %>
   </section>
 </section>

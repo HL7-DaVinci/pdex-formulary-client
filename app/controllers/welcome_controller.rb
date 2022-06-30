@@ -15,6 +15,7 @@ class WelcomeController < ApplicationController
     session[:foo] = "bar" unless session.id
 
     @client = ClientConnections.get(session.id.public_id)
+    reset_session if @client.nil?
     @count = formulary_count
     @cp_count = coverageplan_count
     @cache_nil = ClientConnections.cache_nil?(session.id.public_id)

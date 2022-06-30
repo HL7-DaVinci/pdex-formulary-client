@@ -8,53 +8,59 @@
 
 module ApplicationHelper
 
-	# Determines the CSS class of the flash message for display from the 
-	# specified level.
+  # Determines the CSS class of the flash message for display from the
+  # specified level.
 
-	def flash_class(level)
+  def flash_class(level)
     case level
-	    when "notice"
-	    	css_class = "alert-info"
-	    when "success" 
-	    	css_class = "alert-success"
-	    when "error"
-	    	css_class = "alert-danger"
-	    when "alert"
-	    	css_class = "alert-danger"
+    when "notice"
+      css_class = "alert-info"
+    when "success"
+      css_class = "alert-success"
+    when "error"
+      css_class = "alert-danger"
+    when "alert"
+      css_class = "alert-warning"
     end
 
     return css_class
-	end
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_human_name(name)
-	  human_name = [name.prefix.join(', '), name.given.join(' '), name.family].join(' ')
-	  human_name += ', ' + name.suffix.join(', ') if name.suffix.present?
-	  sanitize(human_name)
-	end
+  def format_hyphenated_word(word)
+    word.to_s.split("-").map(&:capitalize).join(" ")
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_telecom(telecom)
-		sanitize(telecom)
-	  #sanitize(telecom.system + ': ' + number_to_phone(telecom.value, area_code: true))
-	end
+  def display_human_name(name)
+    human_name = [name.prefix.join(", "), name.given.join(" "), name.family].join(" ")
+    human_name += ", " + name.suffix.join(", ") if name.suffix.present?
+    sanitize(human_name)
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_identifier(identifier)
-	  sanitize("#{identifier.assigner.display}: ( #{identifier.type.text}, #{identifier.value})")
-	#    sanitize([identifier.type.text, identifier.value, identifier.assigner.display].join(', '))
-	end
+  def display_telecom(telecom)
+    sanitize(telecom)
+    #sanitize(telecom.system + ': ' + number_to_phone(telecom.value, area_code: true))
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	# Concatenates a list of display elements.
+  def display_identifier(identifier)
+    sanitize("#{identifier.assigner.display}: ( #{identifier.type.text}, #{identifier.value})")
+    #    sanitize([identifier.type.text, identifier.value, identifier.assigner.display].join(', '))
+  end
 
-	def display_list(list)
-	  sanitize(list.empty? ? 'None' : list.map(&:display).join(', '))
-	end
+  #-----------------------------------------------------------------------------
+
+  # Concatenates a list of display elements.
+
+  def display_list(list)
+    sanitize(list.empty? ? "None" : list.map(&:display).join(", "))
+  end
 
   #-----------------------------------------------------------------------------
 
@@ -62,127 +68,126 @@ module ApplicationHelper
     sanitize(code.coding.display)
   end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	# Concatenates a list of code elements.
+  # Concatenates a list of code elements.
 
-	def display_code_list(list)
-	  sanitize(list.empty? ? 'None' : list.map(&:code).join(', '))
-	end
+  def display_code_list(list)
+    sanitize(list.empty? ? "None" : list.map(&:code).join(", "))
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	# Concatenates a list of coding display elements.
+  # Concatenates a list of coding display elements.
 
-	def display_coding_list(list)
-	  if list.empty?
-	    result = 'None'
-	  else
-	    result = []
-	    list.map(&:coding).each do |coding|
-	      result << coding.map(&:display)
-	    end
-
-	    result = result.join(', ')
-	  end
-
-	  sanitize(result)
-	end
-
-	#-----------------------------------------------------------------------------
-
-	def google_maps(address)
-    if address.text.present?
-    	address_text = address.text
+  def display_coding_list(list)
+    if list.empty?
+      result = "None"
     else
-    	address_text = (address.line + 
-    										[ address.city, address.state, address.postalCode ]).join(', ')
+      result = []
+      list.map(&:coding).each do |coding|
+        result << coding.map(&:display)
+      end
+
+      result = result.join(", ")
     end
 
-	  'https://www.google.com/maps/search/' + html_escape(address_text)
-	end
+    sanitize(result)
+  end
+
+  #-----------------------------------------------------------------------------
+
+  def google_maps(address)
+    if address.text.present?
+      address_text = address.text
+    else
+      address_text = (address.line +
+                      [address.city, address.state, address.postalCode]).join(", ")
+    end
+
+    "https://www.google.com/maps/search/" + html_escape(address_text)
+  end
 
   #-----------------------------------------------------------------------------
 
   def address_text(address)
-    address_text = (address.line + [ address.city, address.state, address.postalCode ]).join(', ')
+    address_text = (address.line + [address.city, address.state, address.postalCode]).join(", ")
   end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_postal_code(postal_code)
-	  unless postal_code.nil?
-	  	sanitize(postal_code.match(/^\d{9}$/) ?
-	      postal_code.strip.sub(/([A-Z0-9]+)([A-Z0-9]{4})/, '\1-\2') : postal_code)
-	  end
-	end
+  def display_postal_code(postal_code)
+    unless postal_code.nil?
+      sanitize(postal_code.match(/^\d{9}$/) ?
+        postal_code.strip.sub(/([A-Z0-9]+)([A-Z0-9]{4})/, '\1-\2') : postal_code)
+    end
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_photo(photo, gender, options)
-    options[:class] = 'img-fluid'
- 		if photo.present?
-			result = image_tag(photo, options)
-		else
-			result = image_tag(gender == "female" ? "woman.svg" : "man-user.svg", options)
-		end
+  def display_photo(photo, gender, options)
+    options[:class] = "img-fluid"
+    if photo.present?
+      result = image_tag(photo, options)
+    else
+      result = image_tag(gender == "female" ? "woman.svg" : "man-user.svg", options)
+    end
 
-		return result
-	end
+    return result
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_reference(reference)
-	  if reference.present?
-	    components = reference.reference.split('/')
-	    controller = components.first.underscore.pluralize
+  def display_reference(reference)
+    if reference.present?
+      components = reference.reference.split("/")
+      controller = components.first.underscore.pluralize
 
-	    sanitize(link_to(reference.display,
-	                     [ '/', controller, '/', components.last ].join))
-	  end
-	end
+      sanitize(link_to(reference.display,
+                       ["/", controller, "/", components.last].join))
+    end
+  end
 
   #-----------------------------------------------------------------------------
 
   def display_raw_date(string)
-  	display_date(DateTime.parse(string)) unless string.nil?
+    display_date(DateTime.parse(string)) unless string.nil?
   end
 
   #-----------------------------------------------------------------------------
 
-	def display_date(datetime)
-		datetime.present? ? sanitize(datetime.strftime('%m/%d/%Y')) : "No date"
-	end
+  def display_date(datetime)
+    datetime.present? ? sanitize(datetime.strftime("%m/%d/%Y")) : "No date"
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_datetime(datetime)
-		datetime.present? ? sanitize(datetime.strftime('%m/%d/%Y')) : "No date/time"
-	end
+  def display_datetime(datetime)
+    datetime.present? ? sanitize(datetime.strftime("%m/%d/%Y")) : "No date/time"
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_categories(categories)
-		sanitize(categories.each.map { |category| category.text }.join(', '))	
-	end
+  def display_categories(categories)
+    sanitize(categories.each.map { |category| category.text }.join(", "))
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def display_performers(performers)
-		list = []
+  def display_performers(performers)
+    list = []
 
-		performers.each do |performer|
-			list << display_reference(performer)
-		end
+    performers.each do |performer|
+      list << display_reference(performer)
+    end
 
-		raw(list.join(', '))
-	end
+    raw(list.join(", "))
+  end
 
-	#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-	def hinted_text_field_tag(name, value = nil, hint = "Click and enter text", options={})
-		value = value.nil? ? hint : value
-		text_field_tag name, value, {:onclick => "if($(this).value == '#{hint}'){$(this).value = ''}", :onblur => "if($(this).value == ''){$(this).value = '#{hint}'}" }.update(options.stringify_keys)
-	end
-	
+  def hinted_text_field_tag(name, value = nil, hint = "Click and enter text", options = {})
+    value = value.nil? ? hint : value
+    text_field_tag name, value, { :onclick => "if($(this).value == '#{hint}'){$(this).value = ''}", :onblur => "if($(this).value == ''){$(this).value = '#{hint}'}" }.update(options.stringify_keys)
+  end
 end

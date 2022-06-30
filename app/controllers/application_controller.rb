@@ -92,9 +92,16 @@ class ApplicationController < ActionController::Base
   # Read an array of List instances and return {:plan_id => CoveragePlan_instance} or {}
   def build_coverage_plans(fhir_list_entries)
     fhir_list_entries = [] if fhir_list_entries.nil?
+    errors = []
     coverageplans = fhir_list_entries.each_with_object({}) do |entry, planhashbyid|
-      planhashbyid[entry.resource.identifier.first.value] = CoveragePlan.new(entry.resource)
+      plan = CoveragePlan.new(entry.resource)
+      if plan.valid?
+        planhashbyid[plan.planid] = plan
+      else
+        errors.concat(plan.errors.full_messages).uniq!
+      end
     end
+    flash.now.alert = "Some data returned are not displayed because they are not valid/comformant: #{errors}" if errors.present?
     coverageplans.deep_symbolize_keys
   end
 
