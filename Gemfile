@@ -4,7 +4,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.6.3'
 
 gem 'rails', '~> 5.2.4.1'       # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'sqlite3'                   # Use sqlite3 as the database for Active Record
 gem 'puma', '>= 3.12.2'         # Use Puma as the app server
 gem 'sass-rails', '~> 5.0'      # Use SCSS for stylesheets
 gem 'uglifier', '>= 1.3.0'      # Use Uglifier as compressor for JavaScript assets
@@ -31,6 +30,7 @@ gem 'bootstrap', '~> 4.3.1'     # Integrates Bootstrap HTML, CSS, and JavaScript
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]     # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'sqlite3'                   # Use sqlite3 as the database for Active Record
 end
 
 group :development do
@@ -45,6 +45,10 @@ group :test do
   gem 'capybara', '>= 2.15'     # Adds support for Capybara system testing and selenium driver
   # gem 'selenium-webdriver'      # WebDriver JavaScript bindings from the Selenium project
   # gem 'chromedriver-helper'     # Easy installation and use of chromedriver to run system tests with Chrome
+end
+
+group :production do
+  gem "pg"                        # Use postgres as the database for Active Record
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]    # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
