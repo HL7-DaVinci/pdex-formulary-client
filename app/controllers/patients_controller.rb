@@ -32,11 +32,6 @@ class PatientsController < ApplicationController
     end
   end
 
-  def index
-    puts "==>PatientsController.index"
-    #redirect_to '/dashboard'
-  end
-
   private
 
   def cred_params

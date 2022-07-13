@@ -3,7 +3,6 @@ Rails.application.routes.draw do
 
   root "welcome#index"
 
-  resources :patients, only: [:index]
   resources :formularies, only: [:index, :show]
   resources :coverageplans, only: [:index, :show]
   resources :compare, only: [:index]
