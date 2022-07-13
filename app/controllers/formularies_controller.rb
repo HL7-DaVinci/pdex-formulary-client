@@ -26,7 +26,7 @@ class FormulariesController < ApplicationController
       if reply.code == 200
         @@bundle = reply.resource
       else
-        @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+        @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics rescue "server internal error occurred"
       end
       # Prepare the query string for display on the page
       request = reply.request.to_dot(use_default: true)
@@ -98,7 +98,8 @@ class FormulariesController < ApplicationController
     search[:parameters][:DrugTier] = params[:drug_tier] if params[:drug_tier].present?
     search[:parameters][:DrugPlan] = params[:coverage] if params[:coverage].present?
     search[:parameters][:code] = params[:code] if params[:code].present?
-    search[:parameters]["DrugName:contains"] = params[:name] if params[:name].present?
+    # search[:parameters]["DrugName:contains"] = params[:name] if params[:name].present?
+    search[:parameters][:DrugName] = params[:name] if params[:name].present?
 
     search
   end

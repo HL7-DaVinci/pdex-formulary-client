@@ -11,16 +11,20 @@ class DashboardController < ApplicationController
   require "json"
   require "base64"
 
-  before_action :check_formulary_server_connection, only: [:index]
+  before_action :check_authentication, only: [:index]
 
   #-----------------------------------------------------------------------------
   # Get signed in patient information and coverage_plan
   def index
-    connect_to_patient_server if @patient_client == nil
-
-    search_params = { patient: session[:patient_id], type: "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL",
-                      _include: "Coverage:patient" }
-    reply = @patient_client.search(FHIR::Coverage, search: { parameters: search_params })
+    return if @client.nil?
+    # byebug
+    type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    search_params = { patient: session[:patient_id], type: type, _include: "Coverage:patient" }
+    reply = @client.search(FHIR::Coverage, search: { parameters: search_params })
+    # Retrieving the query url
+    request = reply.request.to_dot(use_default: true)
+    @search = "#{request[:method].to_s.capitalize} #{request.url}"
+    # byebug
     if reply.code == 200
       bundle_entries = reply.resource.entry
       if !bundle_entries.empty?
@@ -30,113 +34,57 @@ class DashboardController < ApplicationController
         get_plansbyid
         @coverage_plan = @plansbyid[coverage_plan_id.to_sym]&.to_dot(use_default: true) if @plansbyid.present?
       end
+    elsif reply.code == 404
+      @coverage_plan = nil
     else
-      request = reply.request.to_dot(use_default: true)
-      @search = "#{request[:method].to_s.capitalize} #{request.url}"
-      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics rescue "Server internal error occured."
     end
-    puts "==>DashboardController.index"
   end
 
   #-----------------------------------------------------------------------------
 
-  # launch:  Pass either params or hardcoded server and client data to the
-  # auth_url via redirection
-
+  # Send request to the server authorization endpoint, providing the client authorization credentials
   def launch
-    #reset_session    # Get a completely fresh session for each launch.  This is a rails method.
-    if params[:client_id].length == 0 #this is a sentinel for unauthenticated access with the patient ID in the client_secret
-      session[:client_secret] = session[:patient_id] = params[:client_secret]
-      session[:client_id] = params[:client_id]
-      session[:iss_url] = params[:iss_url]
-      @patient_client = FHIR::Client.new(session[:iss_url])
-      @patient_client.use_r4
-      # @client.set_bearer_token(session[:access_token])
-      puts "==>redirect_to #{dashboard_url}"
-      redirect_to patients_path, alert: "Please provide a client id and secret"
-    else
-      # Let Params values over-ride session values if they are present
-      launch = params[:launch] || session[:launch] || "launch"
-      iss = (params[:iss_url] || session[:iss_url]).delete_suffix("/metadata")
-      session[:client_id] = params[:client_id].gsub /\t/, "" || session[:client_id]
-      session[:client_secret] = params[:client_secret].gsub /\t/, "" || session[:client_secret]
-      # Get Server Metadata
-      rcRequest = RestClient::Request.new(
-        :method => :get,
-        :url => iss + "/metadata",
-      )
-      rcResult = JSON.parse(rcRequest.execute)
-      session[:auth_url] = rcResult["rest"][0]["security"]["extension"][0]["extension"].select { |e| e["url"] == "authorize" }[0]["valueUri"]
-      session[:token_url] = rcResult["rest"][0]["security"]["extension"][0]["extension"].select { |e| e["url"] == "token" }[0]["valueUri"]
-      session[:iss_url] = iss
-      session[:launch] = launch
-      # for Onyx     scope = "launch/patient openid fhirUser offline_access user/ExplanationOfBenefit.read user/Coverage.read user/Organization.read user/Patient.read user/Practitioner.read patient/ExplanationOfBenefit.read patient/Coverage.read patient/Organization.read patient/Patient.read patient/Practitioner.read"
-      scope = "launch/patient openid fhirUser offline_access user/*.read patient/*.read"
+    credentials = session[:credentials]
+    options = authentication_metadata
+    if (options[:authorize_url] && options[:token_url])
+      scope = credentials.scope
       scope = scope.gsub(" ", "%20")
       scope = scope.gsub("/", "%2F")
-      redirect_to_auth_url = session[:auth_url] +
-                             "?response_type=code" +
-                             "&redirect_uri=" + login_url +
-                             "&aud=" + iss +
-                             "&state=98wrghuwuogerg97" +
-                             "&scope=" + scope +
-                             "&client_id=" + session[:client_id]
-      # + "&_format=json"
-      puts "===>redirect to #{redirect_to_auth_url}"
-      redirect_to redirect_to_auth_url
+      server_auth_url = options[:authorize_url] +
+                        "?response_type=code" +
+                        "&redirect_uri=" + credentials.redirect_url +
+                        "&aud=" + credentials.aud +
+                        "&state=98wrghuwuogerg97" +
+                        "&scope=" + scope +
+                        "&client_id=" + credentials.client_id
+      puts "===>redirect to #{server_auth_url}"
+      redirect_to server_auth_url
+    else
+      session.delete(:credentials)
+      redirect_to root_path, alert: "#{credentials.server_url} is not an auth server: No need to authenticate."
     end
-  rescue StandardError => exception
-    reset_session
-    err = "Failed to connect: " + exception.message
-    redirect_to patients_path, alert: err
   end
 
   #-----------------------------------------------------------------------------
 
   # login:  Once authorization has happened, auth server redirects to here.
-  #         Use the returned info to get a token
+  #         Use the returned info to get an access token
   #         Use the returned token and patientID to get the patient info
 
   def login
     if params[:error].present? # Authentication Failure
-      ## binding.pry
-      err = "Authentication Failure: " + params[:error] + " - " + params[:error_description]
-      redirect_to patients_path, alert: err
+      err = "Authentication Failure: #{params[:error]} - #{params[:error_description]}"
+      redirect_to patient_access_path, error: err
     else
-      session[:wakeupsession] = "ok" # using session hash prompts rails session to load
-      session[:client_id] = params[:client_id] || session[:client_id] #).gsub! /\t/, ''
-      session[:client_secret] = params[:client_secret] || session[:client_secret] #).gsub! /\t/, ''
-      code = params[:code]
-      auth = "Basic " + Base64.strict_encode64(session[:client_id] + ":" + session[:client_secret])
+      cred_attributes = session[:credentials].attributes
+      cred_attributes.delete("id")
+      saved_cred = ClientConnections.find_by(server_url: session[:credentials].server_url)
+      saved_cred ? saved_cred.update(cred_attributes) : session[:credentials].save
 
-      begin
-        result = RestClient.post(session[:token_url],
-                                 {
-          grant_type: "authorization_code",
-          code: code,
-          #   _format: "json",
-          redirect_uri: CLIENT_URL + "/login",
-        },
-                                 {
-          :Authorization => auth,
-        })
-      rescue StandardError => exception
-        # byebug
-        # reset_session
-        redirect_to patients_path, alert: "Failed to connect: " + exception.message and return
-      end
-
-      rcResult = JSON.parse(result)
-      scope = rcResult["scope"]
-      session[:access_token] = rcResult["access_token"]
-      session[:refresh_token] = rcResult["refresh_token"]
-      session[:token_expiration] = Time.now.to_i + rcResult["expires_in"].to_i
-      session[:patient_id] = rcResult["patient"]
-
-      @patient_client = FHIR::Client.new(session[:iss_url])
-      @patient_client.use_r4
-      @patient_client.set_bearer_token(session[:access_token])
-      @patient_client.default_json
+      request_access_token(authentication_metadata[:token_url], "authorization_code", params[:code])
+      return if session[:access_token].nil?
+      ClientConnections.set_bearer_token(session.id.public_id, session[:access_token])
 
       redirect_to dashboard_url, notice: "Successfully signed in"
     end
@@ -145,35 +93,47 @@ class DashboardController < ApplicationController
   #-----------------------------------------------------------------------------
   private
 
+  # Sending a request to the server token url: getting the access token or refreshing the token
+  def request_access_token(token_url, grant_type, code = nil, credentials = session[:credentials])
+    claim = {
+      :grant_type => grant_type,
+      :code => code,
+      :refresh_token => (session[:refresh_token] if grant_type == "refresh_token"),
+      :redirect_uri => (credentials.redirect_url if grant_type == "authorization_code"),
+    }.compact
+    auth = {
+      :Authorization => basic_auth(credentials.client_id, credentials.client_secret),
+    }
+    begin
+      result = RestClient.post(token_url, claim, auth)
+    rescue StandardError => exception
+      session.delete_if { |k, v| [:access_token, :refresh_token, :token_expiration].include? k }
+      err = grant_type == "refresh_token" ? "Failed to refresh token" : "Failed to authenticate"
+      redirect_to patient_access_path, alert: "#{err}: #{exception.message}" and return
+    end
+
+    rcResult = JSON.parse(result)
+    session[:access_token] = rcResult["access_token"]
+    session[:refresh_token] = rcResult["refresh_token"]
+    session[:token_expiration] = Time.now.to_i + rcResult["expires_in"].to_i
+    session[:patient_id] = rcResult["patient"]
+  end
+
   #-----------------------------------------------------------------------------
 
-  # Connect the FHIR client with the specified patient server and save the connection
-  # for future requests.
-
-  def connect_to_patient_server
-    puts "==>connect_to_patient_server"
-    if session[:client_id].length == 0
-      @patient_client = FHIR::Client.new(session[:iss_url])
-      @patient_client.use_r4
-      return  # We do not have authentication
-    end
-    if session.empty?
-      err = "Session Expired"
-      #     binding.pry
-      redirect_to root_path, alert: err
-    end
-    if session[:iss_url].present?
-      @patient_client = FHIR::Client.new(session[:iss_url])
-      @patient_client.use_r4
+  # check if authenticated to auth server
+  def check_authentication
+    if server_connected? && session[:token_expiration].present?
       token_expires_in = session[:token_expiration] - Time.now.to_i
       if token_expires_in.to_i < 10 # if we are less than 10s from an expiration, refresh
-        get_new_token
+        request_access_token(authentication_metadata[:token_url], "refresh_token")
+        return if session[:access_token].nil?
+        ClientConnections.set_bearer_token(session.id.public_id, session[:access_token])
       end
-      @patient_client.set_bearer_token(session[:access_token])
+      session[:is_authenticated] = true
+    else
+      reset_session
+      redirect_to patient_access_path, error: "Session expired: please reconnect"
     end
-  rescue StandardError => exception
-    reset_session
-    err = "Failed to connect: " + exception.message
-    redirect_to root_path, alert: err
   end
 end

@@ -8,7 +8,7 @@
 
 class ApplicationController < ActionController::Base
   require "hash_dot"
-
+  include SessionsHelper
   @@plansbyid = {}
 
   def self.plansbyid
@@ -33,9 +33,12 @@ class ApplicationController < ActionController::Base
     return if @client.nil?
 
     # Read all of the coverage plans from the server (searching by plan code)
-    cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    # cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
     # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code } })
+    # reply = @client.search(FHIR::List, search: { parameters: { code: cp_code } })
+
+    # Reading all coverage plans
+    reply = @client.read_feed(FHIR::List)
 
     if reply.code == 200
       fhir_list_entries = reply.resource.entry
@@ -44,7 +47,11 @@ class ApplicationController < ActionController::Base
       session[:plansbyid] = compress_hash(@plansbyid.to_json)
       session[:cp_options] = compress_hash(@cp_options)
     else
-      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+      begin
+        @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+      rescue JSON::ParserError => e
+        @request_faillure = reply.body
+      end
     end
 
     # Prepare the query string for display on the page
@@ -113,8 +120,24 @@ class ApplicationController < ActionController::Base
   def check_formulary_server_connection
     session[:foo] = "bar" unless session.id
     raise "session.id is nil" unless session.id
-    unless @client = ClientConnections.get(session.id.public_id)
+    unless server_connected?
       redirect_to root_path, flash: { error: "Please connect to a formulary server" }
+    end
+  end
+
+  #-----------------------------------------------------------------------------
+  # Connect the FHIR client with the specified server and save the connection for future requests.
+  def connect_to_formulary_server(server_url = nil)
+    if server_url.present?
+      reset_session
+      session[:foo] = "bar" unless session.id
+      raise "session.id is nil" unless session.id
+      cookies[:server_url] = server_url
+      if !ClientConnections.set(session.id.public_id, server_url)
+        err = "Unable to retrieve capability statement: "
+        err += "the provided server is either unavailale or invalid fhir server."
+        @connection = { error: err }
+      end
     end
   end
 end

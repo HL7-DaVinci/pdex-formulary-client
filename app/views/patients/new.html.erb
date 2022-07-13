@@ -1,0 +1,32 @@
+<section class="container vh-50">
+  <div class="mask d-flex align-items-center h-100">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-10 col-md-10 col-lg-12 col-xl-12">
+          <div class="card" style="border-radius: 15px;">
+            <div class="card-body p-5">
+              <%= render "form_header" %>
+              <%= form_tag patient_access_path, method: "post", id: "server-form" do %>
+
+                <div class="form-outline mb-2">
+                  <%= text_field_tag :server_url, @credentials&.server_url, class: "form-control form-control-lg",
+                    placeholder: "https://davinci-drug-formulary-ri.logicahealth.org/fhir", required: true
+                  %>
+                  <label class="form-label">Patient access FHIR server <span class="text-danger">**</span></label>
+                </div>
+                <% if @credentials %>
+                  <%= render "credential_fields" %>
+                <% end %>
+                <div class="d-flex justify-content-center">
+                  <%= button_tag "Connect", class: "btn btn-primary btn-block btn-md gradient-custom-4 text-body", id: "server-url" %>
+                </div>
+
+              <% end %>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
