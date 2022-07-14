@@ -33,12 +33,12 @@ class ApplicationController < ActionController::Base
     return if @client.nil?
 
     # Read all of the coverage plans from the server (searching by plan code)
-    # cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
     # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-    # reply = @client.search(FHIR::List, search: { parameters: { code: cp_code } })
+    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code } })
 
     # Reading all coverage plans
-    reply = @client.read_feed(FHIR::List)
+    # reply = @client.read_feed(FHIR::List)
 
     if reply.code == 200
       fhir_list_entries = reply.resource.entry
@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
       @cp_options = build_coverage_plan_options(fhir_list_entries)
       session[:plansbyid] = compress_hash(@plansbyid.to_json)
       session[:cp_options] = compress_hash(@cp_options)
-    else
+    elsif reply.code != 404
       begin
         @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
       rescue JSON::ParserError => e

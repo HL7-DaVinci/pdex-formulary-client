@@ -25,7 +25,7 @@ class FormulariesController < ApplicationController
       reply = @client.search(FHIR::MedicationKnowledge, search: search)
       if reply.code == 200
         @@bundle = reply.resource
-      else
+      elsif reply.code != 404
         @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics rescue "server internal error occurred"
       end
       # Prepare the query string for display on the page
@@ -35,10 +35,18 @@ class FormulariesController < ApplicationController
 
     fhir_formularydrugs = @@bundle ? @@bundle.entry.map(&:resource) : []
     @formularydrugs = []
+    error = ""
     fhir_formularydrugs.each do |fhir_formularydrug|
-      formulary_drug = FormularyDrug.new(fhir_formularydrug, @plansbyid)
-      @formularydrugs << formulary_drug if formulary_drug.valid?
+      resource_type = fhir_formularydrug.resourceType
+      if resource_type == "OperationOutcome"
+        issue = fhir_formularydrug&.issue&.first&.diagnostics
+        error = "#{error} #{issue}"
+      elsif resource_type == "MedicationKnowledge"
+        formulary_drug = FormularyDrug.new(fhir_formularydrug, @plansbyid)
+        @formularydrugs << formulary_drug if formulary_drug.valid?
+      end
     end
+    flash.now[:alert] = "Message from server: #{error}" if error.present?
   end
 
   #-----------------------------------------------------------------------------

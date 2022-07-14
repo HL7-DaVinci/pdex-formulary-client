@@ -50,9 +50,9 @@ class WelcomeController < ApplicationController
     return session[:cp_count] if session[:cp_count].present?
     begin
       # profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-      # code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-      # search = { parameters: { code: code, _summary: "count" } }
-      search = { parameters: { _summary: "count" } }
+      code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+      search = { parameters: { code: code, _summary: "count" } }
+      # search = { parameters: { _summary: "count" } }
       count = @client.search(FHIR::List, search: search).resource.total
       session[:cp_count] = count
     rescue => exception

@@ -17,14 +17,14 @@ class DashboardController < ApplicationController
   # Get signed in patient information and coverage_plan
   def index
     return if @client.nil?
-    # byebug
+
     type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
     search_params = { patient: session[:patient_id], type: type, _include: "Coverage:patient" }
     reply = @client.search(FHIR::Coverage, search: { parameters: search_params })
     # Retrieving the query url
     request = reply.request.to_dot(use_default: true)
     @search = "#{request[:method].to_s.capitalize} #{request.url}"
-    # byebug
+
     if reply.code == 200
       bundle_entries = reply.resource.entry
       if !bundle_entries.empty?
