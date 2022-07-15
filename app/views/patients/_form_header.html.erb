@@ -1,14 +1,14 @@
-<h4 class="text-uppercase card-title text-center mb-5">authenticate to a formulary fhir server</h4>
+<h4 class="text-uppercase card-title text-center mb-3">authenticate to a formulary fhir server</h4>
 <% if @client %>
   <p class="card-subtitle text-success m-auto client-connected text-center">
     Connected to <%= @credentials&.server_url %>
   </p>
   <p class="card-subtitle text-success m-auto client-connected text-center">
-    Patient <%= session[:patient_id] %>
+    Patient ID:  <%= session[:patient_id] %>
   </p>
   <br />
   <%= form_tag dashboard_path, method: "get", id: "server-form" do %>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center mb-4">
       <%= button_tag "My Formulary", class: "btn btn-success btn-block btn-md gradient-custom-4 text-body", id: "server-url" %>
     </div>
   <% end %>

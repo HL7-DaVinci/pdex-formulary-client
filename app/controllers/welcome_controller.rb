@@ -8,14 +8,14 @@
 
 class WelcomeController < ApplicationController
   before_action do
-    connect_to_formulary_server(params[:server_url])
+    connect_to_formulary_server(nil, params[:server_url])
   end
 
   # GET / : Connects to the server & retrieves the total count of coverage plans and formulary drugs.
   def index
     # solution from https://stackoverflow.com/questions/30772737/rails-4-session-id-occasionally-nil
     session[:foo] = "bar" unless session.id
-    reset_session if !server_connected?
+    client
     @count = formulary_count
     @cp_count = coverageplan_count
     @cache_nil = ClientConnections.cache_nil?(session.id.public_id)

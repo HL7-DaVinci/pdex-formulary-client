@@ -1,6 +1,7 @@
+
 <section class='container'>
   <%= render "partials/query" %>
-  <% if @coverage_plan %>
+  <% if @coverage_plan && @patient %>
     <section class='row'>
       <div class='col-5 card-container'>
         <%= render 'patient-card' %>
@@ -9,6 +10,10 @@
         <%= render 'plan-card' %>
       </div>
     </section>
+  <% elsif @coverage_plan %>
+    <div class='mt-5'>
+      <%= render 'plan-card' %>
+    </div>
   <% else %>
     <%= render 'query-error', resource_type: 'Drug Coverage', not_found_message: 'You do not have an active drug coverage.' %>
   <% end %>

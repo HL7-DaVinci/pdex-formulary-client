@@ -4,6 +4,11 @@ module SessionsHelper
     @client = ClientConnections.get(session.id.public_id)
   end
 
+  # Get authenticated fhir client in use
+  def auth_client
+    @client = ClientConnections.get_secure(session.id.public_id)
+  end
+
   # Client credentials used to authenticate with fhir server
   def credentials_in_use(client_connections_obj = nil)
     session[:credentials] = client_connections_obj if client_connections_obj
@@ -11,7 +16,7 @@ module SessionsHelper
 
   # Get the authentication metadata
   def authentication_metadata
-    client.get_oauth2_metadata_from_conformance
+    auth_client.get_oauth2_metadata_from_conformance
   end
 
   # Check if connected to server
@@ -21,7 +26,7 @@ module SessionsHelper
 
   # Check if client is authenticated
   def client_is_authenticated?
-    !!session[:is_authenticated]
+    !!auth_client
   end
 
   # Get Basic authentication value
@@ -29,9 +34,4 @@ module SessionsHelper
     token = Base64.strict_encode64("#{client_id}:#{client_secret}")
     "Basic #{token}"
   end
-
-  # def log_out
-  #   session.delete(:user_id)
-  #   @current_user = nil
-  # end
 end

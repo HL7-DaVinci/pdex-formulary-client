@@ -1,8 +1,7 @@
 class ClientConnections < ApplicationRecord
   @clients = Hash.new
-  @@capability_statement
 
-  before_save :default_scope, :default_aud, :format_server_url
+  before_save :default_scope, :default_aud, :format_server_url, :format_open_server_url
   # Validations
   validates_presence_of :server_url, :client_id, :client_secret
   validates_uniqueness_of :server_url
@@ -14,36 +13,68 @@ class ClientConnections < ApplicationRecord
   # ------------------ Class Methods -----------------------------------
 
   # Set the fhir client connection to the fhir server
+  # @return FHIR::Client instance or nil if connection not established
   def self.set(id, url)
+    client = nil
     begin
       puts "ClientConnections:set  (#{id}, #{url})"
       client = FHIR::Client.new(url)
       client.use_r4
       client.additional_headers = { "Accept-Encoding" => "identity" }  #
       FHIR::Model.client = client
-      @@capability_statement = client.capability_statement
-      raise "Unable to retrieve capability statement" if @@capability_statement.nil?
+      raise "Unable to retrieve capability statement" if client.capability_statement.nil?
     rescue => error
       puts "ClientConnections:set  -- returning nil -- #{error.message}"
       return nil
     end
     @clients[id] = Hash.new
     prune(id)
-    @clients[id][:client] = client
+    client
+    # @clients[id][:client] = client
   end
 
-  # Retrieves the fhir client if connection to the server is established
+  # Set and save open and authenticated fhir client instances.
+  # @return true if open or authenticated fhir client instance successfully created, false otherwise
+  def self.set_open_and_auth(id, secure_server_url, open_server_url)
+    if (secure_server_url.present? && open_server_url.nil?)
+      client = set(id, secure_server_url)
+      @clients[id][:client] = @clients[id][:auth_client] = client
+    elsif (open_server_url.present? && secure_server_url.nil?)
+      client = set(id, open_server_url)
+      @clients[id][:client] = client
+    elsif (open_server_url.present? && secure_server_url.present?)
+      auth = set(id, secure_server_url)
+      @clients[id][:auth_client] = auth
+      open_client = set(id, open_server_url)
+      @clients[id][:client] = open_client
+    end
+    (@clients[id][:auth_client] || @clients[id][:client]).present?
+  end
+
+  # Retrieves the secure fhir client if secured connection was established
+  def self.get_secure(id)
+    return nil unless @clients[id]
+    prune(id)
+    @clients[id][:auth_client]
+  end
+
+  # Retrieves the fhir client if connection to the server was established
   def self.get(id)
     return nil unless @clients[id]
     prune(id)
     @clients[id][:client]
   end
 
+  # Delete the authenticated client
+  def self.delete_auth(id)
+    @clients[id].delete(:auth_client) if @clients[id]
+  end
+
   # Set client to use Bearer authenticationif connection is established
   def self.set_bearer_token(id, token)
-    if client = self.get(id)
+    if client = self.get_secure(id)
       client.set_bearer_token(token)
-      @clients[id][:client] = client
+      @clients[id][:auth_client] = client
     end
   end
 
@@ -70,15 +101,14 @@ class ClientConnections < ApplicationRecord
     puts "failure in Client:Connection.prune"
   end
 
-  # Return the server capability_statement
-  def self.capability_statement
-    @@capability_statement
-  end
-
   private
 
   def format_server_url
     self.server_url = self.server_url.delete_suffix("/").delete_suffix("/metadata")
+  end
+
+  def format_open_server_url
+    self.open_server_url = self.open_server_url&.delete_suffix("/")&.delete_suffix("/metadata")
   end
 
   def default_scope

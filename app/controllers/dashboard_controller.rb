@@ -11,33 +11,16 @@ class DashboardController < ApplicationController
   require "json"
   require "base64"
 
-  before_action :check_authentication, only: [:index]
+  before_action :check_authentication, :get_plansbyid, only: [:index]
 
   #-----------------------------------------------------------------------------
   # Get signed in patient information and coverage_plan
   def index
     return if @client.nil?
-
-    type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
-    search_params = { patient: session[:patient_id], type: type, _include: "Coverage:patient" }
-    reply = @client.search(FHIR::Coverage, search: { parameters: search_params })
-    # Retrieving the query url
-    request = reply.request.to_dot(use_default: true)
-    @search = "#{request[:method].to_s.capitalize} #{request.url}"
-
-    if reply.code == 200
-      bundle_entries = reply.resource.entry
-      if !bundle_entries.empty?
-        @patient = bundle_entries.find { |entry| entry.resource.resourceType == "Patient" }&.resource
-        pdex_coverage = bundle_entries.find { |entry| entry.resource.resourceType == "Coverage" }&.resource
-        coverage_plan_id = CoveragePlan.find_formulary_coverage_plan_id(pdex_coverage)
-        get_plansbyid
-        @coverage_plan = @plansbyid[coverage_plan_id.to_sym]&.to_dot(use_default: true) if @plansbyid.present?
-      end
-    elsif reply.code == 404
-      @coverage_plan = nil
+    if cookies[:server_url]&.include?("safhir")
+      @coverage_plan = @plansbyid.values.first&.to_dot(use_default: true)
     else
-      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics rescue "Server internal error occured."
+      get_patient_coverage
     end
   end
 
@@ -62,6 +45,7 @@ class DashboardController < ApplicationController
       redirect_to server_auth_url
     else
       session.delete(:credentials)
+      ClientConnections.delete_auth(session.id.public_id)
       redirect_to root_path, alert: "#{credentials.server_url} is not an auth server: No need to authenticate."
     end
   end
@@ -85,8 +69,8 @@ class DashboardController < ApplicationController
       request_access_token(authentication_metadata[:token_url], "authorization_code", params[:code])
       return if session[:access_token].nil?
       ClientConnections.set_bearer_token(session.id.public_id, session[:access_token])
-
-      redirect_to dashboard_url, notice: "Successfully signed in"
+      get_plansbyid
+      redirect_to dashboard_url, notice: "Successfully signed in with patient id #{session[:patient_id]}"
     end
   end
 
@@ -108,6 +92,7 @@ class DashboardController < ApplicationController
       result = RestClient.post(token_url, claim, auth)
     rescue StandardError => exception
       session.delete_if { |k, v| [:access_token, :refresh_token, :token_expiration].include? k }
+      ClientConnections.delete_auth(session.id.public_id)
       err = grant_type == "refresh_token" ? "Failed to refresh token" : "Failed to authenticate"
       redirect_to patient_access_path, alert: "#{err}: #{exception.message}" and return
     end
@@ -123,17 +108,42 @@ class DashboardController < ApplicationController
 
   # check if authenticated to auth server
   def check_authentication
-    if server_connected? && session[:token_expiration].present?
+    if client_is_authenticated? && session[:token_expiration].present?
       token_expires_in = session[:token_expiration] - Time.now.to_i
       if token_expires_in.to_i < 10 # if we are less than 10s from an expiration, refresh
         request_access_token(authentication_metadata[:token_url], "refresh_token")
         return if session[:access_token].nil?
         ClientConnections.set_bearer_token(session.id.public_id, session[:access_token])
+        auth_client
       end
-      session[:is_authenticated] = true
     else
       reset_session
       redirect_to patient_access_path, error: "Session expired: please reconnect"
+    end
+  end
+
+  # Get Patient's Coverage and associated Drug plan information
+  def get_patient_coverage
+    type = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    search_params = { patient: session[:patient_id], type: type, _include: "Coverage:patient" }
+    reply = @client.search(FHIR::Coverage, search: { parameters: search_params })
+    # Retrieving the query url
+    request = reply.request.to_dot(use_default: true)
+    @search = "#{request[:method].to_s.capitalize} #{request.url}"
+
+    if reply.code == 200
+      bundle_entries = reply.resource.entry
+      if !bundle_entries.empty?
+        @patient = bundle_entries.find { |entry| entry.resource.resourceType == "Patient" }&.resource
+        pdex_coverage = bundle_entries.find { |entry| entry.resource.resourceType == "Coverage" }&.resource
+        coverage_plan_id = CoveragePlan.find_formulary_coverage_plan_id(pdex_coverage)
+        # get_plansbyid
+        @coverage_plan = @plansbyid[coverage_plan_id.to_sym]&.to_dot(use_default: true) if @plansbyid.present?
+      end
+    elsif reply.code == 404
+      @coverage_plan = nil
+    else
+      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics rescue "Server internal error occured."
     end
   end
 end

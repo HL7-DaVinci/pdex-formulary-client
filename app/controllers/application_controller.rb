@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
       @cp_options = build_coverage_plan_options(fhir_list_entries)
       session[:plansbyid] = compress_hash(@plansbyid.to_json)
       session[:cp_options] = compress_hash(@cp_options)
-    elsif reply.code != 404
+    else
       begin
         @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
       rescue JSON::ParserError => e
@@ -121,19 +121,20 @@ class ApplicationController < ActionController::Base
     session[:foo] = "bar" unless session.id
     raise "session.id is nil" unless session.id
     unless server_connected?
+      reset_session
       redirect_to root_path, flash: { error: "Please connect to a formulary server" }
     end
   end
 
   #-----------------------------------------------------------------------------
   # Connect the FHIR client with the specified server and save the connection for future requests.
-  def connect_to_formulary_server(server_url = nil)
-    if server_url.present?
+  def connect_to_formulary_server(secure_server_url = nil, open_server_url = nil)
+    if (secure_server_url.present? || open_server_url.present?)
       reset_session
       session[:foo] = "bar" unless session.id
       raise "session.id is nil" unless session.id
-      cookies[:server_url] = server_url
-      if !ClientConnections.set(session.id.public_id, server_url)
+      cookies[:server_url] = open_server_url || secure_server_url
+      if !ClientConnections.set_open_and_auth(session.id.public_id, secure_server_url, open_server_url)
         err = "Unable to retrieve capability statement: "
         err += "the provided server is either unavailale or invalid fhir server."
         @connection = { error: err }

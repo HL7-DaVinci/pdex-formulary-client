@@ -63,7 +63,7 @@ class FormulariesController < ApplicationController
       @formulary_drug = FormularyDrug.new(fhir_formularydrug, @plansbyid) if fhir_formularydrug
       redirect_to formularies_path, flash: { error: "No Formulary drug matched your search." } if @formulary_drug.nil?
     else
-      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics
+      @request_faillure = JSON.parse(reply.body)&.to_dot(use_default: true)&.issue&.first&.diagnostics rescue "Server internal error"
     end
   end
 

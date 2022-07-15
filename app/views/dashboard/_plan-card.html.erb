@@ -1,6 +1,6 @@
 <div class='card bg-dark text-white'>
   <div class='card-body'>
-    <h2 class="text-light"><%= @coverage_plan.name %></h2>
+    <h2 class="text-light text-center my-4"><span class='text-primary font-weight-bolder font-italic'>My Plan</span>: <%= @coverage_plan.name %></h2>
     <div class='row mb-1 col-md-12'>
       <%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
         <%= hidden_field_tag :coverage, @coverage_plan.planid %>
