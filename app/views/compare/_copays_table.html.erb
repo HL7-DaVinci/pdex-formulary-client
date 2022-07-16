@@ -1,0 +1,38 @@
+<section class=''>
+  <div class='my-auto'>
+    <% fd.coverage_restrictions.each do |key, value| %>
+      <span class="<%= key %>"><%= value %></span>
+    <% end %>
+  </div>
+  <% if (tierdesc = fd.plan_tierdesc).present? %>
+    <div class ='drug w-100'>
+      <% if tierdesc[:mailorder] %>
+        <span class='mail-order'>Mail Order</span>
+      <% end %>
+      <table class='table table-dark table-bordered border-secondary table-secondary table-hover table-striped caption-top'>
+        <caption><%= link_to fd.formatted_drug_tier , fd.formulary_id_path %></caption>
+        <tr>
+          <th scope='col'>Pharmacy Type</th>
+          <th scope='col'>CoPay</th>
+          <th scope='col'>CoPay Option</th>
+          <th scope='col'>CoInsurance</th>
+          <th scope='col'>CoInsurance Option</th>
+        </tr>
+        <% tierdesc[:costshares].each do |costshare| %>
+          <tr>
+            <td> <%= format_hyphenated_word(costshare[:pharmacytype]) %>  </td>
+            <td> $<%= costshare[:copay] %></td>
+            <td> <%= format_hyphenated_word(costshare[:copayoption]) %> </td>
+            <td> <%= costshare[:coinsurancerate] %>%  </td>
+            <td> <%= format_hyphenated_word(costshare[:coinsuranceoption]) %> </td>
+          <tr>
+        <% end %>
+      </table>
+    </div>
+  <% else %>
+    <br>
+    <div class='row col-12'>
+      <span class='float-left text-white'> Tier Description Missing! </span>
+    </div>
+  <% end %>
+</section>

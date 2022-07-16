@@ -1,78 +1,54 @@
-<section>
-    <div class='row compare-page-search'>
-		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form', id: 'compare-page-form' do %>
+<section class="container">
+  <div class='row col-12 query py-2'>
+		<h3 class='card-title text-center font-weight-bolder mb-4 mt-2 w-100'>Compare Plans</h3>
+		<%= form_tag compare_index_path, method: 'get', class: 'form-inline welcome-form mb-3', id: 'compare-page-form' do %>
 			<div class='col'></div>
 			<div class='form-group col-md-4'>
 				<%= text_field_tag :search, params[:search], class: 'form-control', placeholder: 'Search by drug name' %>
 			</div>
+			<div class='col'></div>
 			<div class='form-group col-md-4'>
 				<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'List of RxNorm codes'%>
 			</div>
-            <%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-3', 
-                    id: 'compare-page-url', disabled: @client.nil? %>
+			<div class='col'></div>
+      <%= button_tag 'Compare Plans', class: 'btn btn-primary col-md-2', id: 'compare-page-url', disabled: @client.nil? %>
 			<div class='col'></div>
 		<% end %>
 	</div>
-    <div class='compare-table-container'>
-        <table class='table table-dark compare-table'>
-            <thead>
-    	        <tr>
-		            <th scope='col' class='compare-drug-col compare-table-header' id="compare-drug-header">Drug</th>
-                    <% @table_header.each do |cp| %>
-			            <th scope='col' class='compare-table-header compare-col'><%= cp.name -%></th>
-                    <% end %>
-    	    	</tr>
-            </thead>
-    		<% @table_rows.each do |code, plan_hash| %>
-	    	    <tr>
-	        	    <td class='compare-drug-col'>
-                        <%= plan_hash.values.first.drug_name -%> (<%= link_to code, "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=" + code  %>)
-                        
-        		    </td>
-                    <% @table_header.each do |cp| %>
-						<% fd = plan_hash[cp.id] %>
-                        <% c = (fd ? "table table-dark": "drug-not-in-plan") %>
-		                <td class= <%= c %> >
- 							<% if fd %>
-                            <table class='table table-dark'>
-                               <tr>
-                               <td>  Tier: 
-                               </td> 
-                                <td>  <%= link_to fd.drug_tier.split('-').map(&:capitalize).join(' ') , fd.formulary_id_path%> 
-                               </td>
-                               </tr>
-                                <tr>
-                               <td> Copay
-                               </td>
-                                <td>$<%=fd.copay%>
-                               </td>
-                               </tr>
-                                <tr>
-                               <td> CoInsurance
-                               </td>
-                                <td><%=fd.coinsurancerate %>%
-                               </td>
-                               </tr>
-                                </table>
-								<div style="display: grid;">
-								<% if fd.prior_auth %>
-									<span class='prior-auth-compare'>Prior Authorization</span>
-								<% end %>
-								<% if fd.step_therapy %>
-									<% mtop = fd.prior_auth ? 'compare-buffer' : '' %>
-									<span class='step-therapy-compare <%= mtop %>'>Step Therapy</span>
-								<% end %>
-								<% if fd.quantity_limit %>
-									<% mtop = fd.prior_auth || fd.step_therapy ? 'compare-buffer' : '' %>
-									<span class='quantity-limit-compare <%= mtop %>'>Quantity Limit</span>
-								<% end %>
-   
+  <div class='row'>
+		<div class='col-12 my-5'>
+			<div class='table-responsive'>
+				<table class='table table-bordered table-striped table-dark'>
+					<thead class='bg-primary'>
+						<tr>
+							<th scope='col' class='compare-drug-col compare-table-header' id="compare-drug-header">Drug</th>
+							<% @table_header.each do |cp| %>
+								<th scope='col' class='compare-table-header compare-col'><%= cp.name -%></th>
 							<% end %>
-						</td>
-                    <% end %>
-	        	</tr>
-            <% end %>
-        </table>
-    </div>
+						</tr>
+					</thead>
+					<tbody>
+						<% @table_rows.each do |code, plan_hash| %>
+							<tr>
+								<td class='compare-drug-col'>
+									<%= plan_hash.values.first.drug_name -%>
+									(<%= link_to code, "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=" + code  %>)
+								</td>
+								<% @table_header.each do |cp| %>
+									<% fd = plan_hash[cp.id] %>
+									<% c = (fd ? "table-dark": "drug-not-in-plan") %>
+									<td colspan='1' class= <%= c %> >
+										<% if fd %>
+											<%= render 'copays_table', fd: fd %>
+										<% end %>
+									</td>
+								<% end %>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+  </div>
 </section>
 

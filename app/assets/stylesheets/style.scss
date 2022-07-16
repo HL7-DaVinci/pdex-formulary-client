@@ -1,261 +1,274 @@
 body {
-	background-color: black;
+    background-color: black;
+    margin: 0 auto;
 }
 
-main > .container {
-  padding: 30px 15px;
+body>.container {
+    margin: 7rem auto;
 }
 
 .navbar-brand {
-	display: block;
+    display: block;
 }
 
 .navbar-collapse {
-	margin-left: 100px;
+    margin-left: 100px;
 }
 
 #logo {
-	width: 50px;
-	height: 50px;
-	float: left;
-	margin-right: 20px;
+    width: 50px;
+    height: 50px;
+    float: left;
+    margin-right: 20px;
 }
 
 .navbar-brand a {
-	width: 300px;
-	color: #eee;
-	text-decoration: none;
+    width: 300px;
+    color: #eee;
+    text-decoration: none;
 }
 
 footer {
-	background-color: #222;
-	height: 80px;
-	position: fixed;
-	bottom: 0px;
-	width: 100%;
-	z-index: 2;
-
-	.copyright {
-		color: #eee;
-		margin-top: auto;
-		margin-bottom: auto;
-		margin-left: 20px;
-
-		a {
-			color: #eee;
-		}
-	}
+    background-color: #222;
+    text-align: center;
+    height: 50px;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    z-index: 2;
+    .copyright {
+        color: #eee;
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 20px;
+        a {
+            color: #eee;
+        }
+    }
 }
 
 .welcome-form {
-	margin: 0 auto;
-
-	.form-control {
-		width: 600px;
-	}
-
+    margin: 0 auto;
+    .form-control {
+        width: 600px;
+    }
 }
 
 .client-connected {
-	text-align: center;
+    text-align: center;
 }
 
 .welcome-text {
-	text-align: center;
-	margin-bottom: 30px;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .guidance {
-	text-align: center;
-	margin-top: 15px;
+    text-align: center;
+    margin-top: 15px;
 }
 
 .no-formularies {
-	text-align: center;
+    text-align: center;
 }
 
 .tab-pane {
-	padding-top: 20px;
-	padding-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 #compare-url {
-	width: 100%;
+    width: 100%;
 }
 
-.container {
-	margin-bottom: 70px;
-	margin-top: 70px;
-}
-
+// .container {
+//     margin-bottom: 70px;
+//     margin-top: 70px;
+// }
 table {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 .query {
-  border-color: #454d55; 
-  background-color: #343a40;
-  color: white; 
-  padding: 10px;
-  word-wrap: break-word !important;
+    border-color: #454d55;
+    background-color: #343a40;
+    color: white;
+    padding: 10px;
+    word-wrap: break-word !important;
 }
 
 div.query {
-  margin-left: 0px;
+    margin-left: 0px;
 }
 
 .btn-group {
-	float: right;
+    float: right;
 }
 
 .drug {
-	margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
-.drug-tier-select, .coverage-select, .code-input {
-	width: inherit !important;
+.drug-tier-select,
+.coverage-select,
+.code-input {
+    width: inherit !important;
 }
 
-.form-group { // partially overrides a bootstrap class, not ideal but works
-	padding-right: 0;
+.form-group {
+    // partially overrides a bootstrap class, not ideal but works
+    padding-right: 0;
 }
 
 .last {
-	padding-right: 15px;
+    padding-right: 15px;
 }
 
-.prior-auth, .step-therapy, .quantity-limit, .mail-order,
-.prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
-	float: left;
-	display: inline block;
-	padding: 7px 15px;
-	border-radius: 20px;
+.prior-auth,
+.step-therapy,
+.quantity-limit,
+.mail-order,
+.prior-auth-compare,
+.step-therapy-compare,
+.quantity-limit-compare {
+    float: left;
+    display: inline block;
+    padding: 7px 15px;
+    border-radius: 20px;
 }
 
-.prior-auth, .step-therapy, .quantity-limit, .mail-order {
-	margin-right: 10px;
-	margin-bottom: 10px;
+.prior-auth,
+.step-therapy,
+.quantity-limit,
+.mail-order {
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
-.prior-auth-compare, .step-therapy-compare, .quantity-limit-compare {
-	margin: 0pt auto;
+.prior-auth-compare,
+.step-therapy-compare,
+.quantity-limit-compare {
+    margin: 0pt auto;
 }
 
-.prior-auth, .prior-auth-compare {
-	background-color: #c44;
+.prior-auth,
+.prior-auth-compare {
+    background-color: #c44;
 }
 
-.step-therapy, .step-therapy-compare, .mail-order {
-	background-color: #494;
+.step-therapy,
+.step-therapy-compare,
+.mail-order {
+    background-color: #494;
 }
 
-.quantity-limit, .quantity-limit-compare, .mail-order {
-	background-color: #39b;
+.quantity-limit,
+.quantity-limit-compare,
+.mail-order {
+    background-color: #39b;
 }
 
 .compare-buffer {
-	margin-top: 3pt;
+    margin-top: 3pt;
 }
 
-.messages {
-	margin-bottom: -100px;
-}
-
+// .messages {
+//     margin-bottom: -100px;
+// }
 .no-formularies {
-	margin-top: 100pt;
+    margin-top: 100pt;
 }
 
 .compare-page-search {
-	margin: 75pt auto 5pt;
+    margin: 75pt auto 5pt;
 }
 
 #compare-progress-bar-container {
-	width: 90%;
-	margin: 8pt auto 3pt;
+    width: 90%;
+    margin: 8pt auto 3pt;
 }
 
 .compare-table-container {
-	width: 90%;
-	height: calc(100% - 185pt);
-	height: -webkit-calc(100% - 185pt);
-	height: -moz-calc(100% - 185pt);
-	height: -o-calc(100% - 185pt);
-	position: fixed;
-	overflow: auto;
-	margin: 0 5% 75pt;
+    width: 90%;
+    height: calc(100% - 185pt);
+    height: -webkit-calc(100% - 185pt);
+    height: -moz-calc(100% - 185pt);
+    height: -o-calc(100% - 185pt);
+    position: fixed;
+    overflow: auto;
+    margin: 0 5% 75pt;
 }
 
 .compare-table {
-	width: inherit;
-	table-layout: fixed;
-	margin: 0 auto;
-	th {
-		background-color: #343A40
-	}
+    width: inherit;
+    table-layout: fixed;
+    margin: 0 auto;
+    th {
+        background-color: #343A40
+    }
 }
 
-.compare-drug-col{
-	width: 275pt;
-	position: sticky;
-	left: 0;
-	z-index: 1;
-	background-color: #343A40;
+.compare-drug-col {
+    // width: 275pt;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #343A40;
 }
 
 thead tr th.compare-table-header {
-	position: sticky;
-	top: 0;
-	border-width: 1px;
-	border-color: #454D55;
-	border-top: 0;
-	text-align: center;
+    position: sticky;
+    top: 0;
+    border-width: 1px;
+    border-color: #454D55;
+    border-top: 0;
+    text-align: center;
 }
 
 .compare-col {
-	width: 150pt;
+    width: 150pt;
 }
 
 #compare-drug-header {
-	z-index: 2;
-	background: #242A30
+    z-index: 2;
+    background: #242A30
 }
 
 .drug-in-plan {
-	background-color: #06e080
+    background-color: #06e080
 }
 
 .drug-not-in-plan {
-	background-color: #c45b67
+    background-color: #c45b67
 }
 
 @media (min-width: 200px) and (max-width: 767px) {
-	.welcome-form {
-		display: block;
-		margin: 0 auto;
-
-		.form-control, .drug-tier-select, .coverage-select, .code-input, .btn {
-			width: 300px !important;
-			margin-bottom: 10px;
-		}
-
-		.btn {
-			margin-left: 15px;
-		}
-
-		.col-md-3 { // restores bootstrap class to original state
-			padding-left: 15px;
-		}
- 
-	}
-
-	.compare-table-container {
-		height: calc(100% - 235pt);
-		height: -webkit-calc(100% - 235pt);
-		height: -moz-calc(100% - 235pt);
-		height: -o-calc(100% - 235pt);
-	}
-
-	.compare-drug-col {
-		width: 190pt;
-	}
+    .welcome-form {
+        display: block;
+        margin: 0 auto;
+        .form-control,
+        .drug-tier-select,
+        .coverage-select,
+        .code-input,
+        .btn {
+            width: 300px !important;
+            margin-bottom: 10px;
+        }
+        .btn {
+            margin-left: 15px;
+        }
+        .col-md-3 {
+            // restores bootstrap class to original state
+            padding-left: 15px;
+        }
+    }
+    .compare-table-container {
+        height: calc(100% - 235pt);
+        height: -webkit-calc(100% - 235pt);
+        height: -moz-calc(100% - 235pt);
+        height: -o-calc(100% - 235pt);
+    }
+    .compare-drug-col {
+        width: 190pt;
+    }
 }
