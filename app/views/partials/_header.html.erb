@@ -16,6 +16,11 @@
         <li>
           <%= link_to 'Patient', patient_access_path, class: 'nav-link' %>
         </li>
+        <% if @client %>
+          <li>
+            <%= link_to 'Coverage Plans', coverageplans_path, class: 'nav-link' %>
+          </li>
+        <% end %>
         <li>
           <%= link_to 'Shopping', root_path, class: 'nav-link' %>
         </li>

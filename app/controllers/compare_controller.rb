@@ -105,6 +105,7 @@ class CompareController < ApplicationController
       plan = fd.plan_id
       @table_rows.has_key?(code) ? @table_rows[code][plan] = fd : @table_rows[code] = { plan => fd }
     end
+    flash.now[:alert] = "No plan covers the requested drugs" if @table_rows.blank?
   end
 
   #-----------------------------------------------------------------------------
