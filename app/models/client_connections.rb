@@ -112,7 +112,7 @@ class ClientConnections < ApplicationRecord
   end
 
   def default_redirect_url
-    self.redirect_url = "#{CLIENT_URL}/login"
+    self.redirect_url ||= "#{CLIENT_URL}/login"
   end
 
   def default_scope

@@ -68,7 +68,7 @@ class DashboardController < ApplicationController
       cred_attributes = session[:credentials].attributes
       cred_attributes.delete("id")
       saved_cred = ClientConnections.find_by(server_url: session[:credentials].server_url)
-      saved_cred ? saved_cred.update(cred_attributes) : session[:credentials].save
+      saved_cred ? saved_cred.update!(cred_attributes) : session[:credentials].save! rescue puts "Couldn't save credentials"
 
       request_access_token(authentication_metadata[:token_url], "authorization_code", params[:code])
       return if session[:access_token].nil?
