@@ -7,6 +7,7 @@
 ################################################################################
 
 class ApplicationController < ActionController::Base
+  rescue_from Rack::Timeout::RequestTimeoutException, with: :handle_timeout
   require "hash_dot"
   include SessionsHelper
   @@plansbyid = {}
@@ -140,5 +141,12 @@ class ApplicationController < ActionController::Base
         @connection = { error: err }
       end
     end
+  end
+
+  # ------------------------------------------------------------------------------
+  # Handle time out request:
+  def handle_timeout
+    err = "No response from server: Timed out connecting to server. Server is either down or connection is slow."
+    redirect_to root_path, flash: { error: err }
   end
 end

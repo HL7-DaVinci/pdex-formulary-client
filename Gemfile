@@ -15,6 +15,7 @@ gem 'coffee-rails', '~> 4.2'    # Use CoffeeScript for .coffee assets and views
 gem 'turbolinks', '~> 5'        # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'jbuilder', '~> 2.5'        # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'dalli'                     # Memcache client
+gem 'memcachier'                # Memcache server management
 gem 'hash_dot'                  # Allows using dot notation on hashes
 
 # gem 'redis', '~> 4.0'         # Use Redis adapter to run Action Cable in production
@@ -23,6 +24,7 @@ gem 'hash_dot'                  # Allows using dot notation on hashes
 
 gem 'zlib' , '>= 1.0.0'
 gem 'bootsnap', '>= 1.1.0', require: false  # Reduces boot times through caching; required in config/boot.rb
+gem 'rack-timeout'              # Abort requests that are taking too long.
 
 gem 'fhir_client'               # Handles FHIR client requests
 gem 'jquery-rails'              # Automate using jQuery with Rails
@@ -48,7 +50,7 @@ group :test do
 end
 
 group :production do
-  gem "pg"                        # Use postgres as the database for Active Record
+  gem 'pg'                        # Use postgres as the database for Active Record
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]    # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
