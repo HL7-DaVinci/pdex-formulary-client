@@ -157,14 +157,17 @@ div.query {
 }
 
 .step-therapy,
-.step-therapy-compare,
-.mail-order {
+.step-therapy-compare {
     background-color: #494;
 }
 
+.mail-order,
+.mail-order-compare {
+    background-color: #a4a;
+}
+
 .quantity-limit,
-.quantity-limit-compare,
-.mail-order {
+.quantity-limit-compare {
     background-color: #39b;
 }
 
