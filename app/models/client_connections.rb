@@ -1,7 +1,7 @@
 class ClientConnections < ApplicationRecord
   @clients = Hash.new
 
-  before_save :default_scope, :default_aud, :format_server_url, :format_open_server_url
+  before_save :default_scope, :default_aud, :format_server_url, :format_open_server_url, :default_redirect_url
   # Validations
   validates_presence_of :server_url, :client_id, :client_secret
   validates_uniqueness_of :server_url
@@ -109,6 +109,10 @@ class ClientConnections < ApplicationRecord
 
   def format_open_server_url
     self.open_server_url = self.open_server_url&.delete_suffix("/")&.delete_suffix("/metadata")
+  end
+
+  def default_redirect_url
+    self.redirect_url = "#{CLIENT_URL}/login"
   end
 
   def default_scope
