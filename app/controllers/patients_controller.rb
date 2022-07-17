@@ -9,7 +9,10 @@
 class PatientsController < ApplicationController
   def new
     auth_client
-    session[:credentials] = nil if @client.nil?
+    if @client.nil?
+      session.delete(:credentials)
+      session.delete(:secure_server)
+    end
     # @credentials = session[:credentials]
   end
 

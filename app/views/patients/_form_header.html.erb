@@ -1,7 +1,7 @@
 <h4 class="text-uppercase card-title text-center mb-3">authenticate to a formulary fhir server</h4>
 <% if @client %>
   <p class="card-subtitle text-success m-auto client-connected text-center">
-    Connected to <%= @credentials&.server_url %>
+    Connected to <%= session[:secure_server] %>
   </p>
   <p class="card-subtitle text-success m-auto client-connected text-center">
     Patient ID:  <%= session[:patient_id] %>

@@ -69,6 +69,7 @@ class DashboardController < ApplicationController
       request_access_token(authentication_metadata[:token_url], "authorization_code", params[:code])
       return if session[:access_token].nil?
       ClientConnections.set_bearer_token(session.id.public_id, session[:access_token])
+      session[:secure_server] = session[:credentials]&.server_url
       get_plansbyid
       redirect_to dashboard_url, notice: "Successfully signed in with patient id #{session[:patient_id]}"
     end
