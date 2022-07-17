@@ -16,7 +16,7 @@ module SessionsHelper
 
   # Get the authentication metadata
   def authentication_metadata
-    auth_client.get_oauth2_metadata_from_conformance
+    auth_client&.get_oauth2_metadata_from_conformance
   end
 
   # Check if connected to server

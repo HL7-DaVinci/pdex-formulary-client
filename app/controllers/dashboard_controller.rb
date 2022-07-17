@@ -59,8 +59,12 @@ class DashboardController < ApplicationController
   def login
     if params[:error].present? # Authentication Failure
       err = "Authentication Failure: #{params[:error]} - #{params[:error_description]}"
-      redirect_to patient_access_path, error: err
+      redirect_to patient_access_path, flash: { error: err }
     else
+      if authentication_metadata.blank? && params[:code].blank?
+        redirect_to patient_access_path, flash: { error: "Authenticate with server" } and return
+      end
+
       cred_attributes = session[:credentials].attributes
       cred_attributes.delete("id")
       saved_cred = ClientConnections.find_by(server_url: session[:credentials].server_url)
