@@ -58,6 +58,7 @@ class DashboardController < ApplicationController
 
   def login
     if params[:error].present? # Authentication Failure
+      ClientConnections.delete_auth(session.id.public_id)
       err = "Authentication Failure: #{params[:error]} - #{params[:error_description]}"
       redirect_to patient_access_path, flash: { error: err }
     else
