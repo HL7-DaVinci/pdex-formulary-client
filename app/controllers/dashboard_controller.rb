@@ -89,7 +89,7 @@ class DashboardController < ApplicationController
       :grant_type => grant_type,
       :code => code,
       :refresh_token => (session[:refresh_token] if grant_type == "refresh_token"),
-      :redirect_uri => (credentials.redirect_url if grant_type == "authorization_code"),
+      :redirect_uri => (login_url if grant_type == "authorization_code"),
     }.compact
     auth = {
       :Authorization => basic_auth(credentials.client_id, credentials.client_secret),
@@ -97,7 +97,7 @@ class DashboardController < ApplicationController
     begin
       result = RestClient.post(token_url, claim, auth)
     rescue StandardError => exception
-      session.delete_if { |k, v| [:access_token, :refresh_token, :token_expiration].include? k }
+      [:access_token, :refresh_token, :token_expiration].each { |k| session.delete(k) }
       ClientConnections.delete_auth(session.id.public_id)
       err = grant_type == "refresh_token" ? "Failed to refresh token" : "Failed to authenticate"
       redirect_to patient_access_path, alert: "#{err}: #{exception.message}" and return
