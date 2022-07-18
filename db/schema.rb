@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_17_215917) do
+ActiveRecord::Schema.define(version: 2022_07_18_001818) do
 
   create_table "client_connections", force: :cascade do |t|
     t.string "server_url"
@@ -18,7 +18,6 @@ ActiveRecord::Schema.define(version: 2022_07_17_215917) do
     t.string "client_secret"
     t.string "scope"
     t.string "aud"
-    t.string "redirect_url", default: "http://localhost:3000/login"
     t.string "open_server_url"
     t.index ["server_url"], name: "index_client_connections_on_server_url", unique: true
   end

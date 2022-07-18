@@ -36,7 +36,7 @@ class DashboardController < ApplicationController
       scope = scope.gsub("/", "%2F")
       server_auth_url = options[:authorize_url] +
                         "?response_type=code" +
-                        "&redirect_uri=" + credentials.redirect_url +
+                        "&redirect_uri=" + login_url +
                         "&aud=" + credentials.aud +
                         "&state=98wrghuwuogerg97" +
                         "&scope=" + scope +
