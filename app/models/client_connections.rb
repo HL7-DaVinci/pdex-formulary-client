@@ -6,15 +6,15 @@ class ClientConnections
       puts "ClientConnections:set  (#{id}, #{url})"
       client = FHIR::Client.new(url)
       client.use_r4
-      client.additional_headers = { 'Accept-Encoding' => 'identity' }
+      client.additional_headers = { "Accept-Encoding" => "identity" }
       FHIR::Model.client = client
-      search = { parameters: { _summary: 'count' } }
+      search = { parameters: { _summary: "count" } }
       result = client.search(FHIR::MedicationKnowledge, search: search)
       if result.response[:code] != 200
-        err = JSON.parse(result.response[:body])['issue']
-        err.present? ? (raise err.first['diagnostics']) : (raise 'Invalid FHIR server: Please provide a valid FHIR server')
+        err = JSON.parse(result.response[:body])["issue"]
+        err.present? ? (raise err.first["diagnostics"]) : (raise "Invalid FHIR server: Please provide a valid FHIR server")
       end
-      err = 'Connection failed: Ensure provided url points to a valid FHIR server that holds at least one Formulary'
+      err = "Connection failed: Ensure provided url points to a valid FHIR server that holds at least one Formulary"
       raise err unless result.resource.total > 0
     rescue StandardError => e
       return e.message
@@ -51,6 +51,6 @@ class ClientConnections
     puts "After #{@clients.keys}"
     @clients.each { |key, value| puts "key: ##{key}  lastused: #{value[:lastUsed]}" }
   rescue StandardError => e
-    puts 'failure in Client:Connection.prune'
+    puts "failure in Client:Connection.prune"
   end
 end

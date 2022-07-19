@@ -1,5 +1,3 @@
 {
-  "recommendations": [
-    "manuelpuyol.erb-linter"
-  ]
+  "recommendations": ["manuelpuyol.erb-linter"]
 }

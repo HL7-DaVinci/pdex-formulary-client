@@ -1,0 +1,11 @@
+<section class='row col-12'>
+  <div class='col-md-4'>
+    <%= button_to "Export", bulkdata_export_path,  {method: :get, class: 'col-md-4 btn btn-primary', disabled: @exportdisabled } %>
+  </div>
+  <div class='col-md-4'>
+    <%= button_to "PollExport",  bulkdata_pollexport_path, {method: :get, class: 'col-md-4 btn btn-primary', disabled: @pollexportdisabled } %>
+  </div>
+  <div class='col-md-4'>
+    <%= button_to "Cancel", bulkdata_cancel_path, {method: :get , class: 'col-md-4 btn btn-primary', disabled: @cancelexportdisabled } %>
+  </div>
+</section>

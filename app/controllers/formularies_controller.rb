@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-require 'json'
+require "json"
 
 class FormulariesController < ApplicationController
   before_action :check_formulary_server_connection, only: %i[index show]
@@ -19,22 +19,22 @@ class FormulariesController < ApplicationController
     if params[:page].present?
       @@bundle = update_page(params[:page], @@bundle)
     else
-      drug_tier_system = 'http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-DrugTierCS|'
-      rxnorm_code_system = 'http://www.nlm.nih.gov/research/umls/rxnorm|'
-      pharmacy_type_system = 'http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-PharmacyTypeCS|'
-      code = 'http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item'
-      search = { parameters: { _include: 'Basic:subject', code: code } }
-      search[:parameters]['drug-tier'] = "#{drug_tier_system}#{params[:drug_tier]}" if params[:drug_tier].present?
-      search[:parameters]['formulary'] = "InsurancePlan/#{params[:coverage]}" if params[:coverage].present?
+      drug_tier_system = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-DrugTierCS|"
+      rxnorm_code_system = "http://www.nlm.nih.gov/research/umls/rxnorm|"
+      pharmacy_type_system = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-PharmacyTypeCS|"
+      code = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
+      search = { parameters: { _include: "Basic:subject", code: code } }
+      search[:parameters]["drug-tier"] = "#{drug_tier_system}#{params[:drug_tier]}" if params[:drug_tier].present?
+      search[:parameters]["formulary"] = "InsurancePlan/#{params[:coverage]}" if params[:coverage].present?
       if params[:pharmacy_type].present?
-        search[:parameters]['pharmacy-type'] =
+        search[:parameters]["pharmacy-type"] =
           "#{pharmacy_type_system}#{params[:pharmacy_type]}"
       end
       if params[:code].present?
-        search[:parameters]['subject:MedicationKnowledge.code'] =
+        search[:parameters]["subject:MedicationKnowledge.code"] =
           "#{rxnorm_code_system}#{params[:code]}"
       end
-      search[:parameters]['subject:MedicationKnowledge.drug-name:contains'] = params[:name] if params[:name].present?
+      search[:parameters]["subject:MedicationKnowledge.drug-name:contains"] = params[:name] if params[:name].present?
       reply = @client.search(FHIR::Basic, search: search)
       @@bundle = reply.resource
     end
@@ -47,7 +47,7 @@ class FormulariesController < ApplicationController
 
     @@bundle&.entry&.each do |entry|
       resource = entry.resource
-      resource.resourceType == 'Basic' ? fhir_formularyitems << resource : fhir_formularydrugs << resource
+      resource.resourceType == "Basic" ? fhir_formularyitems << resource : fhir_formularydrugs << resource
     end
 
     @drugsbyid = build_formulary_drugs(fhir_formularydrugs)
@@ -57,8 +57,8 @@ class FormulariesController < ApplicationController
     end
 
     # Prepare the query string for display on the page
-    @search = '<Search String in Returned Bundle is empty>'
-    @search = URI.decode(@@bundle.link.select { |l| l.relation === 'self' }.first.url) if @@bundle.link.first
+    @search = "<Search String in Returned Bundle is empty>"
+    @search = URI.decode(@@bundle.link.select { |l| l.relation === "self" }.first.url) if @@bundle.link.first
   end
 
   #-----------------------------------------------------------------------------
@@ -66,15 +66,15 @@ class FormulariesController < ApplicationController
   # GET /formularies/[id]
 
   def show
-    code = 'http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item'
+    code = "http://hl7.org/fhir/us/davinci-drug-formulary/CodeSystem/usdf-InsuranceItemTypeCS|formulary-item"
     reply = @client.search(FHIR::Basic,
-                           search: { parameters: { _id: params[:id], code: code, _include: 'Basic:subject' } })
+                           search: { parameters: { _id: params[:id], code: code, _include: "Basic:subject" } })
     @@bundle = reply.resource
     fhir_formularydrugs = []
     fhir_formularyitem = nil
     @@bundle&.entry.each do |entry|
       resource = entry.resource
-      resource.resourceType == 'Basic' ? fhir_formularyitem = resource : fhir_formularydrugs << resource
+      resource.resourceType == "Basic" ? fhir_formularyitem = resource : fhir_formularydrugs << resource
     end
 
     get_plansbyid
@@ -82,14 +82,14 @@ class FormulariesController < ApplicationController
     @drugsbyid = build_formulary_drugs(fhir_formularydrugs)
     unless fhir_formularyitem.present?
       redirect_to(formularies_path,
-                  flash: { error: 'Your request returned no result' }) and return
+                  flash: { error: "Your request returned no result" }) and return
     end
 
     @formulary_drug = FormularyItem.new(fhir_formularyitem, @payersbyid, @plansbyid, @drugsbyid)
 
     # Prepare the query string for display on the page
-    @search = '<Search String in Returned Bundle is empty>'
-    @search = URI.decode(@@bundle.link.select { |l| l.relation === 'self' }.first.url) if @@bundle.link.first
+    @search = "<Search String in Returned Bundle is empty>"
+    @search = URI.decode(@@bundle.link.select { |l| l.relation === "self" }.first.url) if @@bundle.link.first
   end
 
   #-----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ class FormulariesController < ApplicationController
   # the server at a time.
 
   def update_page(page, bundle)
-    new_bundle = page.eql?('previous') ? previous_bundle(bundle) : bundle.next_bundle
+    new_bundle = page.eql?("previous") ? previous_bundle(bundle) : bundle.next_bundle
     (new_bundle.nil? ? bundle : new_bundle)
   end
 

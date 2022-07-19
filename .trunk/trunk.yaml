@@ -1,0 +1,13 @@
+version: 0.1
+cli:
+  version: 0.15.0-beta
+lint:
+  enabled:
+    - eslint@7.30.0
+    - git-diff-check@SYSTEM
+    - gitleaks@8.8.12
+    - hadolint@2.10.0
+    - markdownlint@0.32.0
+    - prettier@2.7.1
+    - rufo@0.13.0
+    - svgo@2.8.0

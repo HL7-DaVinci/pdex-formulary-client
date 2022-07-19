@@ -8,8 +8,9 @@
 
 class PatientsController < ApplicationController
   before_action :check_formulary_server_connection
+
   def index
-    puts '==>PatientsController.index'
+    puts "==>PatientsController.index"
     @client = session[:auth_client]
   end
 end

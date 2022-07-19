@@ -5,7 +5,7 @@
 				<%= image_tag 'logo.png', id: 'logo', alt: '' %>
 				<h1>My Health Plan</h1>
 			<% end %>
-		</div>	
+		</div>
 
     <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation'>
       <span class='navbar-toggler-icon'></span>
@@ -18,6 +18,9 @@
         </li>
         <li>
           <%= link_to 'Shopping', root_path, class: 'nav-link' %>
+        </li>
+        <li>
+          <%= link_to 'Bulk Export', bulkdata_index_path, class: 'nav-link' %>
         </li>
       </ul>
     </div>

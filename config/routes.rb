@@ -14,6 +14,10 @@ Rails.application.routes.draw do
   get "/launch", to: "dashboard#launch"
   get "/server-metadata", to: "dashboard#server_metadata"
   get "/registration", to: "dashboard#registration"
+  get "bulkdata/index"
+  get "bulkdata/export"
+  get "bulkdata/pollexport"
+  get "bulkdata/cancel"
 
   root "welcome#index"
 end
