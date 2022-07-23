@@ -35,6 +35,8 @@ class WelcomeController < ApplicationController
     begin
       # profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-FormularyDrug"
       search = { parameters: { _summary: "count" } }
+      chc_payer_id = "9E9CE8B93DE54BA89844A91A0E9A3893" # TODO: TEMPORARY to connect with changehealthcare api. To be removed
+      search[:parameters]["chc-payer-id"] = chc_payer_id if cookies[:server_url]&.include?("changehealthcare.com")
       count = @client.search(FHIR::MedicationKnowledge, search: search).resource.total
       session[:count] = count
     rescue => exception
@@ -52,6 +54,8 @@ class WelcomeController < ApplicationController
       # profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
       code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
       search = { parameters: { code: code, _summary: "count" } }
+      chc_payer_id = "9E9CE8B93DE54BA89844A91A0E9A3893" # TODO: TEMPORARY to connect with changehealthcare api. To be removed
+      search[:parameters]["chc-payer-id"] = chc_payer_id if cookies[:server_url]&.include?("changehealthcare.com")
       # search = { parameters: { _summary: "count" } }
       count = @client.search(FHIR::List, search: search).resource.total
       session[:cp_count] = count

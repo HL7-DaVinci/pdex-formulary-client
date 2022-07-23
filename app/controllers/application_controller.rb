@@ -34,9 +34,13 @@ class ApplicationController < ActionController::Base
     return if @client.nil?
 
     # Read all of the coverage plans from the server (searching by plan code)
+    search = { parameters: {} }
     cp_code = "http://terminology.hl7.org/CodeSystem/v3-ActCode|DRUGPOL"
+    chc_payer_id = "9E9CE8B93DE54BA89844A91A0E9A3893" # TODO: TEMPORARY to connect with changehealthcare api. To be removed
+    search[:parameters][:code] = cp_code if !cookies[:server_url]&.include?("changehealthcare.com")
+    search[:parameters]["chc-payer-id"] = chc_payer_id if cookies[:server_url]&.include?("changehealthcare.com")
     # cp_profile = "http://hl7.org/fhir/us/davinci-drug-formulary/StructureDefinition/usdf-CoveragePlan"
-    reply = @client.search(FHIR::List, search: { parameters: { code: cp_code } })
+    reply = @client.search(FHIR::List, search: search)
 
     # Reading all coverage plans
     # reply = @client.read_feed(FHIR::List)
@@ -109,7 +113,7 @@ class ApplicationController < ActionController::Base
         errors.concat(plan.errors.full_messages).uniq!
       end
     end
-    flash.now.alert = "Some data returned are not displayed because they are not valid/comformant: #{errors}" if errors.present?
+    flash.now[:alert] = "Some data returned are not displayed because they are not valid/comformant: #{errors}" if errors.present?
     coverageplans.deep_symbolize_keys
   end
 

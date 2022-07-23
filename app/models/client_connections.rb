@@ -1,4 +1,5 @@
 class ClientConnections < ApplicationRecord
+  require "rest-client"
   @clients = Hash.new
 
   before_save :default_scope, :default_aud, :format_server_url, :format_open_server_url
@@ -22,7 +23,15 @@ class ClientConnections < ApplicationRecord
       client.use_r4
       client.additional_headers = { "Accept-Encoding" => "identity" }  #
       FHIR::Model.client = client
-      raise "Unable to retrieve capability statement" if client.capability_statement.nil?
+      # TODO: TEMPORARY FIX to connect to the change healthcare server. To be changed to just check client.capability.nil?
+      if url.include?("changehealthcare.com")
+        metadata_url = "https://sandbox.apis.changehealthcare.com/anon/CMSPatientAccess/admin/v1/CapabilityStatement"
+        response = RestClient.get(metadata_url)
+        raise "Unable to retrieve capability statement" if response.code != 200
+      else
+        raise "Unable to retrieve capability statement" if client.capability_statement.nil?
+      end
+      # raise "Unable to retrieve capability statement" if client.capability_statement.nil?
     rescue => error
       puts "ClientConnections:set  -- returning nil -- #{error.message}"
       return nil
@@ -38,16 +47,17 @@ class ClientConnections < ApplicationRecord
   def self.set_open_and_auth(id, secure_server_url, open_server_url)
     if (secure_server_url.present? && open_server_url.nil?)
       client = set(id, secure_server_url)
-      @clients[id][:client] = @clients[id][:auth_client] = client
+      @clients[id][:client] = @clients[id][:auth_client] = client if @clients[id]
     elsif (open_server_url.present? && secure_server_url.nil?)
       client = set(id, open_server_url)
-      @clients[id][:client] = client
+      @clients[id][:client] = client if @clients[id]
     elsif (open_server_url.present? && secure_server_url.present?)
       auth = set(id, secure_server_url)
-      @clients[id][:auth_client] = auth
+      @clients[id][:auth_client] = auth if @clients[id]
       open_client = set(id, open_server_url)
-      @clients[id][:client] = open_client
+      @clients[id][:client] = open_client if @clients[id]
     end
+    return false unless @clients[id]
     (@clients[id][:auth_client] || @clients[id][:client]).present?
   end
 

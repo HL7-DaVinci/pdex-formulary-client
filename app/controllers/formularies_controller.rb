@@ -54,7 +54,10 @@ class FormulariesController < ApplicationController
   # GET /formularies/[id]
 
   def show
-    reply = @client.search(FHIR::MedicationKnowledge, search: { parameters: { _id: params[:id] } })
+    search = { parameters: { _id: params[:id] } }
+    chc_payer_id = "9E9CE8B93DE54BA89844A91A0E9A3893" # TODO: TEMPORARY to connect with changehealthcare api. To be removed
+    search[:parameters]["chc-payer-id"] = chc_payer_id if cookies[:server_url]&.include?("changehealthcare.com") #TODO: remove this
+    reply = @client.search(FHIR::MedicationKnowledge, search: search)
     # Prepare the query string for display on the page
     request = reply.request.to_dot(use_default: true)
     @search = "#{request[:method].to_s.capitalize} #{request.url}"
@@ -108,6 +111,9 @@ class FormulariesController < ApplicationController
     search[:parameters][:code] = params[:code] if params[:code].present?
     # search[:parameters]["DrugName:contains"] = params[:name] if params[:name].present?
     search[:parameters][:DrugName] = params[:name] if params[:name].present?
+
+    chc_payer_id = "9E9CE8B93DE54BA89844A91A0E9A3893" # TODO: TEMPORARY to connect with changehealthcare api. To be removed
+    search[:parameters]["chc-payer-id"] = chc_payer_id if cookies[:server_url]&.include?("changehealthcare.com") #TODO: remove this
 
     search
   end

@@ -78,6 +78,8 @@ class CompareController < ApplicationController
     return nil unless klass
 
     search = { search: { parameters: search_params } }
+    chc_payer_id = "9E9CE8B93DE54BA89844A91A0E9A3893" # TODO: TEMPORARY to connect with changehealthcare api. To be removed
+    search[:parameters]["chc-payer-id"] = chc_payer_id if cookies[:server_url]&.include?("changehealthcare.com") #TODO: remove this
     replies = [].push(@client.search(klass, search).resource)
 
     while replies.last
