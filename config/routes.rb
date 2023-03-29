@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   resources :coverageplans, only: [:index, :show]
   resources :payerplans, only: [:index]
   resources :compare, only: [:index]
+  resources :formularyitems, only: [:index]
 
   get '/home', to: 'welcome#index'
   get '/dashboard', to: 'dashboard#index'
