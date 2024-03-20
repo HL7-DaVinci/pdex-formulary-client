@@ -18,7 +18,7 @@ WORKDIR /app
 # will be cached unless changes to one of those two files
 # are made.
 COPY Gemfile Gemfile.lock Rakefile config.ru ./
-RUN gem install -N bundler && bundle install --jobs 8
+RUN gem install -N bundler -v 2.4.22 && bundle install --jobs 8
 
 # Copy the main application.
 # COPY app app
@@ -33,8 +33,8 @@ RUN gem install -N bundler && bundle install --jobs 8
 COPY . .
 
 # We'll run in production mode by default.
-# FIXME: https://github.com/HL7-DaVinci/pdex-formulary-client/issues/1
-# ENV RAILS_ENV=production
+ENV RAILS_SERVE_STATIC_FILES=true
+ENV RAILS_ENV=production
 
 # Showtime!
 EXPOSE 3000
