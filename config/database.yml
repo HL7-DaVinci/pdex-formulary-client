@@ -80,5 +80,5 @@ test:
 production:
   <<: *default
   database: db/pdex_formulary_production.sqlite3
-  username: pdex_formulary
-  password: <%= ENV['PDEX_FORMULARY_DATABASE_PASSWORD'] %>
+  # username: pdex_formulary
+  # password: <%= ENV['PDEX_FORMULARY_DATABASE_PASSWORD'] %>

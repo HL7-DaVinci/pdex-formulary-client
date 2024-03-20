@@ -1,41 +1,42 @@
+# Using the offical Ruby image
 FROM ruby:2.6.3
-MAINTAINER Preston Lee
-
-# RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y build-essential
 
 # Default shell as bash
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
+# Copy the Gemfile and Gemfile.lock into the container
+COPY Gemfile Gemfile.lock ./
 
-# Configure the main working directory. This is the base
-# directory used in any further RUN, COPY, and ENTRYPOINT
-# commands.
-RUN mkdir -p /app
+# Set the working directory within the container
 WORKDIR /app
 
-# Copy the Gemfile as well as the Gemfile.lock and install
-# the RubyGems. This is a separate step so the dependencies
-# will be cached unless changes to one of those two files
-# are made.
-COPY Gemfile Gemfile.lock Rakefile config.ru ./
-RUN gem install -N bundler -v 2.4.22 && bundle install --jobs 8
+# Install bundler and the dependencies specified in Gemfile
+RUN gem install bundler -v 2.4.22 && bundle install --jobs 8
 
-# Copy the main application.
-# COPY app app
-# COPY bin bin
-# COPY config config
-# COPY db db
-# COPY lib lib
-# COPY log log
-# COPY public public
-# COPY test test
-# COPY vendor vendor
+# Copy the application code into the container
 COPY . .
 
-# We'll run in production mode by default.
-ENV RAILS_SERVE_STATIC_FILES=true
-ENV RAILS_ENV=production
+# Install Node.js, Yarn, and apt-utils
+RUN apt-get update && \
+    apt-get install -y ca-certificates curl gnupg && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo 'deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main' | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get -qy update && \
+    apt-get -qy install nodejs && \
+    npm install --global yarn
 
-# Showtime!
+# Precompile assets
+RUN RAILS_ENV=production \
+  NODE_ENV=production \
+  bundle exec rails assets:precompile db:create db:migrate
+
+# Expose the port that the application will run on
 EXPOSE 3000
-CMD ["/usr/local/bin/bundle", "exec", "puma"]
+
+ENV RAILS_ENV=production
+ENV RAILS_LOG_TO_STDOUT=true
+ENV RAILS_SERVE_STATIC_FILES=true
+
+# Start the application server
+CMD ["bundle", "exec", "rails", "server", "-p", "3000"]
