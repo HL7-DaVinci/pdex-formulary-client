@@ -1,10 +1,11 @@
 <head>
-	<title>Plan Coverage</title>
-	<%= csrf_meta_tags %>
-	<%= csp_meta_tag %>
+  <title>Plan Coverage</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-	<%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-	<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-	<%= favicon_link_tag asset_path('formulary.ico') %>
+  <%= stylesheet_link_tag "bootstrap.min", "json-formatter", "application", media: "all" %>
+  <%= javascript_include_tag "bootstrap.bundle.min", "json-formatter.umd", defer: true %>
+  <%= javascript_importmap_tags %>
+  <%= favicon_link_tag "formulary.ico" %>
 </head>
-

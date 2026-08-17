@@ -52,7 +52,7 @@ class FormulariesController < ApplicationController
 
     # Prepare the query string for display on the page
     @search = "<Search String in Returned Bundle is empty>"
-    @search = URI.decode(@@bundle.link.select { |l| l.relation === "self" }.first.url) if @@bundle.link.first
+    @search = CGI.unescape(@@bundle.link.select { |l| l.relation === "self" }.first.url) if @@bundle.link.first
   end
 
   #-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ class FormulariesController < ApplicationController
 
     # Prepare the query string for display on the page
     @search = "<Search String in Returned Bundle is empty>"
-    @search = URI.decode(@@bundle.link.select { |l| l.relation === "self" }.first.url) if @@bundle.link.first
+    @search = CGI.unescape(@@bundle.link.select { |l| l.relation === "self" }.first.url) if @@bundle.link.first
   end
 
   #-----------------------------------------------------------------------------

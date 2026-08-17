@@ -1,0 +1,21 @@
+<%= turbo_frame_tag "ndjson-preview" do %>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <span>First <%= BulkPublishController::PREVIEW_LINES %> entries of <strong><%= @type %></strong></span>
+    <%= link_to "Open full file", @url, target: "_blank", rel: "noopener", class: "btn btn-sm btn-outline-secondary" %>
+  </div>
+  <% if @preview_error %>
+    <div class="alert alert-warning mb-0" role="alert"><%= @preview_error %></div>
+  <% elsif @lines.blank? %>
+    <p class="text-body-secondary mb-0">The file has no complete entries to preview.</p>
+  <% else %>
+    <% if @preview_note %>
+      <p class="text-body-secondary"><%= @preview_note %></p>
+    <% end %>
+    <% @lines.each do |line| %>
+      <div class="ndjson-entry border rounded p-2 bg-body-tertiary mb-3">
+        <%# Raw source; replaced with a collapsible JSON tree by application.js %>
+        <pre class="ndjson-source mb-0"><code><%= line %></code></pre>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

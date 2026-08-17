@@ -7,7 +7,7 @@ A live demo is hosted by [HL7 FHIR Foundry](https://foundry.hl7.org/products/9f0
 
 The client reference implementation can installed and run locally on your machine.  Install the following dependencies first:
 
-* [Ruby 2.6+](https://www.ruby-lang.org/en/)
+* [Ruby 3.3+](https://www.ruby-lang.org/en/)
 * [Ruby Bundler](http://bundler.io/)
 * [SQLite](https://www.sqlite.org/)
 

@@ -19,7 +19,8 @@ class FormularyItem < Resource
 
 	def initialize(fhir_formulary, payersbyid, formularies_byid, drugsbyid)
 		@id  							= parse_id(fhir_formulary)
-    drug              = drugsbyid[parse_reference_id(fhir_formulary.subject.reference).to_sym]
+    # Guard against a subject reference that is not present in the results
+    drug              = drugsbyid[parse_reference_id(fhir_formulary.subject.reference).to_sym] || {}
     @drug_name        = drug[:drug_name]
     @rxnorm_code      = drug[:rxnorm_code]
 		@formularies_byid = formularies_byid
@@ -28,6 +29,8 @@ class FormularyItem < Resource
 		@rxnorm_path      =    "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm=#{@rxnorm_code}"
 		# @formulary_id_path            = "/formularies/#{@id}"
 		parse_extensions(fhir_formulary.extension)
+		# Guard against a formulary reference that points to an unknown plan
+		@plan ||= { name: "Unknown plan", id: @plan_id || "unknown" }
 		# Test inclusion of drug tier info in formulary drug for display
     @payer_plan = payersbyid.values.find { |payer| payer[:formularies_ids].include?(@plan_id) }
 		@tier = @payer_plan[:plans].first[:tiers][@drug_tier.to_sym] if @payer_plan.present?

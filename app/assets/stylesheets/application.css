@@ -1,0 +1,164 @@
+/*
+ * Custom styles layered on top of Bootstrap 5.3 (vendor/assets/stylesheets).
+ * Colors reference Bootstrap CSS variables so they follow the active theme.
+ */
+
+#logo {
+  width: 40px;
+  height: 40px;
+}
+
+main > .container,
+main > .container-fluid {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.welcome-text {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.guidance {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.client-connected {
+  text-align: center;
+}
+
+.no-formularies {
+  text-align: center;
+  margin-top: 4rem;
+}
+
+.tab-pane {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+/* Query string shown under search results */
+.query {
+  background-color: var(--bs-secondary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  overflow-wrap: break-word;
+}
+
+/* Coverage requirement pills (prior auth, step therapy, ...) */
+.prior-auth,
+.step-therapy,
+.quantity-limit,
+.mail-order,
+.prior-auth-compare,
+.step-therapy-compare,
+.quantity-limit-compare {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 2rem;
+  color: #fff;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.prior-auth,
+.step-therapy,
+.quantity-limit,
+.mail-order {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prior-auth,
+.prior-auth-compare {
+  background-color: #c44;
+}
+
+.mail-order,
+.mail-order-compare {
+  background-color: #a4a;
+}
+
+.step-therapy,
+.step-therapy-compare {
+  background-color: #494;
+}
+
+.quantity-limit,
+.quantity-limit-compare {
+  background-color: #39b;
+}
+
+/* Compare page: scrollable table with sticky header row and drug column */
+#compare-url {
+  width: 100%;
+}
+
+#compare-progress-bar-container {
+  width: 90%;
+  margin: 0.5rem auto;
+}
+
+.compare-table-container {
+  max-height: 70vh;
+  overflow: auto;
+  margin-bottom: 1.5rem;
+}
+
+.compare-table {
+  table-layout: fixed;
+  margin: 0 auto;
+}
+
+.compare-table th {
+  background-color: var(--bs-secondary-bg);
+}
+
+.compare-drug-col {
+  width: 275pt;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: var(--bs-secondary-bg);
+}
+
+thead tr th.compare-table-header {
+  position: sticky;
+  top: 0;
+  text-align: center;
+}
+
+.compare-col {
+  width: 150pt;
+}
+
+#compare-drug-header {
+  z-index: 2;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.drug-in-plan {
+  background-color: #06e080;
+}
+
+.drug-not-in-plan {
+  background-color: #c45b67;
+}
+
+@media (max-width: 767px) {
+  .compare-drug-col {
+    width: 190pt;
+  }
+}
+
+/* Bulk publish ndjson preview: modal fills the viewport height and the
+   scrollable body (modal-dialog-scrollable) handles overflow */
+#ndjson-preview-modal .modal-dialog {
+  height: calc(100vh - 3.5rem);
+}
+
+#ndjson-preview-modal .modal-content {
+  height: 100%;
+}

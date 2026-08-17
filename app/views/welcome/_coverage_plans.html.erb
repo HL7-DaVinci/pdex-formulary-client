@@ -1,8 +1,8 @@
 <h2 class="text-light welcome-text">Lookup Formularies</h2>
-<div class='row mb-1'>
-	<%= form_tag coverageplans_path, method: 'get', class: 'form-inline welcome-form', id: 'coverageplan-form' do %>
-		<div class='col'></div>
-		<%= button_tag 'Review Formularies', class: 'btn btn-primary col-md-12', id: 'coverageplan-url', disabled: @client.nil? %>
-		<div class='col'></div>
+<div class='mb-1'>
+	<%= form_tag coverageplans_path, method: 'get', class: 'row justify-content-center g-2 welcome-form', id: 'coverageplan-form' do %>
+		<div class='col-md-4 d-grid'>
+			<%= button_tag 'Review Formularies', class: 'btn btn-primary', id: 'coverageplan-url', disabled: @client.nil? %>
+		</div>
 	<% end %>
 </div>

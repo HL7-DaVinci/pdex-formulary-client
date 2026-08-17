@@ -1,16 +1,16 @@
 
 <section class='container'>
 	<div class='d-flex flex-column justify-content-center mb-4'>
-		<h2 class='float-left text-white'>
+		<h2 class='mb-0'>
       Formulary:&nbsp;<%= sanitize(@plandata[:name]) %>
 		</h2>
-    <div class='card bg-transparent text-white'>
-      <div class='card-body text-center'>
-        <table class='table table-bordered text-white'>
+    <div class='card bg-transparent'>
+      <div class='card-body'>
+        <table class='table table-bordered'>
           <colgroup>
-            <col style='width: 20px;%'>
-            <col style='width: 20px;%'>
-            <col style='width: 60px;%'>
+            <col style='width: 20%'>
+            <col style='width: 20%'>
+            <col style='width: 60%'>
           </colgroup>
           <thead>
             <tr>
@@ -34,14 +34,10 @@
       </div>
     </div>
 	</div>
-  <section class='col-12'>
-    <div class='row'>
-      <%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form' do %>
-        <%= hidden_field_tag 'coverage', sanitize(@plandata[:id]) %>
-        <div class='col'></div>
-          <%= button_tag 'View Formulary Drugs', class: 'btn btn-primary col-md-12', id: 'formulary-url' %>
-        <div class='col'></div>
-      <% end %>
+  <%= form_tag formularies_path, method: 'get', class: 'row justify-content-center g-2' do %>
+    <%= hidden_field_tag 'coverage', sanitize(@plandata[:id]) %>
+    <div class='col-md-4 d-grid'>
+      <%= button_tag 'View Formulary Drugs', class: 'btn btn-primary', id: 'formulary-url' %>
     </div>
-  </section>
+  <% end %>
 </section>

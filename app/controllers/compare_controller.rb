@@ -21,9 +21,9 @@ class CompareController < ApplicationController
 		@params = nil
 		get_plansbyid
     get_payers_byid
-		if params[:search].length>0 or params[:code].length>0
-			@drugname = params[:search].strip.split(' ').first
-			@codes = params[:code].strip.split(',').map(&:strip).join(',')
+		if params[:search].to_s.length>0 or params[:code].to_s.length>0
+			@drugname = params[:search].to_s.strip.split(' ').first
+			@codes = params[:code].to_s.strip.split(',').map(&:strip).join(',')
 			set_cache
 			set_table
 			@cache_nil = ClientConnections.cache_nil?(session.id.public_id)
@@ -62,43 +62,6 @@ class CompareController < ApplicationController
 
 		ClientConnections.cache(session.id.public_id, @cache) unless params[:search].present?
 
-	end
-
-	#-----------------------------------------------------------------------------
-
-	# Gets all instances of klass from server
-
-  def get_all(klass = nil, search_params = {})
-    replies = get_all_bundles(klass, search_params)
-    return [] unless replies.present?
-
-    resources = []
-		replies.each do |reply|
-      resources.push(reply.entry.collect{ |singleEntry| singleEntry.resource })
-    end
-
-    resources.compact!
-    resources.flatten(1)
-	end
-
-	#-----------------------------------------------------------------------------
-
-	# Gets all bundles from server when querying for klass
-
-  def get_all_bundles(klass = nil, search_params = {})
-		return [] unless klass.present?
-
-		search = { search: { parameters: search_params } }
-    reply = @client.search(klass, search).resource
-    replies = [].push(reply)
-    @search = URI.decode(reply&.link&.select { |l| l.relation === "self"}.first&.url) if reply&.link&.first
-    replies.compact!
-		while replies.last
-			replies.push(replies.last.next_bundle)
-    end
-
-    replies.compact!
-    replies.present? ? replies : nil
 	end
 
 	#-----------------------------------------------------------------------------

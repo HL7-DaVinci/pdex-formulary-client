@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html data-bs-theme="dark">
   <%= render 'partials/head' %>
-  <body>
+  <body class="d-flex flex-column min-vh-100">
     <%= render 'partials/header' %>
-    <div id='content'>
-      <main role='main'>
-        <%= render 'partials/messages' %>
-        <%= yield %>
-      </main>
-      <%= render 'partials/footer' %>
-    </div>
+    <main role="main" class="flex-grow-1">
+      <%= render 'partials/messages' %>
+      <%= yield %>
+    </main>
     <%= yield :scripts %>
   </body>
 </html>

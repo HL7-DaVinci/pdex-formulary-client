@@ -1,30 +1,24 @@
 <section class='container'>
 	<h2 class="text-light welcome-text">Connect to a Formulary server</h2>
-	<div class='row'>
-		<%= form_tag root_path, method: 'get', class: 'form-inline welcome-form', id: 'server-form' do %>
-			<div class='col'></div>
-			<div class='form-group col-md-7 last'>
-				<%= text_field_tag :server_url, nil, class: 'form-control',
-							value: 'https://drug-formulary-ri.davinci.hl7.org/fhir',
-							placeholder: 'https://drug-formulary-ri.davinci.hl7.org/fhir' %>
-			</div>
-			<%= button_tag 'Connect', class: 'btn btn-primary col-md-2', id: 'server-url' %>
-			<div class='col'></div>
-		<% end %>
-	</div>
-	<div class='ml-auto mr-auto mb-5'>
+	<%= form_tag root_path, method: 'get', class: 'row justify-content-center g-2 welcome-form', id: 'server-form' do %>
+		<div class='col-md-7'>
+			<%= text_field_tag :server_url, nil, class: 'form-control',
+						value: cookies[:server_url].presence || DEFAULT_FORMULARY_SERVER,
+						placeholder: DEFAULT_FORMULARY_SERVER %>
+		</div>
+		<div class='col-md-2 d-grid'>
+			<%= button_tag 'Connect', class: 'btn btn-primary', id: 'server-url' %>
+		</div>
+	<% end %>
+	<div class='mt-3 mb-5'>
 		<% if @client %>
-			<p class="text-success m-auto client-connected" style='text-align: center'>
+			<p class="text-success client-connected mb-2">
 				Connected to <%= cookies[:server_url] -%>
 			</p>
-			<div class='container col-6'>
-				<table class="table ">
-					<tr class="row table-secondary">
-					<td class ="col-md-auto"><%= @count %>  <%= link_to "Formulary Drugs", formularies_path%></td>
-					<td class ="col-md-auto "><%=@cp_count %>  <%= link_to "Formularies", coverageplans_path%> </td>
-          <td class ="col-md-auto "><%=@payers_count %>  <%= link_to "Payer Insurance Plans", payerplans_path%> </td>
-					</tr>
-				</table>
+			<div class='d-flex justify-content-center column-gap-4 flex-wrap'>
+				<div><span class='fw-bold'><%= @count %></span> <%= link_to "Formulary Drugs", formularies_path %></div>
+				<div><span class='fw-bold'><%= @cp_count %></span> <%= link_to "Formularies", coverageplans_path %></div>
+				<div><span class='fw-bold'><%= @payers_count %></span> <%= link_to "Payer Insurance Plans", payerplans_path %></div>
 			</div>
 		<% else  %>
 			<div class='text-warning guidance'>
@@ -34,13 +28,13 @@
 	</div>
 	<ul class="nav nav-tabs bg-dark" id="myTab" role="tablist">
 		<li class="nav-item">
-			<a class="nav-link active" id="home-tab" data-toggle="tab" href="#drug-lookup" role="tab" aria-controls="home" aria-selected="true">Drug Lookup</a>
+			<a class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#drug-lookup" href="#drug-lookup" role="tab" aria-controls="home" aria-selected="true">Drug Lookup</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="profile-tab" data-toggle="tab" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Formularies</a>
+			<a class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#coverage-plans" href="#coverage-plans" role="tab" aria-controls="profile" aria-selected="false">Formularies</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="contact-tab" data-toggle="tab" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Formularies</a>
+			<a class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#compare-plans" href="#compare-plans" role="tab" aria-controls="contact" aria-selected="false">Compare Formularies</a>
 		</li>
 	</ul>
 	<div class="tab-content" id="myTabContent">

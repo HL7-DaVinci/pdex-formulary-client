@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :patients, only: [:index, :show]
   resources :plans, only: [:index, :show]
   resources :tiers, only: [:index, :show]
@@ -8,10 +7,15 @@ Rails.application.routes.draw do
   resources :payerplans, only: [:index, :show]
   resources :compare, only: [:index]
 
-  get '/home', to: 'welcome#index'
-  get '/dashboard', to: 'dashboard#index'
-  get '/login', to: 'dashboard#login'
-  get '/launch', to: 'dashboard#launch'
+  get "/home", to: "welcome#index"
+  get "/dashboard", to: "dashboard#index"
+  get "/login", to: "dashboard#login"
+  get "/launch", to: "dashboard#launch"
 
-  root 'welcome#index'
+  get "/bulk-publish", to: "bulk_publish#index", as: :bulk_publish
+  get "/bulk-publish/preview", to: "bulk_publish#preview", as: :bulk_publish_preview
+
+  get "up" => "rails/health#show", as: :rails_health_check
+
+  root "welcome#index"
 end

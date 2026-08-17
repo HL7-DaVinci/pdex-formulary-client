@@ -1,12 +1,12 @@
 <h4 class="text-light welcome-text">Lookup Drugs by Formulary, Pharmacy type, Tier, Name, and/or RxNorm</h4>
-<div class='row mb-1 col-md-12'>
-	<%= form_tag formularies_path, method: 'get', class: 'form-inline welcome-form', id: 'formulary-form' do %>
-		<div class='form-group col-md-2'>
+<div class='mb-1'>
+	<%= form_tag formularies_path, method: 'get', class: 'row justify-content-center g-2 welcome-form', id: 'formulary-form' do %>
+		<div class='col-md-2'>
 			<%= select_tag(:coverage, options_for_select(@cp_options),
-							prompt: 'Formulary', class: 'custom-select coverage-select') %>
+							prompt: 'Formulary', class: 'form-select coverage-select') %>
 		</div>
     <!-- look by pham type -->
-		<div class='form-group col-md-2'>
+		<div class='col-md-2'>
 			<%= select_tag(:pharmacy_type, options_for_select([['All', ''],
 											['1 month in network retail', '1-month-in-retail'],
 											['1 month out of network retail', '1-month-out-retail'],
@@ -17,10 +17,10 @@
                       ['3 month out of network mail order', '3-month-out-mail'],
 											['3 month in network mail order', '3-month-in-mail']]),
 											prompt: 'Pharmacy Type',
-											class: 'custom-select drug-tier-select') %>
+											class: 'form-select drug-tier-select') %>
 		</div>
     <!-- end -->
-		<div class='form-group col-md-2'>
+		<div class='col-md-2'>
 			<%= select_tag(:drug_tier, options_for_select([['All', ''],
 											['Generic', 'generic'],
 											['Medical Benefit', 'medical-benefit'],
@@ -30,20 +30,21 @@
 											['Non-preferred Brand Specialty', 'non-preferred-brand-specialty'],
 											['Zero-cost Share Preventive', 'zero-cost-share-preventive']]),
 											prompt: 'Drug Tier',
-											class: 'custom-select drug-tier-select') %>
+											class: 'form-select drug-tier-select') %>
 		</div>
-		<div class='form-group col-md-2'>
+		<div class='col-md-2'>
 			<%= text_field_tag :name, nil, class: 'form-control code-input', placeholder: 'Drug Name'%>
 		</div>
 
-		<div class='form-group col-md-2 last'>
+		<div class='col-md-2'>
 			<%= text_field_tag :code, nil, class: 'form-control code-input', placeholder: 'RxNorm code'%>
 		</div>
-		<%= button_tag 'Lookup', class: 'btn btn-primary col-md-2', id: 'formulary-url', disabled: @client.nil? %>
-		<div class='col'></div>
+		<div class='col-md-2 d-grid'>
+			<%= button_tag 'Lookup', class: 'btn btn-primary', id: 'formulary-url', disabled: @client.nil? %>
+		</div>
 	<% end %>
 </div>
-<p class='text-info guidance ml-auto mr-auto mb-5'>
+<p class='text-info guidance ms-auto me-auto mb-5'>
 	Each of the above options can be left unspecified.
 	Pressing "Lookup" will display the intersection of defined options.
 </p>

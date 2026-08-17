@@ -21,6 +21,7 @@ class ClientConnections
     end
     @clients[id] = Hash.new
     prune(id)
+    @clients[id][:url] = url
     @clients[id][:client] = client
   end
 
@@ -28,6 +29,12 @@ class ClientConnections
     return nil unless @clients[id]
     prune(id)
     @clients[id][:client]
+  end
+
+  # Base URL of the FHIR server this session is connected to
+  def self.url(id)
+    return nil unless @clients[id]
+    @clients[id][:url]
   end
 
   # sets cache if input is provided, then returns current cache value

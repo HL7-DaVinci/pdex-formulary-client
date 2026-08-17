@@ -1,0 +1,119 @@
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h2 class="mb-0">Bulk Publish Manifest</h2>
+    <% unless @error %>
+      <div class="btn-group">
+        <button type="button" id="view-raw-manifest" class="btn btn-sm btn-outline-primary">Raw manifest</button>
+        <%= link_to "Open", @manifest_url, target: "_blank", rel: "noopener", class: "btn btn-sm btn-outline-secondary" %>
+      </div>
+    <% end %>
+  </div>
+  <p class="text-body-secondary mt-1">
+    Retrieved from <code><%= @manifest_url %></code>
+  </p>
+
+  <% if @error %>
+    <div class="alert alert-warning" role="alert"><%= @error %></div>
+  <% else %>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-subtitle text-body-secondary mb-1">Transaction time</h6>
+            <span class="card-text"><%= manifest_time(@manifest["transactionTime"]) %></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-subtitle text-body-secondary mb-1">Update cadence</h6>
+            <span class="card-text"><%= manifest_cadence(@manifest["updateCadence"]) %></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-subtitle text-body-secondary mb-1">Access token required</h6>
+            <span class="card-text"><%= @manifest["requiresAccessToken"] ? "Yes" : "No" %></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-subtitle text-body-secondary mb-1">Output files</h6>
+            <span class="card-text">
+              <%= @manifest["output"].to_a.size %>
+              (<%= number_to_human_size(@manifest["output"].to_a.sum { |o| o["fileSize"].to_i }) %>)
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Resource type</th>
+            <th class="text-end">Resources</th>
+            <th class="text-end">File size</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @manifest["output"].to_a.each do |output| %>
+            <tr>
+              <td><%= output["type"] %></td>
+              <td class="text-end"><%= number_with_delimiter(output["count"]) %></td>
+              <td class="text-end"><%= number_to_human_size(output["fileSize"]) %></td>
+              <td class="text-end">
+                <%# Modal is opened by application.js; Bootstrap's own data-bs-toggle
+                    handler would preventDefault and stop Turbo from loading the frame %>
+                <%= link_to "Preview", bulk_publish_preview_path(url: output["url"], type: output["type"]),
+                            class: "btn btn-sm btn-outline-primary",
+                            data: { turbo_frame: "ndjson-preview" } %>
+                <%= link_to "Open", output["url"], target: "_blank", rel: "noopener",
+                            class: "btn btn-sm btn-outline-secondary" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @manifest["outcome"].to_a.any? %>
+      <h5 class="mt-4">Outcome files</h5>
+      <ul>
+        <% @manifest["outcome"].each do |outcome| %>
+          <li><%= link_to outcome["url"], outcome["url"], target: "_blank", rel: "noopener" %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <%# Raw manifest for the client-side "Raw manifest" viewer; HTML-escaped by ERB %>
+    <pre id="manifest-source" class="d-none" data-url="<%= @manifest_url %>"><%= @manifest.to_json %></pre>
+
+    <div class="modal fade" id="ndjson-preview-modal" tabindex="-1" aria-label="File preview">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">File preview</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <%= turbo_frame_tag "ndjson-preview" do %>
+              <div class="text-center py-5">
+                <div class="spinner-border text-secondary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

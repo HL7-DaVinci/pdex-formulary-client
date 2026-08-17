@@ -1,14 +1,14 @@
 <section class='container'>
-  <div class='plan'>
-			<h3 class='float-left text-white'>Payer Insurance Plans - Index </h3>
-      <%= render 'partials/query' %>
-			<div class='btn-group float-right mt-2' role='group'>
-				<%= link_to 'Previous', payerplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
-				<%= link_to 'Next', 		payerplans_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
-			</div>
-	</div>
-  <section class='row col-12'>
-    <table class='table table-dark'>
+  <div class='d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3'>
+    <h3 class='mb-0'>Payer Insurance Plans</h3>
+    <div class='btn-group' role='group'>
+      <%= link_to 'Previous', payerplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
+      <%= link_to 'Next', payerplans_path(page: 'next'), class: 'btn btn-outline-primary' %>
+    </div>
+  </div>
+  <%= render 'partials/query' %>
+  <div class='table-responsive'>
+    <table class='table table-hover align-middle'>
 			<tr>
 				<th scope='col'>Payer</th>
 				<th scope='col'>Contacts</th>
@@ -69,11 +69,11 @@
 				</tr>
 			<% end %>
 		</table>
-		<div class='col-12'>
-			<div class='btn-group float-right mt-2' role='group'>
-				<%= link_to 'Previous', payerplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
-				<%= link_to 'Next', 		payerplans_path(page: 'next'), 		class: 'btn btn-outline-primary' %>
-			</div>
-		</div>
-  </section>
+  </div>
+  <div class='d-flex justify-content-end mb-3'>
+    <div class='btn-group' role='group'>
+      <%= link_to 'Previous', payerplans_path(page: 'previous'), class: 'btn btn-outline-primary' %>
+      <%= link_to 'Next', payerplans_path(page: 'next'), class: 'btn btn-outline-primary' %>
+    </div>
+  </div>
 </section>
