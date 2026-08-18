@@ -31,9 +31,7 @@ class ApplicationController < ActionController::Base
     # Follow pagination links so plans beyond the first page are included
     plans = get_all(FHIR::InsurancePlan, type: cp_type)
 
-    # get_all sets @search to the self link of the first result bundle.
-    # Save it now because the locations call below runs get_all again and
-    # replaces @search with the Location search URL.
+    # Save the query self link before the locations call overwrites @search
     session[:query] = @search
 
     @plansbyid = build_coverage_plans(plans)

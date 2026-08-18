@@ -23,6 +23,8 @@ class BulkPublishController < ApplicationController
   PREVIEW_MAX_BYTES = 5_000_000
   # When not even one complete line fits the cap, show this much raw text
   TRUNCATED_PREVIEW_BYTES = 5_000
+  # Published file URLs are commonly http and redirect to https
+  MAX_REDIRECTS = 3
 
   # GET /bulk-publish
 
@@ -33,8 +35,9 @@ class BulkPublishController < ApplicationController
 
     if response.is_a?(Net::HTTPSuccess)
       @manifest = JSON.parse(response.body)
+      @outputs = @manifest["output"].to_a
       # The preview action may only fetch URLs listed in this manifest.
-      session[:bulk_publish_urls] = @manifest["output"].to_a.collect { |output| output["url"] }
+      session[:bulk_publish_urls] = @outputs.collect { |output| output["url"] }
     else
       @error = "The server returned HTTP #{response.code} for $bulk-publish. " \
                "It may not implement the bulk publish operation."
@@ -62,6 +65,7 @@ class BulkPublishController < ApplicationController
     end
 
     @type = params[:type]
+    @preview_lines = PREVIEW_LINES
     @lines = fetch_ndjson_lines(@url)
     render layout: false
   rescue StandardError => exception
@@ -99,14 +103,55 @@ class BulkPublishController < ApplicationController
   #-----------------------------------------------------------------------------
 
   def http_get(url)
-    uri = URI.parse(url)
-    assert_fetchable!(uri)
-    Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
-                    open_timeout: 5, read_timeout: 10) do |http|
-      request = Net::HTTP::Get.new(uri)
-      request["Accept"] = "application/json"
-      http.request(request)
+    get_following_redirects(url, read_timeout: 10, headers: { "Accept" => "application/json" }) do |response|
+      response.body # read the body while the connection is still open
+      response
     end
+  end
+
+  #-----------------------------------------------------------------------------
+
+  # GET with up to MAX_REDIRECTS redirects, re-running the fetch restrictions
+  # on every hop. Yields the final response with its connection still open;
+  # a throw from the caller's block abandons the connection mid-response.
+
+  def get_following_redirects(url, read_timeout:, headers: {})
+    uri = URI.parse(url)
+    redirects_left = MAX_REDIRECTS
+
+    loop do
+      assert_fetchable!(uri)
+
+      next_uri = catch(:redirect) do
+        Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                        open_timeout: 5, read_timeout: read_timeout) do |http|
+          request = Net::HTTP::Get.new(uri)
+          headers.each { |name, value| request[name] = value }
+
+          http.request(request) do |response|
+            if (target = redirect_target(uri, response))
+              raise "Too many redirects" if redirects_left.zero?
+              redirects_left -= 1
+              throw :redirect, target
+            end
+
+            return yield(response)
+          end
+        end
+      end
+
+      uri = next_uri
+    end
+  end
+
+  #-----------------------------------------------------------------------------
+
+  # Returns the URI a redirect response points to, or nil for any other response
+
+  def redirect_target(uri, response)
+    return nil unless response.is_a?(Net::HTTPRedirection) && response["location"].present?
+
+    URI.join(uri, response["location"])
   end
 
   #-----------------------------------------------------------------------------
@@ -115,20 +160,16 @@ class BulkPublishController < ApplicationController
   # bytes) have arrived, then pretty-prints each complete line.
 
   def fetch_ndjson_lines(url)
-    uri = URI.parse(url)
-    assert_fetchable!(uri)
     buffer = +""
 
-    Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
-                    open_timeout: 5, read_timeout: 15) do |http|
-      catch(:enough) do
-        http.request(Net::HTTP::Get.new(uri)) do |response|
-          raise "HTTP #{response.code} while fetching the file" unless response.is_a?(Net::HTTPSuccess)
+    # The throw abandons the connection so the rest of the file is not downloaded
+    catch(:enough) do
+      get_following_redirects(url, read_timeout: 15) do |response|
+        raise "HTTP #{response.code} while fetching the file" unless response.is_a?(Net::HTTPSuccess)
 
-          response.read_body do |chunk|
-            buffer << chunk
-            throw :enough if buffer.count("\n") >= PREVIEW_LINES || buffer.bytesize > PREVIEW_MAX_BYTES
-          end
+        response.read_body do |chunk|
+          buffer << chunk
+          throw :enough if buffer.count("\n") >= PREVIEW_LINES || buffer.bytesize > PREVIEW_MAX_BYTES
         end
       end
     end

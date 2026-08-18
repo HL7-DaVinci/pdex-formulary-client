@@ -39,8 +39,14 @@ function initializeCompareProgress() {
   })
 }
 
-// Replace raw ndjson preview sources with collapsible trees (json-formatter-js,
-// loaded globally from vendor/assets). Entries that fail to parse stay as text.
+// Collapsible tree for one parsed JSON value (json-formatter-js, loaded
+// globally from vendor/assets)
+function jsonTree(parsed, openDepth) {
+  return new JSONFormatter(parsed, openDepth, { theme: "dark" }).render()
+}
+
+// Replace raw ndjson preview sources with collapsible trees. Entries that
+// fail to parse stay as text.
 function renderNdjsonPreviews(frame) {
   if (!window.JSONFormatter) return
 
@@ -54,8 +60,7 @@ function renderNdjsonPreviews(frame) {
     } catch {
       return
     }
-    const formatter = new JSONFormatter(parsed, 1, { theme: "dark" })
-    entry.replaceChildren(formatter.render())
+    entry.replaceChildren(jsonTree(parsed, 1))
   })
 }
 
@@ -96,7 +101,7 @@ document.addEventListener("click", (event) => {
 
   const entry = document.createElement("div")
   entry.className = "ndjson-entry border rounded p-2 bg-body-tertiary"
-  entry.appendChild(new JSONFormatter(JSON.parse(source.textContent), 2, { theme: "dark" }).render())
+  entry.appendChild(jsonTree(JSON.parse(source.textContent), 2))
 
   frame.replaceChildren(header, entry)
   window.bootstrap.Modal.getOrCreateInstance(modalElement).show()

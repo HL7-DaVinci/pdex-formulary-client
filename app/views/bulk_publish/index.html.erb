@@ -45,8 +45,8 @@
           <div class="card-body">
             <h6 class="card-subtitle text-body-secondary mb-1">Output files</h6>
             <span class="card-text">
-              <%= @manifest["output"].to_a.size %>
-              (<%= number_to_human_size(@manifest["output"].to_a.sum { |o| o["fileSize"].to_i }) %>)
+              <%= @outputs.size %>
+              (<%= number_to_human_size(@outputs.sum { |o| o["fileSize"].to_i }) %>)
             </span>
           </div>
         </div>
@@ -64,7 +64,7 @@
           </tr>
         </thead>
         <tbody>
-          <% @manifest["output"].to_a.each do |output| %>
+          <% @outputs.each do |output| %>
             <tr>
               <td><%= output["type"] %></td>
               <td class="text-end"><%= number_with_delimiter(output["count"]) %></td>

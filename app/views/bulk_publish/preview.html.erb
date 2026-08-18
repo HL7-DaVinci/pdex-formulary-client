@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "ndjson-preview" do %>
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <span>First <%= BulkPublishController::PREVIEW_LINES %> entries of <strong><%= @type %></strong></span>
+    <span>First <%= @preview_lines %> entries of <strong><%= @type %></strong></span>
     <%= link_to "Open full file", @url, target: "_blank", rel: "noopener", class: "btn btn-sm btn-outline-secondary" %>
   </div>
   <% if @preview_error %>
